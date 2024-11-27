@@ -1,6 +1,7 @@
 {
     "name": "parfume-project",
     "scripts": {
+        "start": "node server/server.js",
         "dev:frontend": "vite",
         "dev:backend": "node server/server.js",
         "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
