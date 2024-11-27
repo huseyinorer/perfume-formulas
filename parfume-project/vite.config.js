@@ -9,4 +9,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  base: 'parfume-formulas', // GitHub repository adı ile değiştirin
+  build: {
+    outDir: 'dist', // Çıktı dizinini belirtir
+  },
 })
