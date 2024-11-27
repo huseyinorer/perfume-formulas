@@ -8,7 +8,9 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://huseyinorer.github.io']
+}))
 app.use(json());
 
 const pool = new Pool({
