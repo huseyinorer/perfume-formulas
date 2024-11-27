@@ -9,7 +9,7 @@ import { Trash2 } from "lucide-react";
 import AdminLogin from "./components/AdminLogin";
 import Pagination from "./components/Pagination";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
