@@ -71,14 +71,14 @@ app.get('/api/perfumes', async (req, res) => {
       WHERE LOWER(p."brandName") LIKE $1 OR LOWER(p."name") LIKE $1
       GROUP BY p.id
       ORDER BY 
-        CASE WHEN $4 = 'brandName' THEN p."brandName"
-             WHEN $4 = 'name' THEN p."name"
-        END ${sortOrder === 'asc' ? 'ASC' : 'DESC'}
+        COUNT(pf.id) DESC,  -- Önce formül sayısına göre azalan sırada
+        p."brandName" ASC,  -- Sonra marka adına göre alfabetik
+        p."name" ASC       -- Son olarak parfüm adına göre alfabetik
       LIMIT $2 OFFSET $3
     `;
 
     const searchPattern = `%${search.toLowerCase()}%`;
-    const result = await pool.query(query, [searchPattern, limit, offset, sortBy]);
+    const result = await pool.query(query, [searchPattern, limit, offset]);
 
     const countQuery = `
       SELECT COUNT(*) 
@@ -97,7 +97,7 @@ app.get('/api/perfumes', async (req, res) => {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-})
+});
 
 // Belirli bir parfüme ait formülleri getir
 app.get('/api/perfumes/:id/formulas', async (req, res) => {
@@ -111,6 +111,32 @@ app.get('/api/perfumes/:id/formulas', async (req, res) => {
   } catch (error) {
     console.error('Error fetching formulas:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Formul ekle (admin)
+app.post('/api/formulas', async (req, res) => {
+  try {
+    const { parfumesId, fragrancePercentage, alcoholPercentage, waterPercentage, restDay } = req.body;
+
+    // Validasyonlar
+    if (!parfumesId) {
+      return res.status(400).json({ error: 'Parfüm seçilmedi' });
+    }
+
+    // Debug için
+    console.log('Gelen veri:', req.body);
+
+    const result = await pool.query(
+      `INSERT INTO "ParfumensFormules" ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [parfumesId, fragrancePercentage, alcoholPercentage, waterPercentage, restDay]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding formula:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -222,6 +248,27 @@ app.delete('/api/formulas/:id', async (req, res) => {
   }
 });
 
+app.get('/api/perfumes/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    const result = await pool.query(`
+      SELECT id, "brandName", name
+      FROM "Parfumes"
+      WHERE 
+        LOWER("brandName") LIKE $1 OR 
+        LOWER(name) LIKE $1
+      ORDER BY "brandName", name
+      LIMIT 10
+    `, [`%${query.toLowerCase()}%`]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error searching perfumes:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at port: ${port}`);
 });

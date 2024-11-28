@@ -216,11 +216,11 @@ function App() {
             </Button>
           )}
           {isAdmin && pendingRequests.length > 0 && (
-            <Button onClick={() => setIsPendingDialogOpen(true)} variant="outline">
+            <Button variant="outline" onClick={() => setIsPendingDialogOpen(true)}>
               Bekleyen İstekler ({pendingRequests.length})
             </Button>
           )}
-          <Button onClick={() => setIsAddDialogOpen(true)}>Yeni Formül {!isAdmin && "İsteği"} Ekle</Button>
+          <Button variant="outline" onClick={() => setIsAddDialogOpen(true)}>Yeni Formül {!isAdmin && "İsteği"} Ekle</Button>
           {isAdmin && (
             <Button variant="outline" onClick={handleLogout}>
               Çıkış

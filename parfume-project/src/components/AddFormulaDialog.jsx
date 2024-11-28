@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
+import Autocomplete from './Autocomplete'
 
 const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
   const [formData, setFormData] = useState({
@@ -47,6 +48,10 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
     onSave(formData)
   }
 
+  const handlePerfumeSelect = (perfume) => {
+    setFormData(prev => ({ ...prev, parfumesId: perfume.id }));
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
@@ -54,21 +59,9 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
           <DialogTitle>Yeni Formül Ekle</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="parfume">Parfüm</Label>
-            <select
-              id="parfume"
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
-              value={formData.parfumesId}
-              onChange={(e) => setFormData({ ...formData, parfumesId: e.target.value })}
-            >
-              <option value="">Parfüm seçin</option>
-              {perfumes.map((perfume) => (
-                <option key={perfume.id} value={perfume.id.toString()}>
-                  {perfume.brandName} - {perfume.name}
-                </option>
-              ))}
-            </select>
+        <div className="space-y-2">
+            <Label>Parfüm</Label>
+            <Autocomplete onSelect={handlePerfumeSelect} />
           </div>
 
           <div className="space-y-2">
@@ -118,7 +111,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
             <div className="text-red-500 text-sm">{error}</div>
           )}
 
-          <Button type="submit" className="w-full">
+          <Button variant="outline" type="submit" className="w-full">
             Kaydet
           </Button>
         </form>
