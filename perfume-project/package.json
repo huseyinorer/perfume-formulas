@@ -1,5 +1,5 @@
 {
-    "name": "parfume-project",
+    "name": "perfume-project",
     "scripts": {
         "start": "node server/server.js",
         "dev:frontend": "vite",
