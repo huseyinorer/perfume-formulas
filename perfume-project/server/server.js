@@ -114,6 +114,23 @@ app.get('/api/perfumes/:id/formulas', async (req, res) => {
   }
 });
 
+// Parfüm detaylarını ve creative formulas bilgilerini getir
+app.get('/api/perfumes/:id/details', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT cf.*
+      FROM "CreativeFormulas" cf
+      WHERE cf."id" = $1
+    `, [id]);
+    
+    res.json(result.rows[0] || null);
+  } catch (error) {
+    console.error('Error fetching perfume details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Formul ekle (admin)
 app.post('/api/formulas', async (req, res) => {
   try {

@@ -8,6 +8,12 @@ import SearchBox from "./components/SearchBox";
 import { Trash2 } from "lucide-react";
 import AdminLogin from "./components/AdminLogin";
 import Pagination from "./components/Pagination";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./components/ui/accordion";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,6 +29,7 @@ function App() {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [isFormulaDialogOpen, setIsFormulaDialogOpen] = useState(false); // formül detayları için
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false); // admin girişi için
+  const [creativeFormula, setCreativeFormula] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -94,9 +101,22 @@ function App() {
     }
   };
 
+  const fetchCreativeFormula = async (perfumeId) => {
+    try {
+      const response = await fetch(`${API_URL}/perfumes/${perfumeId}/details`);
+      const data = await response.json();
+      setCreativeFormula(data);
+    } catch (error) {
+      console.error("Error fetching creative formula:", error);
+    }
+  };
+
   const handleRowClick = async (perfume) => {
     setSelectedPerfume(perfume);
-    await fetchFormulas(perfume.id);
+    await Promise.all([
+      fetchFormulas(perfume.id),
+      fetchCreativeFormula(perfume.id)
+    ]);
     setIsFormulaDialogOpen(true);
   };
 
@@ -273,6 +293,56 @@ function App() {
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4">
+            {creativeFormula && (
+              <Accordion type="single" collapsible defaultValue="creative-formula">
+                <AccordionItem value="creative-formula">
+                  <AccordionTrigger className="text-sm font-medium text-gray-600">
+                    Creative Formulas Bilgileri
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm grid grid-cols-2 gap-3 bg-gray-50 p-4 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-700">Marka:</p>
+                        <p className="text-gray-600">{creativeFormula.brand}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-700">İsim:</p>
+                        <p className="text-gray-600">{creativeFormula.name}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-700">Koku Ailesi:</p>
+                        <p className="text-gray-600">{creativeFormula.olfactive_family}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-700">Tip:</p>
+                        <p className="text-gray-600">{creativeFormula.type}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="font-medium text-gray-700">Piramit Notu:</p>
+                        <p className="text-gray-600">{creativeFormula.pyramid_not}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-700">Üst Notalar:</p>
+                        <p className="text-gray-600">{creativeFormula.top_notes}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-700">Orta Notalar:</p>
+                        <p className="text-gray-600">{creativeFormula.middle_notes}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-700">Alt Notalar:</p>
+                        <p className="text-gray-600">{creativeFormula.base_notes}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="font-medium text-gray-700">Önerilen Kullanım:</p>
+                        <p className="text-gray-600">{creativeFormula.recommended_usage}</p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
+            <h3 className="text-lg font-semibold mb-4 mt-5 text-left">Parfüm severlerin yaptığı oranlar ♥</h3>
             <Table>
               <TableHeader>
                 <TableRow>
