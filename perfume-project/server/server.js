@@ -61,19 +61,19 @@ app.post('/api/login', async (req, res) => {
 // Tüm parfümleri getir
 app.get('/api/perfumes', async (req, res) => {
   try {
-    const { limit = 10, page = 1, sortBy = 'brandName', sortOrder = 'asc', search = '' } = req.query;
+    const { limit = 10, page = 1, sortBy = 'brand', sortOrder = 'asc', search = '' } = req.query;
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT p.*, COUNT(pf.id) as "formulaCount"
-      FROM "Parfumes" p
-      LEFT JOIN "ParfumensFormules" pf ON p.id = pf."parfumesId"
-      WHERE LOWER(p."brandName") LIKE $1 OR LOWER(p."name") LIKE $1
-      GROUP BY p.id
+      SELECT cf.*, COUNT(pf.id) as "formulaCount"
+      FROM "CreativeFormulas" cf
+      LEFT JOIN "ParfumensFormules" pf ON cf.id = pf."parfumesId"
+      WHERE LOWER(cf."brand") LIKE $1 OR LOWER(cf."name") LIKE $1
+      GROUP BY cf.id
       ORDER BY 
         COUNT(pf.id) DESC,  -- Önce formül sayısına göre azalan sırada
-        p."brandName" ASC,  -- Sonra marka adına göre alfabetik
-        p."name" ASC       -- Son olarak parfüm adına göre alfabetik
+        cf."brand" ASC,     -- Sonra marka adına göre alfabetik
+        cf."name" ASC       -- Son olarak parfüm adına göre alfabetik
       LIMIT $2 OFFSET $3
     `;
 
@@ -82,8 +82,8 @@ app.get('/api/perfumes', async (req, res) => {
 
     const countQuery = `
       SELECT COUNT(*) 
-      FROM "Parfumes" 
-      WHERE LOWER("brandName") LIKE $1 OR LOWER("name") LIKE $1
+      FROM "CreativeFormulas" 
+      WHERE LOWER("brand") LIKE $1 OR LOWER("name") LIKE $1
     `;
     const countResult = await pool.query(countQuery, [searchPattern]);
 
@@ -114,14 +114,14 @@ app.get('/api/perfumes/:id/formulas', async (req, res) => {
   }
 });
 
-// Parfüm detaylarını ve creative formulas bilgilerini getir
+// Parfüm detaylarını getir
 app.get('/api/perfumes/:id/details', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(`
-      SELECT cf.*
-      FROM "CreativeFormulas" cf
-      WHERE cf."id" = $1
+      SELECT *
+      FROM "CreativeFormulas"
+      WHERE id = $1
     `, [id]);
     
     res.json(result.rows[0] || null);
@@ -131,18 +131,14 @@ app.get('/api/perfumes/:id/details', async (req, res) => {
   }
 });
 
-// Formul ekle (admin)
+// Formül ekle
 app.post('/api/formulas', async (req, res) => {
   try {
     const { parfumesId, fragrancePercentage, alcoholPercentage, waterPercentage, restDay } = req.body;
 
-    // Validasyonlar
     if (!parfumesId) {
       return res.status(400).json({ error: 'Parfüm seçilmedi' });
     }
-
-    // Debug için
-    console.log('Gelen veri:', req.body);
 
     const result = await pool.query(
       `INSERT INTO "ParfumensFormules" ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
@@ -153,7 +149,7 @@ app.post('/api/formulas', async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error adding formula:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -181,9 +177,9 @@ app.post('/api/formulas/request', async (req, res) => {
 app.get('/api/formulas/pending', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT fr.*, p."brandName", p."name" as "parfumeName"
+      SELECT fr.*, cf.brand, cf.name as "parfumeName"
       FROM "FormulaPendingRequests" fr
-      JOIN "Parfumes" p ON fr."parfumesId" = p.id
+      JOIN "CreativeFormulas" cf ON fr."parfumesId" = cf.id
       WHERE fr.status = 'PENDING'
       ORDER BY fr."createdAt" DESC
     `);
@@ -270,12 +266,12 @@ app.get('/api/perfumes/search', async (req, res) => {
     const { query } = req.query;
     
     const result = await pool.query(`
-      SELECT id, "brandName", name
-      FROM "Parfumes"
+      SELECT id, brand, name
+      FROM "CreativeFormulas"
       WHERE 
-        LOWER("brandName") LIKE $1 OR 
+        LOWER(brand) LIKE $1 OR 
         LOWER(name) LIKE $1
-      ORDER BY "brandName", name
+      ORDER BY brand, name
       LIMIT 10
     `, [`%${query.toLowerCase()}%`]);
 

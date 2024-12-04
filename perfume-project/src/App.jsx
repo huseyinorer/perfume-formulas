@@ -268,7 +268,7 @@ function App() {
           <TableBody>
             {filteredPerfumes.map((perfume) => (
               <TableRow key={perfume.id} className="cursor-pointer hover:bg-gray-100" onClick={() => handleRowClick(perfume)}>
-                <TableCell>{perfume.brandName}</TableCell>
+                <TableCell>{perfume.brand}</TableCell>
                 <TableCell>{perfume.name}</TableCell>
                 <TableCell>{parseInt(perfume.formulaCount)}</TableCell>
               </TableRow>
@@ -289,7 +289,7 @@ function App() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              {selectedPerfume?.brandName} - {selectedPerfume?.name} Formülleri
+              {selectedPerfume?.brand} - {selectedPerfume?.name} Formülleri
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4">
@@ -334,7 +334,7 @@ function App() {
                         <p className="text-gray-600">{creativeFormula.base_notes}</p>
                       </div>
                       <div className="col-span-2">
-                        <p className="font-medium text-gray-700">Önerilen Kullanım:</p>
+                        <p className="font-medium text-gray-700">Önerilen Kullanım Oranı:</p>
                         <p className="text-gray-600">{creativeFormula.recommended_usage}</p>
                       </div>
                     </div>
