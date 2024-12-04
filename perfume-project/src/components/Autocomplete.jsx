@@ -44,7 +44,7 @@ const Autocomplete = ({ onSelect }) => {
   }, [query]);
 
   const handleSelect = (perfume) => {
-    setQuery(`${perfume.brandName} - ${perfume.name}`);
+    setQuery(`${perfume.brand} - ${perfume.name}`);
     onSelect(perfume);
     setIsOpen(false);
   };
@@ -75,7 +75,7 @@ const Autocomplete = ({ onSelect }) => {
                 className="px-3 py-2 cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSelect(perfume)}
               >
-                {perfume.brandName} - {perfume.name}
+                {perfume.brand} - {perfume.name}
               </div>
             ))}
           </div>

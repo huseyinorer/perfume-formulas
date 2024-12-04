@@ -14,6 +14,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./components/ui/accordion";
+import { PerfumeGuideDialog } from "./components/PerfumeGuideDialog";
+import { Sparkles } from "lucide-react";
+import { HeartHandshake } from "lucide-react";
+import { KeyRound } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -35,9 +39,10 @@ function App() {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [sortBy, setSortBy] = useState("brandName");
+  const [sortBy, setSortBy] = useState("brand");
   const [sortOrder, setSortOrder] = useState("asc");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -227,37 +232,95 @@ function App() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Parfüm Formülleri {isAdmin && "(Admin Panel)"}</h1>
-        <div className="flex gap-4">
-          {!isAdmin && (
-            <Button variant="outline" onClick={() => setIsAdminLoginOpen(true)}>
-              Admin Girişi
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-gray-900 to-gray-700 p-3 rounded-lg">
+              <h1 className="text font-bold text-white">
+                Parfüm Formülleri
+                {isAdmin && <span className="text-sm ml-2 bg-red-500 text-white px-2 py-1 rounded-full">Admin Panel</span>}
+              </h1>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap justify-center md:justify-end items-center gap-3">
+            <Button 
+              onClick={() => setIsAddDialogOpen(true)}
+              className={`
+                ${isAdmin 
+                  ? "bg-blue-600 hover:bg-blue-700" 
+                  : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                }
+                text-white shadow-md hover:shadow-xl 
+                transform hover:-translate-y-0.5 
+                transition-all duration-200 
+                flex items-center gap-2
+                min-w-[200px] justify-center
+              `}
+            >
+              <HeartHandshake className="h-5 w-5" />
+              {isAdmin ? "Yeni Formül Ekle" : "Kendi Formülümü Paylaşmak İstiyorum ♥"}
             </Button>
-          )}
-          {isAdmin && pendingRequests.length > 0 && (
-            <Button variant="outline" onClick={() => setIsPendingDialogOpen(true)}>
-              Bekleyen İstekler ({pendingRequests.length})
+            
+            <Button 
+              onClick={() => setIsGuideOpen(true)}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white 
+                hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-xl 
+                transform hover:-translate-y-0.5 transition-all duration-200 
+                animate-pulse hover:animate-none flex items-center gap-2
+                min-w-[180px] justify-center"
+            >
+              <Sparkles className="h-4 w-4" />
+              Nasıl Parfüm Yapılır?
             </Button>
-          )}
-          <Button variant="outline" onClick={() => setIsAddDialogOpen(true)}>Yeni Formül {!isAdmin && "İsteği"} Ekle</Button>
-          {isAdmin && (
-            <Button variant="outline" onClick={handleLogout}>
-              Çıkış
-            </Button>
-          )}
+            
+            {isAdmin && pendingRequests.length > 0 && (
+              <Button 
+                onClick={() => setIsPendingDialogOpen(true)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white 
+                  shadow-md hover:shadow-xl transition-all duration-200
+                  flex items-center gap-2"
+              >
+                Bekleyen İstekler ({pendingRequests.length})
+              </Button>
+            )}
+            
+            {isAdmin ? (
+              <Button 
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 text-white 
+                  flex items-center gap-2 shadow-md hover:shadow-xl
+                  transition-all duration-200 min-w-[120px] justify-center"
+              >
+                <KeyRound className="h-4 w-4" />
+                Çıkış
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => setIsAdminLoginOpen(true)}
+                className="bg-gray-800 hover:bg-gray-900 text-white 
+                  flex items-center gap-2 shadow-md hover:shadow-xl
+                  transition-all duration-200 min-w-[120px] justify-center"
+              >
+                <KeyRound className="h-4 w-4" />
+                Admin Girişi
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
       <div className="max-w-2xl mx-auto mb-4">
-    <SearchBox onSearch={(value) => setSearchTerm(value)} className="w-full" />
-  </div>
+        <SearchBox onSearch={(value) => setSearchTerm(value)} className="w-full" />
+      </div>
+
       <div className="bg-white rounded-lg shadow max-w-2xl mx-auto">
         {" "}
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("brandName")}>
-                Marka {sortBy === "brandName" && (sortOrder === "asc" ? "↑" : "↓")}
+              <TableHead className="cursor-pointer" onClick={() => handleSort("brand")}>
+                Marka {sortBy === "brand" && (sortOrder === "asc" ? "↑" : "↓")}
               </TableHead>
               <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
                 İsim {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
@@ -342,7 +405,7 @@ function App() {
                 </AccordionItem>
               </Accordion>
             )}
-            <h3 className="text-lg font-semibold mb-4 mt-5 text-left">Parfüm severlerin yaptığı oranlar ♥</h3>
+            <h3 className="text-lg font-semibold mb-4 mt-5 text-left">Parfüm severler nasıl yaptı ♥</h3>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -404,6 +467,10 @@ function App() {
           onSuccess={fetchPendingRequests}
         />
       )}
+      <PerfumeGuideDialog 
+        open={isGuideOpen} 
+        onOpenChange={setIsGuideOpen}
+      />
     </div>
   );
 }

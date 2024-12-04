@@ -38,7 +38,7 @@ const FormulasList = ({ open, onClose, perfume }) => {
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>
-            {perfume.brandName} - {perfume.name} Formülleri
+            {perfume.brand} - {perfume.name} Formülleri
           </DialogTitle>
         </DialogHeader>
         

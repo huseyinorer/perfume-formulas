@@ -28,7 +28,7 @@ const PendingFormulasDialog = ({ open, onClose, requests = [], onApprove, onReje
               <TableBody>
                 {requests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell>{request.brandName} - {request.parfumeName}</TableCell>
+                    <TableCell>{request.brand} - {request.parfumeName}</TableCell>
                     <TableCell>{request.fragrancePercentage}%</TableCell>
                     <TableCell>{request.alcoholPercentage}%</TableCell>
                     <TableCell>{request.waterPercentage}%</TableCell>

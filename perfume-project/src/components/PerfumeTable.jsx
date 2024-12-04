@@ -25,7 +25,7 @@ const PerfumeTable = ({ perfumes, onRowClick }) => {
             onClick={() => onRowClick(perfume)}
             className="cursor-pointer hover:bg-gray-100"
           >
-            <TableCell>{perfume.brandName}</TableCell>
+            <TableCell>{perfume.brand}</TableCell>
             <TableCell>{perfume.name}</TableCell>
             <TableCell>{perfume.formulaCount}</TableCell>
           </TableRow>
