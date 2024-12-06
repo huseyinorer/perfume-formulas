@@ -67,7 +67,7 @@ app.get('/api/perfumes', async (req, res) => {
     let query = `
       SELECT cf.*, COUNT(pf.id) as "formulaCount"
       FROM "CreativeFormulas" cf
-      LEFT JOIN "ParfumensFormules" pf ON cf.id = pf."parfumesId"
+      LEFT JOIN "ParfumeFormulas" pf ON cf.id = pf."parfumesId"
       WHERE LOWER(cf."brand") LIKE $1 OR LOWER(cf."name") LIKE $1
       GROUP BY cf.id
       ORDER BY 
@@ -104,7 +104,7 @@ app.get('/api/perfumes/:id/formulas', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      'SELECT * FROM "ParfumensFormules" WHERE "parfumesId" = $1 ORDER BY id DESC',
+      'SELECT * FROM "ParfumeFormulas" WHERE "parfumesId" = $1 ORDER BY id DESC',
       [id]
     );
     res.json(result.rows);
@@ -141,7 +141,7 @@ app.post('/api/formulas', async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO "ParfumensFormules" ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
+      `INSERT INTO "ParfumeFormulas" ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [parfumesId, fragrancePercentage, alcoholPercentage, waterPercentage, restDay]
     );
@@ -156,6 +156,7 @@ app.post('/api/formulas', async (req, res) => {
 // Formül isteği gönder
 app.post('/api/formulas/request', async (req, res) => {
   try {
+    console.log(req)
     const { parfumesId, fragrancePercentage, alcoholPercentage, waterPercentage, restDay } = req.body;
     const result = await pool.query(
       `INSERT INTO "FormulaPendingRequests" 
@@ -210,7 +211,7 @@ app.post('/api/formulas/approve/:id', async (req, res) => {
     
     // Formülü ekle
     await client.query(
-      `INSERT INTO "ParfumensFormules" 
+      `INSERT INTO "ParfumeFormulas" 
        ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
        VALUES ($1, $2, $3, $4, $5)`,
       [formula.parfumesId, formula.fragrancePercentage, formula.alcoholPercentage, 
@@ -253,7 +254,7 @@ app.post('/api/formulas/reject/:id', async (req, res) => {
 app.delete('/api/formulas/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM "ParfumensFormules" WHERE id = $1', [id]);
+    await pool.query('DELETE FROM "ParfumeFormulas" WHERE id = $1', [id]);
     res.status(200).json({ message: 'Formula deleted successfully' });
   } catch (error) {
     console.error('Error deleting formula:', error);
