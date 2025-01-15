@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 10000;
 
 app.use(cors({
   origin: ['http://localhost:5173', 'https://huseyinorer.github.io']
@@ -283,8 +282,13 @@ app.get('/api/perfumes/search', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at port: ${port}`);
-});
+// Local development için
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
+// Vercel için export
 module.exports = app;
