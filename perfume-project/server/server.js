@@ -282,13 +282,6 @@ app.get('/api/perfumes/search', async (req, res) => {
   }
 });
 
-// Local development için
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}
-
-// Vercel için export
-module.exports = app;
+app.listen(port, () => {
+  console.log(`Server running at port: ${port}`);
+});
