@@ -8,42 +8,44 @@ const PendingFormulasDialog = ({ open, onClose, requests = [], onApprove, onReje
     <Dialog.Root open={open} onOpenChange={onClose}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-        <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[90vw] max-w-4xl bg-white rounded-lg p-6">
-          <Dialog.Title className="text-lg font-bold mb-4">
+        <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[90vw] max-w-4xl bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border dark:border-gray-700">
+          <Dialog.Title className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
             Bekleyen Formül İstekleri
           </Dialog.Title>
 
           <div className="mt-4">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Parfüm</TableHead>
-                  <TableHead>Esans %</TableHead>
-                  <TableHead>Alkol %</TableHead>
-                  <TableHead>Su %</TableHead>
-                  <TableHead>Dinlenme (Gün)</TableHead>
-                  <TableHead>İşlemler</TableHead>
+                <TableRow className="dark:border-gray-700">
+                  <TableHead className="dark:text-gray-300">Parfüm</TableHead>
+                  <TableHead className="dark:text-gray-300">Esans %</TableHead>
+                  <TableHead className="dark:text-gray-300">Alkol %</TableHead>
+                  <TableHead className="dark:text-gray-300">Su %</TableHead>
+                  <TableHead className="dark:text-gray-300">Dinlenme (Gün)</TableHead>
+                  <TableHead className="dark:text-gray-300">İşlemler</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>{request.brand} - {request.parfumeName}</TableCell>
-                    <TableCell>{request.fragrancePercentage}%</TableCell>
-                    <TableCell>{request.alcoholPercentage}%</TableCell>
-                    <TableCell>{request.waterPercentage}%</TableCell>
-                    <TableCell>{request.restDay}</TableCell>
+                  <TableRow key={request.id} className="dark:border-gray-700">
+                    <TableCell className="dark:text-gray-300">{request.brand} - {request.parfumeName}</TableCell>
+                    <TableCell className="dark:text-gray-300">{request.fragrancePercentage}%</TableCell>
+                    <TableCell className="dark:text-gray-300">{request.alcoholPercentage}%</TableCell>
+                    <TableCell className="dark:text-gray-300">{request.waterPercentage}%</TableCell>
+                    <TableCell className="dark:text-gray-300">{request.restDay}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <button
                           onClick={() => onApprove(request.id)}
-                          className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
+                          className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 
+                            transition-all duration-1200 transform hover:-translate-y-0.5"
                         >
                           Onayla
                         </button>
                         <button
                           onClick={() => onReject(request.id)}
-                          className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                          className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 
+                            transition-all duration-1200 transform hover:-translate-y-0.5"
                         >
                           Reddet
                         </button>
@@ -52,8 +54,8 @@ const PendingFormulasDialog = ({ open, onClose, requests = [], onApprove, onReje
                   </TableRow>
                 ))}
                 {requests.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-gray-500">
+                  <TableRow className="dark:border-gray-700">
+                    <TableCell colSpan={6} className="text-center text-gray-500 dark:text-gray-400">
                       Bekleyen formül isteği bulunmuyor.
                     </TableCell>
                   </TableRow>
@@ -64,7 +66,9 @@ const PendingFormulasDialog = ({ open, onClose, requests = [], onApprove, onReje
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 
+                dark:text-gray-500 dark:hover:text-gray-300
+                transition-all duration-1200"
               aria-label="Close"
             >
               ✕
