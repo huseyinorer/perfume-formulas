@@ -277,7 +277,7 @@ function App() {
                 onClick={() => setIsGuideOpen(true)}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white 
                   hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-xl 
-                  transform hover:-translate-y-0.5 transition-all duration-200 
+                  transform hover:-translate-y-0.5 transition-all duration-900 
                   animate-pulse hover:animate-none flex items-center gap-2
                   min-w-[180px] justify-center"
               >
@@ -301,7 +301,8 @@ function App() {
                   onClick={handleLogout}
                   className="bg-red-500 hover:bg-red-600 text-white 
                     flex items-center gap-2 shadow-md hover:shadow-xl
-                    transition-all duration-200 min-w-[120px] justify-center"
+                    transform hover:-translate-y-0.5
+                    transition-all duration-1200 min-w-[120px] justify-center"
                 >
                   <KeyRound className="h-4 w-4" />
                   Çıkış
@@ -312,7 +313,8 @@ function App() {
                     onClick={() => setIsAdminLoginOpen(true)}
                     className="bg-gray-800 hover:bg-gray-900 text-white 
                       flex items-center gap-2 shadow-md hover:shadow-xl
-                      transition-all duration-200 min-w-[120px] justify-center"
+                      transform hover:-translate-y-0.5
+                      transition-all duration-1200 min-w-[120px] justify-center"
                   >
                     <KeyRound className="h-4 w-4" />
                     Admin Girişi
