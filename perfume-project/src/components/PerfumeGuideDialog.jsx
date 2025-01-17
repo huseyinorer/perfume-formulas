@@ -33,33 +33,33 @@ export function PerfumeGuideDialog({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center mb-4">
+          <DialogTitle className="text-2xl font-bold text-center mb-4 dark:text-gray-100">
             Evde Parfüm Nasıl Yapılır?
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-8">            
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-            <p className="text-yellow-700">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded dark:bg-yellow-900/20 dark:border-yellow-600">
+            <p className="text-yellow-700 dark:text-yellow-500">
               <strong>Önemli Not:</strong> Bu kılavuz genel bilgi amaçlıdır. 
               Her parfüm formülü farklı olabilir. Sitemizdeki formülleri takip ederek 
               daha kesin sonuçlar elde edebilirsiniz.
             </p>
           </div>
           {steps.map((step, index) => (
-            <div key={index} className="border rounded-lg p-6 bg-white shadow-sm">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <span className="bg-gray-900 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">
+            <div key={index} className="border rounded-lg p-6 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 flex items-center dark:text-gray-100">
+                <span className="bg-gray-900 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-gray-700">
                   {index + 1}
                 </span>
                 {step.title}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="whitespace-pre-line text-gray-600">
+                <div className="whitespace-pre-line text-gray-600 dark:text-gray-300">
                   {step.content}
                 </div>
                 {step.image && (
-                  <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden">
+                  <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700">
                     <img
                       src={step.image}
                       alt={step.title}
