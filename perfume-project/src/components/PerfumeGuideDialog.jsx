@@ -28,9 +28,9 @@ const steps = [
   }
 ];
 
-export function PerfumeGuideDialog({ open, onOpenChange }) {
+export function PerfumeGuideDialog({ open, onClose }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center mb-4 dark:text-gray-100">

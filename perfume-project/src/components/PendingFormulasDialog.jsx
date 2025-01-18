@@ -7,8 +7,10 @@ const PendingFormulasDialog = ({ open, onClose, requests = [], onApprove, onReje
   return (
     <Dialog.Root open={open} onOpenChange={onClose}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-        <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[90vw] max-w-4xl bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border dark:border-gray-700">
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
+        <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] 
+          w-[90vw] max-w-4xl bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg 
+          border dark:border-gray-700 z-50">
           <Dialog.Title className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
             Bekleyen Formül İstekleri
           </Dialog.Title>

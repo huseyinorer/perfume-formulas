@@ -6,7 +6,6 @@ import AddFormulaDialog from "./components/AddFormulaDialog";
 import PendingFormulasDialog from "./components/PendingFormulasDialog";
 import SearchBox from "./components/SearchBox";
 import { Trash2 } from "lucide-react";
-import AdminLogin from "./components/AdminLogin";
 import Pagination from "./components/Pagination";
 import {
   Accordion,
@@ -17,14 +16,20 @@ import {
 import { PerfumeGuideDialog } from "./components/PerfumeGuideDialog";
 import { Sparkles } from "lucide-react";
 import { HeartHandshake } from "lucide-react";
-import { KeyRound } from "lucide-react";
 import { ThemeToggle } from "./components/ThemeToggle";
 import Footer from './components/Footer';
+import UserMenu from './components/UserMenu';
+import ChangePasswordDialog from './components/ChangePasswordDialog';
+import RegisterDialog from './components/RegisterDialog';
+import { LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import LoginDialog from './components/LoginDialog';
+import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [perfumes, setPerfumes] = useState([]);
   const [filteredPerfumes, setFilteredPerfumes] = useState([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -33,9 +38,10 @@ function App() {
   const [formulas, setFormulas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [pendingRequests, setPendingRequests] = useState([]);
-  const [isFormulaDialogOpen, setIsFormulaDialogOpen] = useState(false); // formül detayları için
-  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false); // admin girişi için
+  const [isFormulaDialogOpen, setIsFormulaDialogOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [creativeFormula, setCreativeFormula] = useState(null);
+  const [user, setUser] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -45,6 +51,12 @@ function App() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isAddPerfumeOpen, setIsAddPerfumeOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,6 +73,21 @@ function App() {
     }
   }, [currentPage, pageSize, sortBy, sortOrder, debouncedSearchTerm, isAdmin]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUser(payload);
+        setIsLoggedIn(true);
+        setIsAdmin(payload.isAdmin === true);
+      } catch (error) {
+        console.error('Invalid token:', error);
+        handleLogout();
+      }
+    }
+  }, []);
+
   const handleSort = (field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -71,7 +98,7 @@ function App() {
   };
 
   const fetchPendingRequests = async () => {
-    if (!isAdmin) return;
+    if (!isAdmin===true) return;
     try {
       const response = await fetch(`${API_URL}/formulas/pending`);
       const data = await response.json();
@@ -223,12 +250,19 @@ function App() {
     }
   };
 
-  const handleLoginSuccess = () => {
-    setIsAdmin(true);
-    setIsAdminLoginOpen(false);
+  const handleLogin = (response) => {
+    const { token, user } = response;
+    localStorage.setItem('token', token);
+    setUser(user);
+    setIsLoggedIn(true);
+    setIsAdmin(user.isAdmin === true);
+    setIsLoginOpen(false);
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    setIsLoggedIn(false);
     setIsAdmin(false);
   };
 
@@ -240,6 +274,78 @@ function App() {
     setIsAddDialogOpen(true);
   };
 
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      alert('Yeni şifreler eşleşmiyor');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/admin/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ oldPassword, newPassword }),
+      });
+
+      if (response.ok) {
+        alert('Şifre başarıyla değiştirildi');
+        setIsChangePasswordOpen(false);
+        // Form alanlarını temizle
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        alert('Şifre değiştirme başarısız');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('Bir hata oluştu');
+    }
+  };
+
+  // Dialog'ları kapatma fonksiyonları
+  const handleCloseDialog = (setterFunction) => {
+    setterFunction(false);
+    // Tüm dialog'ları kapatıyoruz
+    setIsAddDialogOpen(false);
+    setIsPendingDialogOpen(false);
+    setIsChangePasswordOpen(false);
+    setIsGuideOpen(false);
+    setIsLoginOpen(false);
+  };
+
+  // API istekleri için axios instance oluştur
+  const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  // Her istekte token'ı ekle
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // Token expire olduğunda otomatik logout
+  api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
+      return Promise.reject(error);
+    }
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 dark:bg-gray-900">
@@ -249,7 +355,7 @@ function App() {
               <div className="bg-gradient-to-r from-gray-900 to-gray-700 p-3 rounded-lg">
                 <h1 className="text font-bold text-white">
                   Parfüm Formülleri
-                  {isAdmin && <span className="text-sm ml-2 bg-red-500 text-white px-2 py-1 rounded-full">Admin Panel</span>}
+                  {isAdmin === true && <span className="text-sm ml-2 bg-red-500 text-white px-2 py-1 rounded-full">Admin Panel</span>}
                 </h1>
               </div>
             </div>
@@ -258,7 +364,7 @@ function App() {
               <Button 
                 onClick={() => setIsAddDialogOpen(true)}
                 className={`
-                  ${isAdmin 
+                  ${isAdmin === true
                     ? "bg-blue-600 hover:bg-blue-700" 
                     : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                   }
@@ -270,7 +376,7 @@ function App() {
                 `}
               >
                 <HeartHandshake className="h-5 w-5" />
-                {isAdmin ? "Yeni Formül Ekle" : "Kendi Formülümü Paylaşmak İstiyorum ♥"}
+                {isAdmin === true ? "Yeni Formül Ekle" : "Kendi Formülümü Paylaşmak İstiyorum ♥"}
               </Button>
               
               <Button 
@@ -284,40 +390,41 @@ function App() {
                 <Sparkles className="h-4 w-4" />
                 Nasıl Parfüm Yapılır?
               </Button>
-              
-              {isAdmin && pendingRequests.length > 0 && (
-                <Button 
-                  onClick={() => setIsPendingDialogOpen(true)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white 
-                    shadow-md hover:shadow-xl transition-all duration-200
-                    flex items-center gap-2"
-                >
-                  Bekleyen İstekler ({pendingRequests.length})
-                </Button>
-              )}
-              
-              {isAdmin ? (
-                <Button 
-                  onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white 
-                    flex items-center gap-2 shadow-md hover:shadow-xl
-                    transform hover:-translate-y-0.5
-                    transition-all duration-1200 min-w-[120px] justify-center"
-                >
-                  <KeyRound className="h-4 w-4" />
-                  Çıkış
-                </Button>
+                            
+              {isLoggedIn ? (
+                <>
+                  <UserMenu 
+                    pendingRequestsCount={pendingRequests.length}
+                    onPendingRequestsClick={() => setIsPendingDialogOpen(true)}
+                    onAddPerfumeClick={() => setIsAddDialogOpen(true)}
+                    onChangePasswordClick={() => setIsChangePasswordOpen(true)}
+                    onLogout={handleLogout}
+                    username={user?.username}
+                    isAdmin={isAdmin}
+                  />
+                  <ThemeToggle />
+                </>
               ) : (
                 <>
                   <Button 
-                    onClick={() => setIsAdminLoginOpen(true)}
-                    className="bg-gray-800 hover:bg-gray-900 text-white 
+                    onClick={() => setIsLoginOpen(true)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white 
                       flex items-center gap-2 shadow-md hover:shadow-xl
                       transform hover:-translate-y-0.5
-                      transition-all duration-1200 min-w-[120px] justify-center"
+                      transition-all duration-1200"
                   >
-                    <KeyRound className="h-4 w-4" />
-                    Admin Girişi
+                    <LogIn className="h-4 w-4" />
+                    Giriş Yap
+                  </Button>
+                  <Button 
+                    onClick={() => setIsRegisterOpen(true)}
+                    className="bg-green-500 hover:bg-green-600 text-white 
+                      flex items-center gap-2 shadow-md hover:shadow-xl
+                      transform hover:-translate-y-0.5
+                      transition-all duration-1200"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Üye Ol
                   </Button>
                   <ThemeToggle />
                 </>
@@ -376,7 +483,7 @@ function App() {
                 <Accordion type="single" collapsible defaultValue="creative-formula">
                   <AccordionItem value="creative-formula">
                     <AccordionTrigger className="text-sm font-medium text-gray-600">
-                      Creative Formulas Bilgileri
+                      Parfüm Bilgileri
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="text-sm grid grid-cols-2 gap-3 bg-gray-50 p-4 rounded-lg dark:bg-gray-800/50">
@@ -429,7 +536,7 @@ function App() {
                     <TableHead>Alkol %</TableHead>
                     <TableHead>Su %</TableHead>
                     <TableHead>Dinlenme (Gün)</TableHead>
-                    {isAdmin && <TableHead className="w-[100px]">İşlemler</TableHead>}
+                    {isAdmin === true && <TableHead className="w-[100px]">İşlemler</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -439,7 +546,7 @@ function App() {
                       <TableCell>{formula.alcoholPercentage}%</TableCell>
                       <TableCell>{formula.waterPercentage}%</TableCell>
                       <TableCell>{formula.restDay}</TableCell>
-                      {isAdmin && (
+                      {isAdmin === true && (
                         <TableCell>
                           <Button
                             variant="ghost"
@@ -455,7 +562,7 @@ function App() {
                   ))}
                   {formulas.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-gray-500">
+                      <TableCell colSpan={isAdmin === true ? 5 : 4} className="text-center text-gray-500">
                         Henüz formül eklenmemiş.
                       </TableCell>
                     </TableRow>
@@ -467,25 +574,36 @@ function App() {
         </Dialog>
         <AddFormulaDialog
           open={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
-          onSave={isAdmin ? handleSaveFormula : handleFormulaRequest}
+          onClose={() => handleCloseDialog(setIsAddDialogOpen)}
+          onSave={handleSaveFormula}
           perfumes={perfumes}
-          isAdmin={isAdmin}
         />
-        <AdminLogin open={isAdminLoginOpen} onClose={() => setIsAdminLoginOpen(false)} onLogin={handleLoginSuccess} />
-        {isAdmin && (
+        <LoginDialog 
+          open={isLoginOpen} 
+          onOpenChange={setIsLoginOpen}
+          onLogin={handleLogin}
+        />
+        {isAdmin === true && (
           <PendingFormulasDialog
             open={isPendingDialogOpen}
-            onClose={() => setIsPendingDialogOpen(false)}
+            onClose={() => handleCloseDialog(setIsPendingDialogOpen)}
             requests={pendingRequests}
             onApprove={handleApproveRequest}
             onReject={handleRejectRequest}
-            onSuccess={fetchPendingRequests}
           />
         )}
         <PerfumeGuideDialog 
           open={isGuideOpen} 
-          onOpenChange={setIsGuideOpen}
+          onClose={() => handleCloseDialog(setIsGuideOpen)}
+        />
+        <ChangePasswordDialog 
+          open={isChangePasswordOpen} 
+          onOpenChange={setIsChangePasswordOpen}
+          user={user}
+        />
+        <RegisterDialog 
+          open={isRegisterOpen} 
+          onOpenChange={setIsRegisterOpen}
         />
       </div>
       
