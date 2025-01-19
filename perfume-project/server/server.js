@@ -228,11 +228,11 @@ app.get('/api/perfumes', async (req, res) => {
         b.brand_name as brand,
         p.perfume_name as name,
         p.type,
-        p.pyramid_note,
-        p.top_notes,
-        p.middle_notes,
-        p.base_notes,
-        p.olfactive_family,
+        translate_text(p.pyramid_note) AS pyramid_note,
+        translate_text(p.top_notes) AS top_notes,
+        translate_text(p.middle_notes) AS middle_notes,
+        translate_text(p.base_notes) AS base_notes,
+        translate_text(p.olfactive_family) AS olfactive_family,
         u.usage_info as recommended_usage,
         COUNT(pf.id) as "formulaCount",
         CASE 
@@ -325,11 +325,11 @@ app.get("/api/perfumes/:id/details", async (req, res) => {
        b.brand_name as brand,
        p.perfume_name as name,
        p.type,
-       p.pyramid_note,
-       p.top_notes,
-       p.middle_notes,
-       p.base_notes,
-       p.olfactive_family,
+       translate_text(p.pyramid_note) AS pyramid_note,
+       translate_text(p.top_notes) AS top_notes,
+       translate_text(p.middle_notes) AS middle_notes,
+       translate_text(p.base_notes) AS base_notes,
+       translate_text(p.olfactive_family) AS olfactive_family,
        u.usage_info as recommended_usage
      FROM "Perfumes" p
      JOIN "Brands" b ON p.brand_id = b.brand_id

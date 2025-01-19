@@ -611,7 +611,7 @@ function App() {
                             Piramit Notu:
                           </p>
                           <p className="text-gray-600 dark:text-gray-400">
-                            {creativeFormula.pyramid_not}
+                            {creativeFormula.pyramid_note}
                           </p>
                         </div>
                         <div>
