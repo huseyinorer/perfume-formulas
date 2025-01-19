@@ -12,7 +12,8 @@ import {
   Sprout, 
   KeyRound,
   LogOut,
-  User
+  User,
+  Heart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -24,7 +25,8 @@ const UserMenu = ({
   onLogout,
   username,
   isAdmin = false,
-  className = ""
+  className = "",
+  onFavoritesClick
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -95,6 +97,16 @@ const UserMenu = ({
         >
           <KeyRound className="h-4 w-4" />
           <span>Şifre Değiştir</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onSelect={(e) => {
+            e.preventDefault();
+            handleMenuItemClick(onFavoritesClick);
+          }}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <Heart className="h-4 w-4" />
+          <span>Favorilerim</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onSelect={(e) => {

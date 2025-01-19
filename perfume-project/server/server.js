@@ -193,7 +193,7 @@ app.post("/api/change-password", async (req, res) => {
 });
 
 // Tüm parfümleri getir
-app.get("/api/perfumes", async (req, res) => {
+app.get('/api/perfumes', async (req, res) => {
   try {
     const { 
       limit = 10, 
@@ -203,8 +203,23 @@ app.get("/api/perfumes", async (req, res) => {
       search = '' 
     } = req.query;
     
-    const offset = (page - 1) * limit;
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const offset = (pageNumber - 1) * limitNumber;
     const searchPattern = `%${search.toLowerCase()}%`;
+
+    // Token'dan user_id'yi al (eğer varsa)
+    let user_id = null;
+    const authHeader = req.headers['authorization'];
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        user_id = decoded.id;
+      } catch (err) {
+        // Token geçersiz veya expire olmuş - sessizce devam et
+      }
+    }
 
     let query = `
       SELECT 
@@ -219,11 +234,17 @@ app.get("/api/perfumes", async (req, res) => {
         p.base_notes,
         p.olfactive_family,
         u.usage_info as recommended_usage,
-        COUNT(pf.id) as "formulaCount"
+        COUNT(pf.id) as "formulaCount",
+        CASE 
+          WHEN f.id IS NOT NULL THEN true
+          ELSE false
+        END as "is_favorite"
       FROM "Perfumes" p
       JOIN "Brands" b ON p.brand_id = b.brand_id
       LEFT JOIN "CreativeFormulasUsageInfo" u ON p.perfume_id = u.perfume_id
       LEFT JOIN "ParfumeFormulas" pf ON p.perfume_id = pf."parfumesId"
+      LEFT JOIN "Favorites" f ON p.perfume_id = f.perfume_id 
+        AND f.user_id = $5
       WHERE 
         LOWER(b.brand_name) LIKE $1 
         OR LOWER(p.perfume_name) LIKE $1
@@ -237,20 +258,26 @@ app.get("/api/perfumes", async (req, res) => {
         p.middle_notes,
         p.base_notes,
         p.olfactive_family,
-        u.usage_info
+        u.usage_info,
+        f.id
       ORDER BY 
-        CASE WHEN LOWER(b.brand_name) LIKE $1 THEN 0 ELSE 1 END, -- Marka eşleşenleri önce göster
-        COUNT(pf.id) DESC, -- Formül sayısına göre sırala
+        CASE WHEN LOWER(b.brand_name) LIKE $1 THEN 0 ELSE 1 END,
+        COUNT(pf.id) DESC,
         CASE 
-          WHEN $4 = 'brand' THEN b.brand_name 
-          WHEN $4 = 'name' THEN p.perfume_name 
+          WHEN $2 = 'brand' THEN b.brand_name 
+          WHEN $2 = 'name' THEN p.perfume_name 
         END ${sortOrder},
         b.brand_name ASC,
         p.perfume_name ASC
-      LIMIT $2 OFFSET $3
+      LIMIT $3 OFFSET $4
     `;
-
-    const result = await pool.query(query, [searchPattern, limit, offset, sortBy]);
+    const result = await pool.query(query, [
+      searchPattern,    // $1
+      sortBy,          // $2
+      limitNumber,     // $3
+      offset,          // $4
+      user_id || null  // $5
+    ]);
 
     const countQuery = `
       SELECT COUNT(DISTINCT p.perfume_id)
@@ -263,8 +290,8 @@ app.get("/api/perfumes", async (req, res) => {
     res.json({
       data: result.rows,
       total: parseInt(countResult.rows[0].count),
-      page: parseInt(page),
-      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
+      page: pageNumber,
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limitNumber)
     });
   } catch (error) {
     console.error('Error:', error);
@@ -765,6 +792,87 @@ app.get('/api/brands', async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching brands:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Favori ekleme/çıkarma
+app.post('/api/favorites/toggle', authenticateToken, async (req, res) => {
+  try {
+    const { perfume_id } = req.body;
+    const user_id = req.user.id;
+
+    // Önce favori var mı kontrol et
+    const checkResult = await pool.query(
+      'SELECT id FROM "Favorites" WHERE user_id = $1 AND perfume_id = $2',
+      [user_id, perfume_id]
+    );
+
+    if (checkResult.rows.length > 0) {
+      // Favori varsa kaldır
+      await pool.query(
+        'DELETE FROM "Favorites" WHERE user_id = $1 AND perfume_id = $2',
+        [user_id, perfume_id]
+      );
+      res.json({ message: 'Favorilerden kaldırıldı', isFavorite: false });
+    } else {
+      // Favori yoksa ekle
+      await pool.query(
+        'INSERT INTO "Favorites" (user_id, perfume_id) VALUES ($1, $2)',
+        [user_id, perfume_id]
+      );
+      res.json({ message: 'Favorilere eklendi', isFavorite: true });
+    }
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Favori listesi getirme
+app.get('/api/favorites', authenticateToken, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt((page - 1) * limit);
+
+    // Toplam kayıt sayısı
+    const countResult = await pool.query(
+      'SELECT COUNT(*) FROM "Favorites" WHERE user_id = $1',
+      [user_id]
+    );
+
+    // Favori parfümleri getir
+    const result = await pool.query(`
+      SELECT 
+        p.perfume_id,
+        b.brand_id,
+        b.brand_name as brand,
+        p.perfume_name as name,
+        p.type,
+        p.olfactive_family,
+        f.created_at as favorited_at,
+        true as is_favorite
+      FROM "Favorites" f
+      JOIN "Perfumes" p ON f.perfume_id = p.perfume_id
+      JOIN "Brands" b ON p.brand_id = b.brand_id
+      WHERE f.user_id = $1
+      ORDER BY f.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [user_id, limit, offset]);
+
+    const total = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      data: result.rows,
+      total,
+      totalPages,
+      currentPage: page
+    });
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

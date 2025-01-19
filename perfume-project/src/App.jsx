@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "./components/ui/dialog";
 import AddFormulaDialog from "./components/AddFormulaDialog";
 import PendingFormulasDialog from "./components/PendingFormulasDialog";
 import SearchBox from "./components/SearchBox";
@@ -17,14 +29,16 @@ import { PerfumeGuideDialog } from "./components/PerfumeGuideDialog";
 import { Sparkles } from "lucide-react";
 import { HeartHandshake } from "lucide-react";
 import { ThemeToggle } from "./components/ThemeToggle";
-import Footer from './components/Footer';
-import UserMenu from './components/UserMenu';
-import ChangePasswordDialog from './components/ChangePasswordDialog';
-import RegisterDialog from './components/RegisterDialog';
-import { LogIn, UserPlus, LogOut, User } from 'lucide-react';
-import LoginDialog from './components/LoginDialog';
-import axios from 'axios';
+import Footer from "./components/Footer";
+import UserMenu from "./components/UserMenu";
+import ChangePasswordDialog from "./components/ChangePasswordDialog";
+import RegisterDialog from "./components/RegisterDialog";
+import { LogIn, UserPlus, LogOut, User } from "lucide-react";
+import LoginDialog from "./components/LoginDialog";
+import axios from "axios";
 import PerfumeManagementDialog from "./components/PerfumeManagementDialog";
+import PerfumeCard from "./components/PerfumeCard";
+import FavoritesDialog from "./components/FavoritesDialog";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -54,11 +68,12 @@ function App() {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isAddPerfumeOpen, setIsAddPerfumeOpen] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPerfumeManagementOpen, setIsPerfumeManagementOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -76,15 +91,15 @@ function App() {
   }, [currentPage, pageSize, sortBy, sortOrder, debouncedSearchTerm, isAdmin]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(atob(token.split(".")[1]));
         setUser(payload);
         setIsLoggedIn(true);
         setIsAdmin(payload.isAdmin === true);
       } catch (error) {
-        console.error('Invalid token:', error);
+        console.error("Invalid token:", error);
         handleLogout();
       }
     }
@@ -100,7 +115,7 @@ function App() {
   };
 
   const fetchPendingRequests = async () => {
-    if (!isAdmin===true) return;
+    if (!isAdmin === true) return;
     try {
       const response = await fetch(`${API_URL}/formulas/pending`);
       const data = await response.json();
@@ -125,7 +140,15 @@ function App() {
       const response = await fetch(
         `${API_URL}/perfumes?page=${currentPage}&limit=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}${
           debouncedSearchTerm ? `&search=${debouncedSearchTerm}` : ""
-        }`
+        }`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem('token') ? 
+              `Bearer ${localStorage.getItem("token")}` : undefined,
+          },
+        }
       );
       const data = await response.json();
       setPerfumes(data.data);
@@ -151,7 +174,7 @@ function App() {
     setSelectedPerfume(perfume);
     await Promise.all([
       fetchFormulas(perfume.id),
-      fetchCreativeFormula(perfume.id)
+      fetchCreativeFormula(perfume.id),
     ]);
     setIsFormulaDialogOpen(true);
   };
@@ -177,16 +200,20 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": isLoggedIn ? `Bearer ${localStorage.getItem('token')}` : undefined
+          Authorization: isLoggedIn
+            ? `Bearer ${localStorage.getItem("token")}`
+            : undefined,
         },
         body: JSON.stringify({
           ...formulaData,
-          userId: user?.id || null  // Eğer user varsa id'sini, yoksa null gönder
-        })
+          userId: user?.id || null, // Eğer user varsa id'sini, yoksa null gönder
+        }),
       });
 
       if (response.ok) {
-        alert("Formül isteğiniz başarıyla gönderildi. Admin onayından sonra eklenecektir.");
+        alert(
+          "Formül isteğiniz başarıyla gönderildi. Admin onayından sonra eklenecektir."
+        );
         setIsAddDialogOpen(false);
       }
     } catch (error) {
@@ -200,7 +227,7 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(formulaData),
       });
@@ -265,17 +292,20 @@ function App() {
     }
   };
 
-  const handleLogin = (response) => {
+  const handleLogin = async (response) => {
     const { token, user } = response;
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
     setUser(user);
     setIsLoggedIn(true);
     setIsAdmin(user.isAdmin === true);
     setIsLoginOpen(false);
+    
+    // Login olduktan sonra parfümleri yeniden çek
+    await fetchPerfumes();
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
     setIsLoggedIn(false);
     setIsAdmin(false);
@@ -291,34 +321,34 @@ function App() {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
-      alert('Yeni şifreler eşleşmiyor');
+      alert("Yeni şifreler eşleşmiyor");
       return;
     }
 
     try {
       const response = await fetch(`${API_URL}/admin/change-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ oldPassword, newPassword }),
       });
 
       if (response.ok) {
-        alert('Şifre başarıyla değiştirildi');
+        alert("Şifre başarıyla değiştirildi");
         setIsChangePasswordOpen(false);
         // Form alanlarını temizle
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
       } else {
-        alert('Şifre değiştirme başarısız');
+        alert("Şifre değiştirme başarısız");
       }
     } catch (error) {
-      console.error('Error changing password:', error);
-      alert('Bir hata oluştu');
+      console.error("Error changing password:", error);
+      alert("Bir hata oluştu");
     }
   };
 
@@ -337,13 +367,13 @@ function App() {
   const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   // Her istekte token'ı ekle
   api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -361,27 +391,57 @@ function App() {
     }
   );
 
+  const handleFavoriteToggle = async (perfumeId) => {
+    if (!isLoggedIn) {
+      alert("Favorilere eklemek için giriş yapmalısınız");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/favorites/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ perfume_id: perfumeId }),
+      });
+
+      if (response.ok) {
+        // Parfüm listesini güncelle
+        fetchPerfumes();
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 dark:bg-gray-900">
+      <div className="container max-w-[1800px] mx-auto p-4 dark:bg-gray-900">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-r from-gray-900 to-gray-700 p-3 rounded-lg">
                 <h1 className="text font-bold text-white">
                   Parfüm Formülleri
-                  {isAdmin === true && <span className="text-sm ml-2 bg-red-500 text-white px-2 py-1 rounded-full">Admin Panel</span>}
+                  {isAdmin === true && (
+                    <span className="text-sm ml-2 bg-red-500 text-white px-2 py-1 rounded-full">
+                      Admin Panel
+                    </span>
+                  )}
                 </h1>
               </div>
             </div>
-            
+
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-3">
-              <Button 
+              <Button
                 onClick={() => setIsAddDialogOpen(true)}
                 className={`
-                  ${isAdmin === true
-                    ? "bg-blue-600 hover:bg-blue-700" 
-                    : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                  ${
+                    isAdmin === true
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                   }
                   text-white shadow-md hover:shadow-xl 
                   transform hover:-translate-y-0.5 
@@ -391,10 +451,12 @@ function App() {
                 `}
               >
                 <HeartHandshake className="h-5 w-5" />
-                {isAdmin === true ? "Yeni Formül Ekle" : "Kendi Formülümü Paylaşmak İstiyorum ♥"}
+                {isAdmin === true
+                  ? "Yeni Formül Ekle"
+                  : "Kendi Formülümü Paylaşmak İstiyorum ♥"}
               </Button>
-              
-              <Button 
+
+              <Button
                 onClick={() => setIsGuideOpen(true)}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white 
                   hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-xl 
@@ -405,10 +467,10 @@ function App() {
                 <Sparkles className="h-4 w-4" />
                 Nasıl Parfüm Yapılır?
               </Button>
-                            
+
               {isLoggedIn ? (
                 <>
-                  <UserMenu 
+                  <UserMenu
                     pendingRequestsCount={pendingRequests.length}
                     onPendingRequestsClick={() => setIsPendingDialogOpen(true)}
                     onAddPerfumeClick={() => setIsPerfumeManagementOpen(true)}
@@ -416,12 +478,13 @@ function App() {
                     onLogout={handleLogout}
                     username={user?.username}
                     isAdmin={isAdmin}
+                    onFavoritesClick={() => setIsFavoritesOpen(true)}
                   />
                   <ThemeToggle />
                 </>
               ) : (
                 <>
-                  <Button 
+                  <Button
                     onClick={() => setIsLoginOpen(true)}
                     className="bg-blue-500 hover:bg-blue-600 text-white 
                       flex items-center gap-2 shadow-md hover:shadow-xl
@@ -431,7 +494,7 @@ function App() {
                     <LogIn className="h-4 w-4" />
                     Giriş Yap
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => setIsRegisterOpen(true)}
                     className="bg-green-500 hover:bg-green-600 text-white 
                       flex items-center gap-2 shadow-md hover:shadow-xl
@@ -448,45 +511,50 @@ function App() {
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-4">
-          <SearchBox onSearch={(value) => setSearchTerm(value)} className="w-full" />
-        </div>
+        <div className="container mx-auto">
+          <div className="max-w-2xl mx-auto mb-4">
+            <SearchBox
+              onSearch={(value) => setSearchTerm(value)}
+              className="w-full"
+            />
+          </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow max-w-2xl mx-auto">
-          {" "}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="cursor-pointer" onClick={() => handleSort("brand")}>
-                  Marka {sortBy === "brand" && (sortOrder === "asc" ? "↑" : "↓")}
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
-                  İsim {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
-                </TableHead>
-                <TableHead>Formül Sayısı</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPerfumes.map((perfume) => (
-                <TableRow key={perfume.id} className="cursor-pointer hover:bg-gray-100" onClick={() => handleRowClick(perfume)}>
-                  <TableCell>{perfume.brand}</TableCell>
-                  <TableCell>{perfume.name}</TableCell>
-                  <TableCell>{parseInt(perfume.formulaCount)}</TableCell>
-                </TableRow>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-fr">
+              {perfumes.slice(0, 20).map((perfume) => (
+                <PerfumeCard
+                  key={perfume.id}
+                  perfume={perfume}
+                  onClick={() => handleRowClick(perfume)}
+                  onFormulaRequest={() => setIsAddDialogOpen(true)}
+                  onFavoriteToggle={handleFavoriteToggle}
+                  isLoggedIn={isLoggedIn}
+                />
               ))}
-            </TableBody>
-          </Table>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-            totalItems={totalItems}
-          />
-          {filteredPerfumes.length === 0 && <div className="p-4 text-center text-gray-500">Aranan kriterlere uygun parfüm bulunamadı.</div>}
+            </div>
+
+            {perfumes.length === 0 && (
+              <div className="p-4 text-center text-gray-500">
+                Aranan kriterlere uygun parfüm bulunamadı.
+              </div>
+            )}
+
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                pageSize={pageSize}
+                onPageSizeChange={setPageSize}
+                totalItems={totalItems}
+              />
+            </div>
+          </div>
         </div>
-        <Dialog open={isFormulaDialogOpen} onOpenChange={setIsFormulaDialogOpen}>
+        <Dialog
+          open={isFormulaDialogOpen}
+          onOpenChange={setIsFormulaDialogOpen}
+        >
           <DialogContent className="max-w-3xl">
             <DialogHeader>
               <DialogTitle>
@@ -495,7 +563,11 @@ function App() {
             </DialogHeader>
             <div className="mt-4">
               {creativeFormula && (
-                <Accordion type="single" collapsible defaultValue="creative-formula">
+                <Accordion
+                  type="single"
+                  collapsible
+                  defaultValue="creative-formula"
+                >
                   <AccordionItem value="creative-formula">
                     <AccordionTrigger className="text-sm font-medium text-gray-600">
                       Parfüm Bilgileri
@@ -503,47 +575,85 @@ function App() {
                     <AccordionContent>
                       <div className="text-sm grid grid-cols-2 gap-3 bg-gray-50 p-4 rounded-lg dark:bg-gray-800/50">
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Marka:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.brand}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Marka:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.brand}
+                          </p>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">İsim:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.name}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            İsim:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.name}
+                          </p>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Koku Ailesi:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.olfactive_family}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Koku Ailesi:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.olfactive_family}
+                          </p>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Tip:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.type}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Tip:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.type}
+                          </p>
                         </div>
                         <div className="col-span-2">
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Piramit Notu:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.pyramid_not}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Piramit Notu:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.pyramid_not}
+                          </p>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Üst Notalar:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.top_notes}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Üst Notalar:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.top_notes}
+                          </p>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Orta Notalar:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.middle_notes}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Orta Notalar:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.middle_notes}
+                          </p>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Alt Notalar:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.base_notes}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Alt Notalar:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.base_notes}
+                          </p>
                         </div>
                         <div className="col-span-2">
-                          <p className="font-medium text-gray-700 dark:text-gray-300">Önerilen Kullanım Oranı:</p>
-                          <p className="text-gray-600 dark:text-gray-400">{creativeFormula.recommended_usage}</p>
+                          <p className="font-medium text-gray-700 dark:text-gray-300">
+                            Önerilen Kullanım Oranı:
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            {creativeFormula.recommended_usage}
+                          </p>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
               )}
-              <h3 className="text-lg font-semibold mb-4 mt-5 text-left">Parfüm severler nasıl yaptı ♥</h3>
+              <h3 className="text-lg font-semibold mb-4 mt-5 text-left">
+                Parfüm severler nasıl yaptı ♥
+              </h3>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -551,7 +661,9 @@ function App() {
                     <TableHead>Alkol %</TableHead>
                     <TableHead>Su %</TableHead>
                     <TableHead>Dinlenme (Gün)</TableHead>
-                    {isAdmin === true && <TableHead className="w-[100px]">İşlemler</TableHead>}
+                    {isAdmin === true && (
+                      <TableHead className="w-[100px]">İşlemler</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -577,7 +689,10 @@ function App() {
                   ))}
                   {formulas.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={isAdmin === true ? 5 : 4} className="text-center text-gray-500">
+                      <TableCell
+                        colSpan={isAdmin === true ? 5 : 4}
+                        className="text-center text-gray-500"
+                      >
                         Henüz formül eklenmemiş.
                       </TableCell>
                     </TableRow>
@@ -593,8 +708,8 @@ function App() {
           onSave={handleFormulaSubmit}
           perfumes={perfumes}
         />
-        <LoginDialog 
-          open={isLoginOpen} 
+        <LoginDialog
+          open={isLoginOpen}
           onOpenChange={setIsLoginOpen}
           onLogin={handleLogin}
         />
@@ -607,26 +722,31 @@ function App() {
             onReject={handleRejectRequest}
           />
         )}
-        <PerfumeGuideDialog 
-          open={isGuideOpen} 
+        <PerfumeGuideDialog
+          open={isGuideOpen}
           onClose={() => handleCloseDialog(setIsGuideOpen)}
         />
-        <ChangePasswordDialog 
-          open={isChangePasswordOpen} 
+        <ChangePasswordDialog
+          open={isChangePasswordOpen}
           onOpenChange={setIsChangePasswordOpen}
           user={user}
         />
-        <RegisterDialog 
-          open={isRegisterOpen} 
+        <RegisterDialog
+          open={isRegisterOpen}
           onOpenChange={setIsRegisterOpen}
         />
-        <PerfumeManagementDialog 
-          open={isPerfumeManagementOpen} 
+        <PerfumeManagementDialog
+          open={isPerfumeManagementOpen}
           onOpenChange={setIsPerfumeManagementOpen}
         />
+        <FavoritesDialog
+          open={isFavoritesOpen}
+          onOpenChange={setIsFavoritesOpen}
+          onFavoriteToggle={handleFavoriteToggle}
+        />
       </div>
-      
-      <Footer 
+
+      <Footer
         onGuideClick={handleFooterGuideClick}
         onAddFormulaClick={handleFooterAddFormulaClick}
       />

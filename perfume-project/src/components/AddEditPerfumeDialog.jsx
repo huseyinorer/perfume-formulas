@@ -22,8 +22,10 @@ const AddEditPerfumeDialog = ({ open, onOpenChange, perfume, onSuccess }) => {
   });
 
   useEffect(() => {
-    fetchBrands();
-  }, []);
+    if (open) {
+      fetchBrands();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (perfume) {
