@@ -82,7 +82,7 @@ const UserMenu = ({
               className="flex items-center gap-2 cursor-pointer"
             >
               <Sprout className="h-4 w-4" />
-              <span>Parfüm Ekle</span>
+              <span>Parfüm Yönetimi</span>
             </DropdownMenuItem>
           </>
         )}

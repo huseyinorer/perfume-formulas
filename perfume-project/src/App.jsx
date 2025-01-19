@@ -24,6 +24,7 @@ import RegisterDialog from './components/RegisterDialog';
 import { LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import LoginDialog from './components/LoginDialog';
 import axios from 'axios';
+import PerfumeManagementDialog from "./components/PerfumeManagementDialog";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -57,6 +58,7 @@ function App() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isPerfumeManagementOpen, setIsPerfumeManagementOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -161,14 +163,26 @@ function App() {
     return () => clearTimeout(timeoutId);
   };
 
+  const handleFormulaSubmit = async (formulaData) => {
+    if (isAdmin) {
+      await handleSaveFormula(formulaData);
+    } else {
+      await handleFormulaRequest(formulaData);
+    }
+  };
+
   const handleFormulaRequest = async (formulaData) => {
     try {
       const response = await fetch(`${API_URL}/formulas/request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": isLoggedIn ? `Bearer ${localStorage.getItem('token')}` : undefined
         },
-        body: JSON.stringify(formulaData),
+        body: JSON.stringify({
+          ...formulaData,
+          userId: user?.id || null  // Eğer user varsa id'sini, yoksa null gönder
+        })
       });
 
       if (response.ok) {
@@ -186,6 +200,7 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify(formulaData),
       });
@@ -396,7 +411,7 @@ function App() {
                   <UserMenu 
                     pendingRequestsCount={pendingRequests.length}
                     onPendingRequestsClick={() => setIsPendingDialogOpen(true)}
-                    onAddPerfumeClick={() => setIsAddDialogOpen(true)}
+                    onAddPerfumeClick={() => setIsPerfumeManagementOpen(true)}
                     onChangePasswordClick={() => setIsChangePasswordOpen(true)}
                     onLogout={handleLogout}
                     username={user?.username}
@@ -575,7 +590,7 @@ function App() {
         <AddFormulaDialog
           open={isAddDialogOpen}
           onClose={() => handleCloseDialog(setIsAddDialogOpen)}
-          onSave={handleSaveFormula}
+          onSave={handleFormulaSubmit}
           perfumes={perfumes}
         />
         <LoginDialog 
@@ -604,6 +619,10 @@ function App() {
         <RegisterDialog 
           open={isRegisterOpen} 
           onOpenChange={setIsRegisterOpen}
+        />
+        <PerfumeManagementDialog 
+          open={isPerfumeManagementOpen} 
+          onOpenChange={setIsPerfumeManagementOpen}
         />
       </div>
       

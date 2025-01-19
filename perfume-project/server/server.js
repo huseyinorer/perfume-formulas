@@ -160,7 +160,6 @@ app.post("/api/change-password", async (req, res) => {
     ]);
 
     if (user.rows.length === 0) {
-      console.log("User not found"); // Debug log
       return res.status(404).json({ error: "User not found" });
     }
 
@@ -196,21 +195,21 @@ app.post("/api/change-password", async (req, res) => {
 // Tüm parfümleri getir
 app.get("/api/perfumes", async (req, res) => {
   try {
-    const {
-      limit = 10,
-      page = 1,
-      sortBy = "brand",
-      sortOrder = "asc",
-      search = "",
+    const { 
+      limit = 10, 
+      page = 1, 
+      sortBy = 'brand', 
+      sortOrder = 'asc', 
+      search = '' 
     } = req.query;
+    
     const offset = (page - 1) * limit;
-
-    // Tek bir search pattern oluştur
     const searchPattern = `%${search.toLowerCase()}%`;
 
     let query = `
       SELECT 
         p.perfume_id as id,
+        p.brand_id,
         b.brand_name as brand,
         p.perfume_name as name,
         p.type,
@@ -241,30 +240,23 @@ app.get("/api/perfumes", async (req, res) => {
         u.usage_info
       ORDER BY 
         CASE WHEN LOWER(b.brand_name) LIKE $1 THEN 0 ELSE 1 END, -- Marka eşleşenleri önce göster
-        COUNT(pf.id) DESC,  -- Sonra formül sayısına göre sırala
+        COUNT(pf.id) DESC, -- Formül sayısına göre sırala
         CASE 
-          WHEN $2 = 'brand' THEN b.brand_name 
-          WHEN $2 = 'name' THEN p.perfume_name 
+          WHEN $4 = 'brand' THEN b.brand_name 
+          WHEN $4 = 'name' THEN p.perfume_name 
         END ${sortOrder},
         b.brand_name ASC,
         p.perfume_name ASC
-      LIMIT $3 OFFSET $4
+      LIMIT $2 OFFSET $3
     `;
 
-    const result = await pool.query(query, [
-      searchPattern,
-      sortBy,
-      limit,
-      offset,
-    ]);
+    const result = await pool.query(query, [searchPattern, limit, offset, sortBy]);
 
     const countQuery = `
       SELECT COUNT(DISTINCT p.perfume_id)
       FROM "Perfumes" p
       JOIN "Brands" b ON p.brand_id = b.brand_id
-      WHERE 
-        LOWER(b.brand_name) LIKE $1 
-        OR LOWER(p.perfume_name) LIKE $1
+      WHERE LOWER(b.brand_name) LIKE $1 OR LOWER(p.perfume_name) LIKE $1
     `;
     const countResult = await pool.query(countQuery, [searchPattern]);
 
@@ -272,11 +264,11 @@ app.get("/api/perfumes", async (req, res) => {
       data: result.rows,
       total: parseInt(countResult.rows[0].count),
       page: parseInt(page),
-      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
     });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -370,22 +362,27 @@ app.post("/api/formulas/request", async (req, res) => {
       alcoholPercentage,
       waterPercentage,
       restDay,
+      userId  // Yeni eklenen, opsiyonel
     } = req.body;
+
     const result = await pool.query(
       `INSERT INTO "FormulaPendingRequests" 
-      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
-      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+       ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "user_id")
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING *`,
       [
         parfumesId,
         fragrancePercentage,
         alcoholPercentage,
         waterPercentage,
         restDay,
+        userId || null  // userId yoksa null olacak
       ]
     );
-    res.status(201).json({
-      message: "Formül isteğiniz incelemeye gönderildi",
-      request: result.rows[0],
+
+    res.status(201).json({ 
+      message: 'Formül isteğiniz incelemeye gönderildi', 
+      request: result.rows[0] 
     });
   } catch (error) {
     console.error("Error creating formula request:", error);
@@ -579,6 +576,197 @@ app.get("/api/admin-route", authenticateToken, (req, res) => {
     return res.status(403).json({ error: "Admin access required" });
   }
   // Admin işlemleri
+});
+
+// Perfumes CRUD endpoints
+
+// CREATE - Yeni parfüm ekle
+app.post("/api/perfumes", authenticateToken, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const {
+      brand_id,
+      perfume_name,
+      type,
+      pyramid_note,
+      top_notes,
+      middle_notes,
+      base_notes,
+      olfactive_family
+    } = req.body;
+
+    // Input validasyonu
+    if (!brand_id || !perfume_name) {
+      return res.status(400).json({ error: "Brand and perfume name are required" });
+    }
+
+    // Brand'in var olup olmadığını kontrol et
+    const brandCheck = await client.query(
+      'SELECT brand_id FROM "Brands" WHERE brand_id = $1',
+      [brand_id]
+    );
+
+    if (brandCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+
+    // Parfümü ekle
+    const result = await client.query(
+      `INSERT INTO "Perfumes" 
+       (brand_id, perfume_name, type, pyramid_note, top_notes, middle_notes, base_notes, olfactive_family)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *`,
+      [brand_id, perfume_name, type, pyramid_note, top_notes, middle_notes, base_notes, olfactive_family]
+    );
+
+    await client.query('COMMIT');
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    if (error.constraint === 'unique_brand_perfume') {
+      res.status(400).json({ error: "This perfume already exists for this brand" });
+    } else {
+      console.error("Error creating perfume:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  } finally {
+    client.release();
+  }
+});
+
+// READ - Tek bir parfümü getir
+app.get("/api/perfumes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `SELECT 
+        p.*,
+        b.brand_name,
+        u.usage_info as recommended_usage
+       FROM "Perfumes" p
+       JOIN "Brands" b ON p.brand_id = b.brand_id
+       LEFT JOIN "CreativeFormulasUsageInfo" u ON p.perfume_id = u.perfume_id
+       WHERE p.perfume_id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Perfume not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching perfume:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// UPDATE - Parfüm güncelle
+app.put("/api/perfumes/:id", authenticateToken, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { id } = req.params;
+    const {
+      brand_id,
+      perfume_name,
+      type,
+      pyramid_note,
+      top_notes,
+      middle_notes,
+      base_notes,
+      olfactive_family
+    } = req.body;
+
+    // Parfümün var olup olmadığını kontrol et
+    const existingPerfume = await client.query(
+      'SELECT perfume_id FROM "Perfumes" WHERE perfume_id = $1',
+      [id]
+    );
+
+    if (existingPerfume.rows.length === 0) {
+      return res.status(404).json({ error: "Perfume not found" });
+    }
+
+    // Parfümü güncelle
+    const result = await client.query(
+      `UPDATE "Perfumes" 
+       SET brand_id = $1, 
+           perfume_name = $2, 
+           type = $3, 
+           pyramid_note = $4, 
+           top_notes = $5, 
+           middle_notes = $6, 
+           base_notes = $7, 
+           olfactive_family = $8
+       WHERE perfume_id = $9
+       RETURNING *`,
+      [brand_id, perfume_name, type, pyramid_note, top_notes, middle_notes, base_notes, olfactive_family, id]
+    );
+
+    await client.query('COMMIT');
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    if (error.constraint === 'unique_brand_perfume') {
+      res.status(400).json({ error: "This perfume already exists for this brand" });
+    } else {
+      console.error("Error updating perfume:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  } finally {
+    client.release();
+  }
+});
+
+// DELETE - Parfüm sil
+app.delete("/api/perfumes/:id", authenticateToken, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { id } = req.params;
+
+    // İlişkili formülleri ve usage info'yu kontrol et ve sil
+    await client.query('DELETE FROM "ParfumeFormulas" WHERE "parfumesId" = $1', [id]);
+    await client.query('DELETE FROM "CreativeFormulasUsageInfo" WHERE perfume_id = $1', [id]);
+    
+    // Parfümü sil
+    const result = await client.query(
+      'DELETE FROM "Perfumes" WHERE perfume_id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Perfume not found" });
+    }
+
+    await client.query('COMMIT');
+    
+    res.json({ message: "Perfume deleted successfully" });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error("Error deleting perfume:", error);
+    res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
+  }
+});
+
+// Brands endpoint'i - authentication olmadan erişilebilir
+app.get('/api/brands', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM "Brands" ORDER BY brand_name');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching brands:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.listen(port, () => {
