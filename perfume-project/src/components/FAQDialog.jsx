@@ -135,26 +135,75 @@ const FAQDialog = ({ open, onOpenChange }) => {
           </div>
         </div>
       )
+    },
+    {
+      question: "Parfüm nereye sıkılır?",
+      answer: (
+        <div className="space-y-4">
+          <p className="font-medium">Parfümün en etkili ve kalıcı olacağı bölgeler şunlardır:</p>
+
+          <div className="space-y-3">
+            <div>
+              <p className="font-medium text-primary/80">Nabız noktaları:</p>
+              <ul className="list-disc pl-6 space-y-1 mt-1">
+                <li>Bileklerin iç kısmı</li>
+                <li>Dirseklerin iç kısmı</li>
+                <li>Boynun yan kısımları</li>
+                <li>Göğüs kafesinin ortası</li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-medium text-primary/80">Sıcak bölgeler:</p>
+              <ul className="list-disc pl-6 space-y-1 mt-1">
+                <li>Kulak arkası</li>
+                <li>Ense</li>
+                <li>Saç diplerine yakın bölgeler</li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <p className="font-medium text-primary/80">Önemli ipuçları:</p>
+            <ul className="list-disc pl-6 space-y-1 mt-1">
+              <li>Parfümü direkt giysiye değil, cilde sıkın</li>
+              <li>Kıyafetlerle örtülmeyecek noktalara sıkın</li>
+              <li>Cildinizi nemli tutun (nemli cilt kokuyu daha iyi tutar)</li>
+              <li>Parfümü sürdükten sonra ovalamayın</li>
+              <li>Tüm bu noktalara aynı anda sıkmak yerine 2-3 noktayı seçin</li>
+            </ul>
+          </div>
+
+          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+            <p className="font-medium mb-2">Kaçınılması gereken durumlar:</p>
+            <ul className="list-disc pl-6 space-y-1">
+              <li>Güneşe maruz kalacak bölgelere direkt sıkmayın</li>
+              <li>Parfümü havaya sıkıp içinden geçmeyin (parfüm damlacıkları eşit dağılmaz)</li>
+              <li>Metal takı olan bölgelere direkt sıkmaktan kaçının (metal parfümün kokusunu değiştirebilir)</li>
+            </ul>
+          </div>
+        </div>
+      )
     }
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 dark:hover:scrollbar-thumb-gray-500">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold mb-4">
             Sıkça Sorulan Sorular
           </DialogTitle>
         </DialogHeader>
         
-        <div className="mt-4">
+        <div className="mt-4 overflow-y-auto pr-2">
           <Accordion type="single" collapsible>
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger>
-                  {faq.question}
+                <AccordionTrigger className="hover:no-underline bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-lg">
+                  <span className="text-left font-medium">{faq.question}</span>
                 </AccordionTrigger>
-                <AccordionContent className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50">
+                <AccordionContent className="px-4 py-2">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

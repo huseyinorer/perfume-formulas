@@ -42,7 +42,7 @@ const UserMenu = ({
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className={`relative flex items-center gap-2 px-3 hover:bg-gray-100 dark:hover:bg-gray-700 ${className}`}
+          className={`relative flex items-center gap-2 px-3 py-2 text-white dark:text-white rounded-md ${className}`}
         >
           <User className="h-4 w-4" />
           <span className="font-medium">{username}</span>
