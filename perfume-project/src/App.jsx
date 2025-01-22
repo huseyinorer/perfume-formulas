@@ -26,7 +26,7 @@ import {
   AccordionTrigger,
 } from "./components/ui/accordion";
 import { PerfumeGuideDialog } from "./components/PerfumeGuideDialog";
-import { Sparkles } from "lucide-react";
+import { Sparkles, HelpCircle } from "lucide-react";
 import { HeartHandshake } from "lucide-react";
 import { ThemeToggle } from "./components/ThemeToggle";
 import Footer from "./components/Footer";
@@ -39,6 +39,7 @@ import axios from "axios";
 import PerfumeManagementDialog from "./components/PerfumeManagementDialog";
 import PerfumeCard from "./components/PerfumeCard";
 import FavoritesDialog from "./components/FavoritesDialog";
+import FAQDialog from './components/FAQDialog';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -74,6 +75,7 @@ function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPerfumeManagementOpen, setIsPerfumeManagementOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isFAQOpen, setIsFAQOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -319,6 +321,10 @@ function App() {
     setIsAddDialogOpen(true);
   };
 
+  const handleFooterFAQClick = () => {
+    setIsFAQOpen(true);
+  };
+
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
 
@@ -466,6 +472,17 @@ function App() {
               >
                 <Sparkles className="h-4 w-4" />
                 Nasıl Parfüm Yapılır?
+              </Button>
+
+              <Button
+                onClick={() => setIsFAQOpen(true)}
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white 
+                  hover:from-cyan-600 hover:to-blue-600 shadow-md hover:shadow-xl 
+                  transform hover:-translate-y-0.5 transition-all duration-200
+                  flex items-center gap-2 min-w-[180px] justify-center"
+              >
+                <HelpCircle className="h-4 w-4" />
+                Sık Sorulan Sorular
               </Button>
 
               {isLoggedIn ? (
@@ -744,11 +761,16 @@ function App() {
           onOpenChange={setIsFavoritesOpen}
           onFavoriteToggle={handleFavoriteToggle}
         />
+        <FAQDialog 
+          open={isFAQOpen} 
+          onOpenChange={setIsFAQOpen}
+        />
       </div>
 
       <Footer
         onGuideClick={handleFooterGuideClick}
         onAddFormulaClick={handleFooterAddFormulaClick}
+        onFAQClick={handleFooterFAQClick}
       />
     </div>
   );

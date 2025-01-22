@@ -1,7 +1,7 @@
 import React from 'react';
 import { Twitter, Github } from 'lucide-react';
 
-const Footer = ({ onGuideClick, onAddFormulaClick }) => {
+const Footer = ({ onGuideClick, onAddFormulaClick, onFAQClick }) => {
   return (
     <footer className="bg-gray-100 dark:bg-gray-800 mt-8">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -40,9 +40,12 @@ const Footer = ({ onGuideClick, onAddFormulaClick }) => {
                 </button>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                <button
+                  onClick={onFAQClick}
+                  className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                >
                   SSS
-                </a>
+                </button>
               </li>
             </ul>
           </div>
