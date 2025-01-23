@@ -65,7 +65,7 @@ app.post("/api/login", async (req, res) => {
         isAdmin: user.is_admin,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "30d" }
     );
 
     res.json({

@@ -97,9 +97,30 @@ function App() {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        setUser(payload);
-        setIsLoggedIn(true);
-        setIsAdmin(payload.isAdmin === true);
+        const expirationTime = payload.exp * 1000; // Convert to milliseconds
+        
+        if (Date.now() >= expirationTime) {
+          // Token has expired, clear state
+          localStorage.removeItem("token");
+          setUser(null);
+          setIsLoggedIn(false);
+          setIsAdmin(false);
+        } else {
+          setUser(payload);
+          setIsLoggedIn(true);
+          setIsAdmin(payload.isAdmin);
+          
+          // Set up cleanup timer for when token expires
+          const timeUntilExpiry = expirationTime - Date.now();
+          const cleanup = setTimeout(() => {
+            localStorage.removeItem("token");
+            setUser(null);
+            setIsLoggedIn(false);
+            setIsAdmin(false);
+          }, timeUntilExpiry);
+          
+          return () => clearTimeout(cleanup);
+        }
       } catch (error) {
         console.error("Invalid token:", error);
         handleLogout();
