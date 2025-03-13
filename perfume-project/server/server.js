@@ -299,14 +299,24 @@ app.get('/api/perfumes', async (req, res) => {
   }
 });
 
-// Belirli bir parfüme ait formülleri getir
+// Belirli bir parfüme ait formülleri getir (değerlendirme bilgileriyle birlikte)
 app.get("/api/perfumes/:id/formulas", async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query(
-      'SELECT * FROM "ParfumeFormulas" WHERE "parfumesId" = $1 ORDER BY id DESC',
-      [id]
-    );
+    
+    // Formülleri ve değerlendirme bilgilerini getir
+    const result = await pool.query(`
+      SELECT 
+        pf.*,
+        COALESCE(AVG(fr.rating), 0) as "averageRating",
+        COUNT(fr.id) as "reviewCount"
+      FROM "ParfumeFormulas" pf
+      LEFT JOIN "FormulaRatings" fr ON pf.id = fr.formula_id
+      WHERE pf."parfumesId" = $1
+      GROUP BY pf.id
+      ORDER BY pf.id DESC
+    `, [id]);
+    
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching formulas:", error);
@@ -873,6 +883,216 @@ app.get('/api/favorites', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching favorites:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Bir formüle ait değerlendirmeleri getir
+app.get('/api/formulas/:id/ratings', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const result = await pool.query(`
+      SELECT 
+        fr.id, 
+        fr.formula_id,
+        fr.rating, 
+        fr.comment, 
+        fr.created_at, 
+        fr.updated_at,
+        fr.user_id,
+        u.username
+      FROM "FormulaRatings" fr
+      JOIN "Users" u ON fr.user_id = u.id
+      WHERE fr.formula_id = $1
+      ORDER BY fr.created_at DESC
+    `, [id]);
+    
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching formula ratings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Bir formüle yeni değerlendirme ekle (sadece giriş yapmış kullanıcılar)
+app.post('/api/formulas/:id/ratings', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const user_id = req.user.id;
+    
+    // Rating aralığını kontrol et
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Değerlendirme puanı 1 ile 5 arasında olmalıdır.' });
+    }
+    
+    // Formülün var olup olmadığını kontrol et
+    const formulaCheck = await pool.query(
+      'SELECT id FROM "ParfumeFormulas" WHERE id = $1',
+      [id]
+    );
+    
+    if (formulaCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Formül bulunamadı.' });
+    }
+    
+    // Kullanıcının daha önce bu formülü değerlendirip değerlendirmediğini kontrol et
+    const existingRating = await pool.query(
+      'SELECT id FROM "FormulaRatings" WHERE formula_id = $1 AND user_id = $2',
+      [id, user_id]
+    );
+    
+    let result;
+    if (existingRating.rows.length > 0) {
+      // Mevcut değerlendirmeyi güncelle
+      result = await pool.query(
+        `UPDATE "FormulaRatings" 
+         SET rating = $1, comment = $2, updated_at = CURRENT_TIMESTAMP
+         WHERE formula_id = $3 AND user_id = $4
+         RETURNING *`,
+        [rating, comment, id, user_id]
+      );
+      
+      res.json({ 
+        message: 'Değerlendirmeniz güncellendi.', 
+        rating: result.rows[0] 
+      });
+    } else {
+      // Yeni değerlendirme ekle
+      result = await pool.query(
+        `INSERT INTO "FormulaRatings" (formula_id, user_id, rating, comment)
+         VALUES ($1, $2, $3, $4)
+         RETURNING *`,
+        [id, user_id, rating, comment]
+      );
+      
+      res.status(201).json({ 
+        message: 'Değerlendirmeniz kaydedildi.', 
+        rating: result.rows[0] 
+      });
+    }
+  } catch (error) {
+    console.error('Error adding formula rating:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Bir değerlendirmeyi güncelle (sadece sahibi veya admin)
+app.put('/api/formulas/ratings/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comment, rating } = req.body;
+    const user_id = req.user.id;
+    
+    // Değerlendirmenin var olup olmadığını kontrol et
+    const ratingCheck = await pool.query(
+      'SELECT formula_id, user_id FROM "FormulaRatings" WHERE id = $1',
+      [id]
+    );
+    
+    if (ratingCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Değerlendirme bulunamadı.' });
+    }
+    
+    // Değerlendirmenin sahibini veya admin olup olmadığını kontrol et
+    const isOwner = ratingCheck.rows[0].user_id === user_id;
+    const isAdmin = req.user.isAdmin === true;
+    
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Bu işlem için yetkiniz yok.' });
+    }
+    
+    // Rating puanı güncelleniyor mu kontrol et
+    if (rating !== undefined && (rating < 1 || rating > 5)) {
+      return res.status(400).json({ error: 'Değerlendirme puanı 1 ile 5 arasında olmalıdır.' });
+    }
+    
+    // Güncelleme sorgusunu oluştur
+    let updateQuery = 'UPDATE "FormulaRatings" SET updated_at = CURRENT_TIMESTAMP';
+    const queryParams = [];
+    let paramIndex = 1;
+    
+    if (comment !== undefined) {
+      updateQuery += `, comment = $${paramIndex}`;
+      queryParams.push(comment);
+      paramIndex++;
+    }
+    
+    if (rating !== undefined) {
+      updateQuery += `, rating = $${paramIndex}`;
+      queryParams.push(rating);
+      paramIndex++;
+    }
+    
+    updateQuery += ` WHERE id = $${paramIndex} RETURNING *`;
+    queryParams.push(id);
+    
+    // Değerlendirmeyi güncelle
+    const result = await pool.query(updateQuery, queryParams);
+    
+    res.json({ 
+      message: 'Değerlendirme güncellendi.', 
+      rating: result.rows[0] 
+    });
+  } catch (error) {
+    console.error('Error updating formula rating:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Bir değerlendirmeyi sil (sadece sahibi veya admin)
+app.delete('/api/formulas/ratings/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user.id;
+    
+    // Değerlendirmenin var olup olmadığını kontrol et
+    const ratingCheck = await pool.query(
+      'SELECT formula_id, user_id FROM "FormulaRatings" WHERE id = $1',
+      [id]
+    );
+    
+    if (ratingCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Değerlendirme bulunamadı.' });
+    }
+    
+    // Değerlendirmenin sahibini veya admin olup olmadığını kontrol et
+    const isOwner = ratingCheck.rows[0].user_id === user_id;
+    const isAdmin = req.user.isAdmin === true;
+    
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Bu işlem için yetkiniz yok.' });
+    }
+    
+    // Değerlendirmeyi sil
+    await pool.query('DELETE FROM "FormulaRatings" WHERE id = $1', [id]);
+    
+    res.json({ message: 'Değerlendirme silindi.' });
+  } catch (error) {
+    console.error('Error deleting formula rating:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Kullanıcının bir formül için daha önce yaptığı değerlendirmeyi getir
+app.get('/api/formulas/:id/user-rating', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user.id;
+    
+    const result = await pool.query(
+      'SELECT * FROM "FormulaRatings" WHERE formula_id = $1 AND user_id = $2',
+      [id, user_id]
+    );
+    
+    if (result.rows.length === 0) {
+      res.json(null);
+    } else {
+      res.json(result.rows[0]);
+    }
+  } catch (error) {
+    console.error('Error fetching user rating:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

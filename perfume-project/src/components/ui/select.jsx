@@ -32,14 +32,59 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100",
+        "relative z-50 min-w-[8rem] rounded-md border bg-popover text-popover-foreground shadow-md",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       )}
+      style={{
+        maxHeight: '300px',
+        overflowY: 'auto',
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent',
+        msOverflowStyle: 'auto',
+      }}
       position={position}
       {...props}
     >
+      <style jsx global>{`
+        /* Added !important to force scrollbar display */
+        [data-radix-select-content] {
+          max-height: 300px !important;
+          overflow-y: auto !important;
+        }
+        
+        [data-radix-select-content]::-webkit-scrollbar {
+          width: 10px !important;
+          display: block !important;
+        }
+        
+        [data-radix-select-content]::-webkit-scrollbar-track {
+          background: transparent !important;
+        }
+        
+        [data-radix-select-content]::-webkit-scrollbar-thumb {
+          background-color: rgba(203, 213, 224, 0.8) !important;
+          border-radius: 20px !important;
+          border: 3px solid transparent !important;
+          background-clip: padding-box !important;
+        }
+        
+        .dark [data-radix-select-content]::-webkit-scrollbar-thumb {
+          background-color: rgba(74, 85, 104, 0.8) !important;
+        }
+        
+        [data-radix-select-viewport] {
+          max-height: none !important;
+          overflow: visible !important;
+        }
+      `}</style>
       <SelectPrimitive.Viewport
         className={cn(
           "p-1",

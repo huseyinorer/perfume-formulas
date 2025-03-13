@@ -106,23 +106,22 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
 
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Marka</TableHead>
-                  <TableHead>Parfüm Adı</TableHead>
-                  <TableHead className="text-right">İşlemler</TableHead>
+                <TableRow className="dark:border-gray-700">
+                  <TableHead className="dark:text-gray-300">Marka</TableHead>
+                  <TableHead className="dark:text-gray-300">Parfüm Adı</TableHead>
+                  <TableHead className="text-right dark:text-gray-300">İşlemler</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {Array.isArray(perfumes) && perfumes.map((perfume) => (
-                  <TableRow key={perfume.id}>
-                    <TableCell className="font-medium">{perfume.brand}</TableCell>
-                    <TableCell>{perfume.name}</TableCell>
+                  <TableRow key={perfume.id} className="dark:border-gray-700">
+                    <TableCell className="font-medium dark:text-gray-300">{perfume.brand}</TableCell>
+                    <TableCell className="dark:text-gray-300">{perfume.name}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          console.log('Selected perfume for edit:', perfume);
                           setSelectedPerfume({
                             id: perfume.id,
                             brand_id: perfume.brand_id,
@@ -136,7 +135,7 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
                           });
                           setIsEditDialogOpen(true);
                         }}
-                        className="text-blue-600 hover:text-blue-700 mr-2"
+                        className="bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/50 mr-2"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -144,7 +143,7 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
                         variant="ghost"
                         size="sm"
                         onClick={(e) => handleDelete(perfume.id, e)}
-                        className="text-red-600 hover:text-red-700"
+                        className="bg-red-50 text-red-600 hover:text-red-700 hover:bg-red-100 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/50"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

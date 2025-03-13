@@ -46,8 +46,8 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
       return
     }
 
-    if (fragrance + alcohol + water > 100) {
-      setError('Toplam yüzde 100\'ü geçemez.')
+    if (fragrance + alcohol + water == 100) {
+      setError('Toplam yüzde 100 olmalı.')
       return
     }
 
@@ -228,7 +228,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
             <div className="text-red-500 dark:text-red-400 text-sm">{error}</div>
           )}
 
-          <Button variant="outline" type="submit" className="w-full">
+          <Button variant="default" type="submit" className="w-full">
             Kaydet
           </Button>
         </form>
