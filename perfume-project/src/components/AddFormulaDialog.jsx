@@ -46,7 +46,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
       return
     }
 
-    if (fragrance + alcohol + water == 100) {
+    if ((fragrance + alcohol + water) != 100) {
       setError('Toplam yüzde 100 olmalı.')
       return
     }
