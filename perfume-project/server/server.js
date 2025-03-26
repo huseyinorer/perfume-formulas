@@ -306,15 +306,17 @@ app.get("/api/perfumes/:id/formulas", async (req, res) => {
     
     // Formülleri ve değerlendirme bilgilerini getir
     const result = await pool.query(`
-      SELECT 
-        pf.*,
-        COALESCE(AVG(fr.rating), 0) as "averageRating",
-        COUNT(fr.id) as "reviewCount"
-      FROM "ParfumeFormulas" pf
-      LEFT JOIN "FormulaRatings" fr ON pf.id = fr.formula_id
-      WHERE pf."parfumesId" = $1
-      GROUP BY pf.id
-      ORDER BY pf.id DESC
+      SELECT
+      pf.*,
+      COALESCE(AVG(fr.rating), 0) as "averageRating",
+      COUNT(fr.id) as "reviewCount"
+    FROM "ParfumeFormulas" pf
+    LEFT JOIN "FormulaRatings" fr ON pf.id = fr.formula_id
+    WHERE pf."parfumesId" = $1
+    GROUP BY pf.id
+    ORDER BY 
+      CASE WHEN pf."created_at" IS NULL THEN 0 ELSE 1 END DESC,
+      pf."created_at" DESC
     `, [id]);
     
     res.json(result.rows);
@@ -372,8 +374,9 @@ app.post("/api/formulas", async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO "ParfumeFormulas" ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
-      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      `INSERT INTO "ParfumeFormulas" 
+      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "createdAt")
+      VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *`,
       [
         parfumesId,
         fragrancePercentage,
@@ -439,7 +442,7 @@ app.get("/api/formulas/pending", async (req, res) => {
      JOIN "Perfumes" p ON fr."parfumesId" = p.perfume_id
      JOIN "Brands" b ON p.brand_id = b.brand_id
      WHERE fr.status = 'PENDING'
-     ORDER BY fr."createdAt" DESC
+     ORDER BY fr."created_at" DESC
    `);
     res.json(result.rows);
   } catch (error) {
@@ -469,14 +472,15 @@ app.post("/api/formulas/approve/:id", async (req, res) => {
     // Formülü ekle
     await client.query(
       `INSERT INTO "ParfumeFormulas" 
-      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay")
-      VALUES ($1, $2, $3, $4, $5)`,
+      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "createdAt")
+      VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         formula.parfumesId,
         formula.fragrancePercentage,
         formula.alcoholPercentage,
         formula.waterPercentage,
         formula.restDay,
+        formula.created_at
       ]
     );
 
@@ -856,7 +860,7 @@ app.get('/api/favorites', authenticateToken, async (req, res) => {
     // Favori parfümleri getir
     const result = await pool.query(`
       SELECT 
-        p.perfume_id,
+        p.perfume_id as id,
         b.brand_id,
         b.brand_name as brand,
         p.perfume_name as name,

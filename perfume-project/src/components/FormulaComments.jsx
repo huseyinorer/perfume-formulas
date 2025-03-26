@@ -457,6 +457,16 @@ const FormulaComments = ({
           <div className="mt-2 text-sm text-gray-500 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-md">
             <div className="flex gap-4">
               <div>
+                <span className="font-medium">Eklenme Tarihi:</span> 
+                {selectedFormula?.created_at ? 
+                  new Date(selectedFormula.created_at).toLocaleDateString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }).replace(/\//g, '.') 
+                  : ''}
+              </div>
+              <div>
                 <span className="font-medium">Esans:</span> %
                 {selectedFormula?.fragrancePercentage}
               </div>

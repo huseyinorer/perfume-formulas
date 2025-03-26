@@ -697,7 +697,7 @@ function App() {
         >
           <DialogContent
             className={`${
-              showComments ? "max-w-5xl w-full" : "max-w-3xl"
+              showComments ? "max-w-7xl w-full" : "max-w-3xl"
             } transition-all duration-300 ease-in-out overflow-hidden`}
           >
             <DialogHeader className="flex flex-row justify-between items-center">
@@ -857,6 +857,7 @@ function App() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>Eklenme Tar.</TableHead>
                         <TableHead>Esans %</TableHead>
                         <TableHead>Alkol %</TableHead>
                         <TableHead>Su %</TableHead>
@@ -871,6 +872,15 @@ function App() {
                     <TableBody>
                       {formulas.map((formula) => (
                         <TableRow key={formula.id}>
+                          <TableCell>
+                            {formula.created_at ? 
+                              new Date(formula.created_at).toLocaleDateString('tr-TR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                              }).replace(/\//g, '.') 
+                              : ''}
+                          </TableCell>
                           <TableCell>{formula.fragrancePercentage}%</TableCell>
                           <TableCell>{formula.alcoholPercentage}%</TableCell>
                           <TableCell>{formula.waterPercentage}%</TableCell>
@@ -992,6 +1002,7 @@ function App() {
           open={isFavoritesOpen}
           onOpenChange={setIsFavoritesOpen}
           onFavoriteToggle={handleFavoriteToggle}
+          onRowClick={handleRowClick}
         />
         <FAQDialog open={isFAQOpen} onOpenChange={setIsFAQOpen} />
       </div>

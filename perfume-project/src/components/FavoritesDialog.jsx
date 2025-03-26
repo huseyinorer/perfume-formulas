@@ -11,7 +11,8 @@ import {
 } from "./ui/table";
 import Pagination from "./Pagination";
 
-const FavoritesDialog = ({ open, onOpenChange, onFavoriteToggle }) => {
+// Named fonksiyon komponenti olarak tanımlayın
+function FavoritesDialog({ open, onOpenChange, onFavoriteToggle, onRowClick }) {
   const [favorites, setFavorites] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -45,6 +46,15 @@ const FavoritesDialog = ({ open, onOpenChange, onFavoriteToggle }) => {
     }
   };
 
+  // Satıra tıklandığında çağrılacak fonksiyon
+  const handlePerfumeClick = (perfume) => {
+    // Favoriler modalını kapat
+    //onOpenChange(false);
+    console.log(perfume);
+    // Perfüm detaylarını göster
+    onRowClick(perfume);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -63,21 +73,27 @@ const FavoritesDialog = ({ open, onOpenChange, onFavoriteToggle }) => {
           </TableHeader>
           <TableBody>
             {favorites.map((perfume) => (
-              <TableRow key={perfume.perfume_id}>
+              <TableRow 
+                key={perfume.id}
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                onClick={() => handlePerfumeClick(perfume)}
+              >
                 <TableCell>{perfume.brand}</TableCell>
                 <TableCell>{perfume.name}</TableCell>
                 <TableCell>{perfume.type}</TableCell>
                 <TableCell className="text-right">
                   <button
-                    onClick={async () => {
-                      await onFavoriteToggle(perfume.perfume_id);
-                      setFavorites((prevFavorites) =>
-                        prevFavorites.filter(
-                          (fav) => fav.perfume_id !== perfume.perfume_id
-                        )
-                      );
+                    onClick={(e) => {
+                      e.stopPropagation(); // Tıklama eventi satıra ulaşmasın
+                      onFavoriteToggle(perfume.id).then(() => {
+                        setFavorites((prevFavorites) =>
+                          prevFavorites.filter(
+                            (fav) => fav.id !== perfume.id
+                          )
+                        );
+                      });
                     }}
-                    className="p-2 rounded-full hover:bg-gray-100"
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <Heart className="h-5 w-5 text-red-500 fill-current" />
                   </button>
@@ -98,6 +114,6 @@ const FavoritesDialog = ({ open, onOpenChange, onFavoriteToggle }) => {
       </DialogContent>
     </Dialog>
   );
-};
+}
 
 export default FavoritesDialog;

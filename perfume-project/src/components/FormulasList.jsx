@@ -45,6 +45,7 @@ const FormulasList = ({ open, onClose, perfume }) => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Eklenme Tar.</TableHead>
               <TableHead>Esans %</TableHead>
               <TableHead>Alkol %</TableHead>
               <TableHead>Su %</TableHead>
@@ -54,6 +55,15 @@ const FormulasList = ({ open, onClose, perfume }) => {
           <TableBody>
             {formulas.map((formula) => (
               <TableRow key={formula.id}>
+                <TableCell>
+                {formula.created_at ? 
+                  new Date(formula.created_at).toLocaleDateString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }).replace(/\//g, '.') 
+                  : ''}
+              </TableCell>
                 <TableCell>{formula.fragrancePercentage}%</TableCell>
                 <TableCell>{formula.alcoholPercentage}%</TableCell>
                 <TableCell>{formula.waterPercentage}%</TableCell>
