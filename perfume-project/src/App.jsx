@@ -871,7 +871,12 @@ function App() {
                     </TableHeader>
                     <TableBody>
                       {formulas.map((formula) => (
-                        <TableRow key={formula.id}>
+                        
+                          <TableRow 
+                            key={formula.id}
+                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                            onClick={(e) => handleOpenComments(formula, e)}
+                          >
                           <TableCell>
                             {formula.created_at ? 
                               new Date(formula.created_at).toLocaleDateString('tr-TR', {
