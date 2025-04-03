@@ -375,7 +375,7 @@ app.post("/api/formulas", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO "ParfumeFormulas" 
-      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "createdAt")
+      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "created_at")
       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *`,
       [
         parfumesId,
@@ -472,7 +472,7 @@ app.post("/api/formulas/approve/:id", async (req, res) => {
     // Formülü ekle
     await client.query(
       `INSERT INTO "ParfumeFormulas" 
-      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "createdAt")
+      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "created_at")
       VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         formula.parfumesId,
