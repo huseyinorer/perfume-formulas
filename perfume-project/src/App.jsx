@@ -648,6 +648,56 @@ function App() {
         </div>
 
         <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+            {/* Shopier Store Banner - 6 grid */}
+            <div className="md:col-span-6">
+              <a 
+                href="https://www.shopier.com/soultrace" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="block h-full"
+              >
+                <div className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg shadow-lg p-4 transform transition-transform hover:scale-102 hover:shadow-xl h-full">
+                  <div className="flex items-center justify-between">
+                    <div className="text-white">
+                      <h3 className="text-xl font-bold">Shopier Parfüm Mağazamız</h3>
+                      <p className="text-sm opacity-90">Kendi yaptığımız parfümleri keşfedin</p>
+                    </div>
+                    <div className="bg-white rounded-full p-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            
+            {/* Etiket Tasarla Banner - 6 grid */}
+            <div className="md:col-span-6">
+              <a 
+                href="/perfume-formulas/label-designer.html" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block h-full"
+              >
+                <div className="bg-gradient-to-r from-teal-500 to-blue-500 rounded-lg shadow-lg p-4 transform transition-transform hover:scale-102 hover:shadow-xl h-full">
+                  <div className="flex items-center justify-between">
+                    <div className="text-white">
+                      <h3 className="text-xl font-bold">Etiket Oluştur</h3>
+                      <p className="text-sm opacity-90">Kendi özel parfüm etiketinizi hızlıca oluşturun</p>
+                    </div>
+                    <div className="bg-white rounded-full p-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
           <div className="max-w-2xl mx-auto mb-4">
             <SearchBox
               onSearch={(value) => setSearchTerm(value)}

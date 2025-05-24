@@ -30,7 +30,7 @@ const SearchBox = ({ onSearch }) => {
         onChange={handleSearch}
       />
       <div className="text-xs text-gray-500 mt-1">
-        Hem marka adında hem parfüm adında arama yapar
+        Hem marka adında hem parfüm adında arama
       </div>
     </div>
   );
