@@ -570,7 +570,7 @@
                     
                     // Create main text
                     const mainText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    const textStartY = contentStartY + headerHeight + parseInt(cell.fontSize);
+                    const textStartY = hasHeader ? contentStartY + headerHeight + parseInt(cell.fontSize) : rowCenterY + (parseInt(cell.fontSize) / 3);
                     mainText.setAttribute('x', textX);
                     mainText.setAttribute('y', textStartY);
                     mainText.setAttribute('font-family', 'Arial, sans-serif');
