@@ -3,50 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved Perfume Label Template</title>
+    <title>Dynamic Perfume Label Template</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            min-height: 100vh;
+        }
+        
+        .left-panel {
+            width: 45%;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        
+        .right-panel {
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        
         #svgContainer {
-            width: 800px;
-            height: 500px;
-            margin: 20px auto;
+            width: 100%;
+            max-width: 700px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border: 1px solid #ddd;
+            margin-bottom: 20px;
+            background: white;
         }
+        
+        #perfumeLabel {
+            width: 100%;
+            height: auto;
+        }
+        
         button {
-            display: block;
-            margin: 10px auto;
-            padding: 10px 20px;
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 16px;
             background: #333;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-family: Arial, sans-serif;
+            font-size: 14px;
         }
         button:hover {
             background: #555;
         }
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
+        .delete-btn {
+            background: #dc3545;
+            padding: 4px 8px;
+            font-size: 12px;
         }
-        h1 {
-            color: #333;
-            margin-top: 30px;
+        .delete-btn:hover {
+            background: #c82333;
         }
+        
         .controls {
-            max-width: 800px;
-            margin: 20px auto;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            background-color: #f0f0f0;
-            padding: 20px;
-            border-radius: 8px;
         }
         .controls label {
             display: flex;
@@ -55,179 +88,238 @@
             padding: 5px 0;
         }
         .controls input, .controls select, .controls textarea {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 14px;
         }
         .input-group {
             display: flex;
-            gap: 10px;
-            width: 450px;
+            gap: 8px;
+            width: 100%;
+            align-items: center;
+            flex-wrap: wrap;
         }
         .input-group input[type="text"],
-        .input-group input[type="number"],
-        .input-group select,
         .input-group textarea {
-            flex-grow: 1;
+            flex: 1;
+            min-width: 120px;
         }
+        .input-group input[type="number"],
+        .input-group select {
+            width: 70px;
+            flex-shrink: 0;
+        }
+        .input-group input[type="checkbox"] {
+            width: auto;
+        }
+        
         .section-title {
             font-weight: bold;
             margin-top: 15px;
             text-align: left;
             border-bottom: 1px solid #ccc;
             padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .row-controls {
+            background-color: #e8e8e8;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 2px solid #ccc;
+        }
+        .cell-controls {
+            background-color: #f8f8f8;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .cell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .export-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 1200px) {
+            body {
+                flex-direction: column;
+            }
+            .left-panel, .right-panel {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Perfume Label Template</h1>
-    <div id="svgContainer">
-        <svg id="perfumeLabel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-            <!-- Main outline -->
-            <rect width="800" height="500" fill="white" stroke="black" stroke-width="3"/>
+    <div class="left-panel">
+        <h1>Perfume Label Controls</h1>
+        <div class="controls">
+            <div class="section-title">
+                Brand Section (Row 1 - Fixed)
+            </div>
+            <div class="row-controls">
+                <div class="cell-controls">
+                    <div class="cell-header">Brand Name Cell</div>
+                    <label>
+                        Text:
+                        <div class="input-group">
+                            <input type="text" id="brandInput" value="Borcelle" />
+                            <input type="number" id="brandFontSize" value="48" min="20" max="60" title="Font Size">
+                            <select id="brandAlign">
+                                <option value="middle">Center</option>
+                                <option value="start">Left</option>
+                                <option value="end">Right</option>
+                            </select>
+                            <label style="margin: 0; font-size: 12px;">
+                                <input type="checkbox" id="brandBold" checked> Bold
+                            </label>
+                        </div>
+                    </label>
+                </div>
+                <div class="cell-controls">
+                    <div class="cell-header">Product Type Cell</div>
+                    <label>
+                        Text:
+                        <div class="input-group">
+                            <input type="text" id="productTypeInput" value="Eau de Parfum" />
+                            <input type="number" id="productTypeFontSize" value="36" min="20" max="50" title="Font Size">
+                            <select id="productTypeAlign">
+                                <option value="middle">Center</option>
+                                <option value="start">Left</option>
+                                <option value="end">Right</option>
+                            </select>
+                            <label style="margin: 0; font-size: 12px;">
+                                <input type="checkbox" id="productTypeBold"> Bold
+                            </label>
+                        </div>
+                    </label>
+                </div>
+            </div>
             
-            <!-- Header bar (Brand & Product Type) -->
-            <rect x="5" y="5" width="790" height="100" fill="white" stroke="black" stroke-width="3"/>
-            <rect x="5" y="5" width="395" height="100" fill="black"/>
+            <!-- Dynamic Rows Container -->
+            <div id="dynamicRows"></div>
             
-            <!-- Brand name -->
-            <text id="brandName" x="200" y="70" font-family="'Courier New', monospace" font-size="48" text-anchor="middle" fill="white" font-weight="bold">Borcelle</text>
-            
-            <!-- Product type -->
-            <text id="productType" x="600" y="70" font-family="'Times New Roman', serif" font-size="36" text-anchor="middle" fill="black">Eau de Parfum</text>
-            
-            <!-- Product name section -->
-            <rect x="5" y="105" width="790" height="145" fill="white" stroke="black" stroke-width="3"/>
-            
-            <!-- Product name -->
-            <text id="productName" x="400" y="200" font-family="Arial, sans-serif" font-size="70" text-anchor="middle" fill="black" font-weight="bold">SWEET VANILLA</text>
-            
-            <!-- Notes and Usage section -->
-            <rect x="5" y="250" width="790" height="125" fill="white" stroke="black" stroke-width="3"/>
-            <line x1="400" y1="250" x2="400" y2="375" stroke="black" stroke-width="3"/>
-            
-            <!-- Notes header -->
-            <text id="notesHeader" x="200" y="280" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="black" font-weight="bold">Know the Notes</text>
-            
-        <!-- Notes text with extended text box -->
-            <text id="notesText" x="5" y="320" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="black" width="390">
-                <tspan x="200" dy="0" text-anchor="middle">Vanilla, Cotton, Coffee,</tspan>
-                <tspan x="200" dy="25" text-anchor="middle">Cognac, Chocolate.</tspan>
-            </text>
-            
-            <!-- Usage header -->
-            <text id="usageHeader" x="600" y="280" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="black" font-weight="bold">Used to</text>
-            
-            <!-- Usage text with extended text box -->
-            <text id="usageText" x="405" y="320" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="black" width="390">
-                <tspan x="600" dy="0" text-anchor="middle">All Occasions</tspan>
-                <tspan x="600" dy="25" text-anchor="middle">for Unisex</tspan>
-            </text>
-            
-            <!-- Bottom section (Fragrance type & Volume) -->
-            <rect x="5" y="375" width="790" height="120" fill="white" stroke="black" stroke-width="3"/>
-            <line x1="400" y1="375" x2="400" y2="495" stroke="black" stroke-width="3"/>
-            
-            <!-- Fragrance type changed to Production Date -->
-            <text id="productionDateHeader" x="200" y="415" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="black" font-weight="bold">Date</text>
-
-            <text id="productionDate" x="200" y="455" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="black">18.04.2025</text>
-            
-            <!-- Volume header -->
-            <text id="volumeHeader" x="600" y="415" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="black" font-weight="bold">Netto</text>
-            
-            <!-- Volume text -->
-            <text id="volumeText" x="600" y="455" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="black">250ml/1.75oz</text>
-        </svg>
+            <button onclick="addRow()" style="margin: 10px auto; display: block;">Add New Row</button>
+        </div>
     </div>
     
-    <div class="controls">
-        <div class="section-title">Brand Section</div>
-        <label>
-            Brand Name:
-            <div class="input-group">
-                <input type="text" id="brandInput" value="Borcelle" />
-                <input type="number" id="brandFontSize" value="48" min="20" max="60" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        <label>
-            Product Type:
-            <div class="input-group">
-                <input type="text" id="productTypeInput" value="Eau de Parfum" />
-                <input type="number" id="productTypeFontSize" value="36" min="20" max="50" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
+    <div class="right-panel">
+        <h1>Label Preview</h1>
+        <div id="svgContainer">
+            <svg id="perfumeLabel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+                <!-- Main outline -->
+                <rect width="800" height="500" fill="white" stroke="black" stroke-width="3"/>
+                
+                <!-- Header bar (Brand & Product Type) - Row 1 -->
+                <rect x="5" y="5" width="790" height="100" fill="white" stroke="black" stroke-width="3"/>
+                <rect x="5" y="5" width="395" height="100" fill="black"/>
+                
+                <!-- Brand name -->
+                <text id="brandName" x="200" y="70" font-family="'Courier New', monospace" font-size="48" text-anchor="middle" fill="white" font-weight="bold">Borcelle</text>
+                
+                <!-- Product type -->
+                <text id="productType" x="600" y="70" font-family="'Times New Roman', serif" font-size="36" text-anchor="middle" fill="black">Eau de Parfum</text>
+            </svg>
+        </div>
         
-        <div class="section-title">Product Name</div>
-        <label>
-            Product Name:
-            <div class="input-group">
-                <input type="text" id="productNameInput" value="SWEET VANILLA" />
-                <input type="number" id="productNameFontSize" value="70" min="30" max="90" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        
-        <div class="section-title">Notes & Usage Information</div>
-        <label>
-            Notes Header:
-            <div class="input-group">
-                <input type="text" id="notesHeaderInput" value="Know the Notes" />
-                <input type="number" id="notesHeaderFontSize" value="24" min="16" max="36" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        <label>
-            Notes Text:
-            <div class="input-group">
-                <textarea id="notesTextInput" rows="2" style="resize: vertical;">Vanilla, Cotton, Coffee,
-Cognac, Chocolate.</textarea>
-                <input type="number" id="notesTextFontSize" value="20" min="14" max="28" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        <label>
-            Usage Header:
-            <div class="input-group">
-                <input type="text" id="usageHeaderInput" value="Used to" />
-                <input type="number" id="usageHeaderFontSize" value="24" min="16" max="36" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        <label>
-            Usage Text:
-            <div class="input-group">
-                <textarea id="usageTextInput" rows="2" style="resize: vertical;">All Occasions
-for Unisex</textarea>
-                <input type="number" id="usageTextFontSize" value="20" min="14" max="28" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        
-        <div class="section-title">Fragrance Details</div>
-        <label>
-            Production Date:
-            <div class="input-group">
-                <input type="text" id="productionDateInput" value="18.04.2025" />
-                <input type="number" id="productionDateFontSize" value="36" min="20" max="50" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        <label>
-            Volume Header:
-            <div class="input-group">
-                <input type="text" id="volumeHeaderInput" value="Netto" />
-                <input type="number" id="volumeHeaderFontSize" value="24" min="16" max="36" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
-        <label>
-            Volume Text:
-            <div class="input-group">
-                <input type="text" id="volumeTextInput" value="250ml/1.75oz" />
-                <input type="number" id="volumeTextFontSize" value="24" min="16" max="36" style="width: 80px" title="Font Size (px)">
-            </div>
-        </label>
+        <div class="export-controls">
+            <button id="exportBtn">Download as PNG</button>
+        </div>
     </div>
-    
-    <button id="exportBtn">Download as PNG</button>
 
     <script>
-        // Set today's date in format DD.MM.YYYY
+        let rowCounter = 1;
+        let labelHeight = 500;
+        const rowHeight = 125;
+        const minHeight = 250;
+        
+        // Initialize with original data structure
+        let rows = [
+            {
+                id: 1,
+                cells: [
+                    {
+                        id: 'productName',
+                        text: 'SWEET VANILLA',
+                        fontSize: 70,
+                        alignment: 'middle',
+                        header: '',
+                        headerFontSize: 24,
+                        bold: true,
+                        headerBold: true,
+                        multiline: false
+                    }
+                ]
+            },
+            {
+                id: 2,
+                cells: [
+                    {
+                        id: 'notes',
+                        text: 'Vanilla, Cotton, Coffee,\nCognac, Chocolate.',
+                        fontSize: 20,
+                        alignment: 'middle',
+                        header: 'Know the Notes',
+                        headerFontSize: 24,
+                        bold: false,
+                        headerBold: true,
+                        multiline: true
+                    },
+                    {
+                        id: 'usage',
+                        text: 'All Occasions\nfor Unisex',
+                        fontSize: 20,
+                        alignment: 'middle',
+                        header: 'Used to',
+                        headerFontSize: 24,
+                        bold: false,
+                        headerBold: true,
+                        multiline: true
+                    }
+                ]
+            },
+            {
+                id: 3,
+                cells: [
+                    {
+                        id: 'date',
+                        text: getTodayDate(),
+                        fontSize: 24,
+                        alignment: 'middle',
+                        header: 'Date',
+                        headerFontSize: 24,
+                        bold: false,
+                        headerBold: true,
+                        multiline: false
+                    },
+                    {
+                        id: 'volume',
+                        text: '250ml/1.75oz',
+                        fontSize: 24,
+                        alignment: 'middle',
+                        header: 'Netto',
+                        headerFontSize: 24,
+                        bold: false,
+                        headerBold: true,
+                        multiline: false
+                    }
+                ]
+            }
+        ];
+        
+        rowCounter = 3; // Set counter to match existing rows
+        
         function getTodayDate() {
             const today = new Date();
             const day = String(today.getDate()).padStart(2, '0');
@@ -236,108 +328,290 @@ for Unisex</textarea>
             return `${day}.${month}.${year}`;
         }
         
-        // Initialize date field with today's date
-        document.addEventListener('DOMContentLoaded', function() {
-            const todayDate = getTodayDate();
-            document.getElementById('productionDateInput').value = todayDate;
-            document.getElementById('productionDate').textContent = todayDate;
-        });
-        
-        // Get all form elements
-        const brandInput = document.getElementById('brandInput');
-        const brandFontSize = document.getElementById('brandFontSize');
-        const productTypeInput = document.getElementById('productTypeInput');
-        const productTypeFontSize = document.getElementById('productTypeFontSize');
-        const productNameInput = document.getElementById('productNameInput');
-        const productNameFontSize = document.getElementById('productNameFontSize');
-        const notesHeaderInput = document.getElementById('notesHeaderInput');
-        const notesHeaderFontSize = document.getElementById('notesHeaderFontSize');
-        const notesTextInput = document.getElementById('notesTextInput');
-        const notesTextFontSize = document.getElementById('notesTextFontSize');
-        const usageHeaderInput = document.getElementById('usageHeaderInput');
-        const usageHeaderFontSize = document.getElementById('usageHeaderFontSize');
-        const usageTextInput = document.getElementById('usageTextInput');
-        const usageTextFontSize = document.getElementById('usageTextFontSize');
-        const productionDateInput = document.getElementById('productionDateInput');
-        const productionDateFontSize = document.getElementById('productionDateFontSize');
-        const volumeHeaderInput = document.getElementById('volumeHeaderInput');
-        const volumeHeaderFontSize = document.getElementById('volumeHeaderFontSize');
-        const volumeTextInput = document.getElementById('volumeTextInput');
-        const volumeTextFontSize = document.getElementById('volumeTextFontSize');
-        
-        // Add event listeners to all inputs
-        const allInputs = document.querySelectorAll('input, textarea');
-        allInputs.forEach(input => {
-            input.addEventListener('input', updateLabel);
-        });
-        
-        function updateLabel() {
-            // Update text content
-            document.getElementById('brandName').textContent = brandInput.value;
-            document.getElementById('productType').textContent = productTypeInput.value;
-            document.getElementById('productName').textContent = productNameInput.value;
-            document.getElementById('notesHeader').textContent = notesHeaderInput.value;
-            document.getElementById('usageHeader').textContent = usageHeaderInput.value;
-            document.getElementById('productionDate').textContent = productionDateInput.value;
-            document.getElementById('volumeHeader').textContent = volumeHeaderInput.value;
-            document.getElementById('volumeText').textContent = volumeTextInput.value;
-            
-            // Handle multi-line text areas
-            updateMultilineText('notesText', notesTextInput.value, 200);
-            updateMultilineText('usageText', usageTextInput.value, 600);
-            
-            // Update font sizes
-            document.getElementById('brandName').setAttribute('font-size', brandFontSize.value);
-            document.getElementById('productType').setAttribute('font-size', productTypeFontSize.value);
-            document.getElementById('productName').setAttribute('font-size', productNameFontSize.value);
-            document.getElementById('notesHeader').setAttribute('font-size', notesHeaderFontSize.value);
-            document.getElementById('notesText').setAttribute('font-size', notesTextFontSize.value);
-            document.getElementById('usageHeader').setAttribute('font-size', usageHeaderFontSize.value);
-            document.getElementById('usageText').setAttribute('font-size', usageTextFontSize.value);
-            document.getElementById('productionDate').setAttribute('font-size', productionDateFontSize.value);
-            document.getElementById('volumeHeader').setAttribute('font-size', volumeHeaderFontSize.value);
-            document.getElementById('volumeText').setAttribute('font-size', volumeTextFontSize.value);
+        function addRow() {
+            rowCounter++;
+            const newRow = {
+                id: rowCounter,
+                cells: [
+                    {
+                        id: `row${rowCounter}_cell1`,
+                        text: 'New Text',
+                        fontSize: 24,
+                        alignment: 'middle',
+                        header: 'Header',
+                        headerFontSize: 20,
+                        bold: false,
+                        headerBold: true,
+                        multiline: false
+                    }
+                ]
+            };
+            rows.push(newRow);
+            updateLabel();
+            renderControls();
         }
         
-        function updateMultilineText(elementId, text, xPosition) {
-            const element = document.getElementById(elementId);
-            // Clear existing content
-            while (element.firstChild) {
-                element.removeChild(element.firstChild);
+        function deleteRow(rowId) {
+            rows = rows.filter(row => row.id !== rowId);
+            updateLabel();
+            renderControls();
+        }
+        
+        function addCellToRow(rowId) {
+            const row = rows.find(r => r.id === rowId);
+            if (row && row.cells.length < 2) {
+                row.cells.push({
+                    id: `row${rowId}_cell${row.cells.length + 1}`,
+                    text: 'New Cell',
+                    fontSize: 24,
+                    alignment: 'middle',
+                    header: 'Header',
+                    headerFontSize: 20,
+                    bold: false,
+                    headerBold: true,
+                    multiline: false
+                });
+                updateLabel();
+                renderControls();
             }
-            
-            // Split by newlines and create tspan elements
-            const lines = text.split('\n');
-            
-            // Calculate vertical positioning based on number of lines
-            const lineHeight = 25;
-            const totalHeight = lines.length * lineHeight;
-            let startY = 0;
-            
-            // For notesText, calculate different position
-            if (elementId === 'notesText') {
-                startY = 320 - (totalHeight / 2) + (lineHeight / 2);
-            } else if (elementId === 'usageText') {
-                startY = 320 - (totalHeight / 2) + (lineHeight / 2);
+        }
+        
+        function deleteCellFromRow(rowId, cellIndex) {
+            const row = rows.find(r => r.id === rowId);
+            if (row && row.cells.length > 1) {
+                row.cells.splice(cellIndex, 1);
+                updateLabel();
+                renderControls();
             }
+        }
+        
+        function renderControls() {
+            const container = document.getElementById('dynamicRows');
+            container.innerHTML = '';
             
-            lines.forEach((line, index) => {
-                const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-                tspan.textContent = line;
-                tspan.setAttribute('x', xPosition);
+            rows.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.innerHTML = `
+                    <div class="section-title">
+                        Row ${row.id} 
+                        <button class="delete-btn" onclick="deleteRow(${row.id})">Delete Row</button>
+                    </div>
+                    <div class="row-controls">
+                        <div style="margin-bottom: 10px;">
+                            <button onclick="addCellToRow(${row.id})" ${row.cells.length >= 2 ? 'disabled' : ''}>
+                                Add Cell (${row.cells.length}/2)
+                            </button>
+                        </div>
+                        <div id="cells_row_${row.id}"></div>
+                    </div>
+                `;
+                container.appendChild(rowDiv);
                 
-                // If it's the first line, set absolute Y position based on calculation
-                if (index === 0) {
-                    tspan.setAttribute('dy', 0);
-                    tspan.setAttribute('y', startY);
-                } else {
-                    tspan.setAttribute('dy', lineHeight);
-                }
-                
-                tspan.setAttribute('text-anchor', 'middle');
-                element.appendChild(tspan);
+                const cellsContainer = document.getElementById(`cells_row_${row.id}`);
+                row.cells.forEach((cell, cellIndex) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell-controls';
+                    cellDiv.innerHTML = `
+                        <div class="cell-header">
+                            Cell ${cellIndex + 1}
+                            ${row.cells.length > 1 ? `<button class="delete-btn" onclick="deleteCellFromRow(${row.id}, ${cellIndex})">Delete Cell</button>` : ''}
+                        </div>
+                        <label>
+                            Header:
+                            <div class="input-group">
+                                <input type="text" id="${cell.id}_header" value="${cell.header}" 
+                                       onchange="updateCellData(${row.id}, ${cellIndex}, 'header', this.value)" />
+                                <input type="number" id="${cell.id}_headerSize" value="${cell.headerFontSize}" min="12" max="36" title="Header Font Size"
+                                       onchange="updateCellData(${row.id}, ${cellIndex}, 'headerFontSize', this.value)" />
+                                <label style="margin: 0; font-size: 12px;">
+                                    <input type="checkbox" id="${cell.id}_headerBold" ${cell.headerBold ? 'checked' : ''}
+                                           onchange="updateCellData(${row.id}, ${cellIndex}, 'headerBold', this.checked)"> Bold
+                                </label>
+                            </div>
+                        </label>
+                        <label>
+                            Text:
+                            <div class="input-group">
+                                <textarea id="${cell.id}_text" rows="2" style="resize: vertical;"
+                                          onchange="updateCellData(${row.id}, ${cellIndex}, 'text', this.value)">${cell.text}</textarea>
+                                <input type="number" id="${cell.id}_fontSize" value="${cell.fontSize}" min="12" max="80" title="Font Size"
+                                       onchange="updateCellData(${row.id}, ${cellIndex}, 'fontSize', this.value)" />
+                                <select id="${cell.id}_align" onchange="updateCellData(${row.id}, ${cellIndex}, 'alignment', this.value)">
+                                    <option value="middle" ${cell.alignment === 'middle' ? 'selected' : ''}>Center</option>
+                                    <option value="start" ${cell.alignment === 'start' ? 'selected' : ''}>Left</option>
+                                    <option value="end" ${cell.alignment === 'end' ? 'selected' : ''}>Right</option>
+                                </select>
+                                <label style="margin: 0; font-size: 12px;">
+                                    <input type="checkbox" id="${cell.id}_bold" ${cell.bold ? 'checked' : ''}
+                                           onchange="updateCellData(${row.id}, ${cellIndex}, 'bold', this.checked)"> Bold
+                                </label>
+                            </div>
+                        </label>
+                    `;
+                    cellsContainer.appendChild(cellDiv);
+                });
             });
         }
+        
+        function updateCellData(rowId, cellIndex, property, value) {
+            const row = rows.find(r => r.id === rowId);
+            if (row && row.cells[cellIndex]) {
+                row.cells[cellIndex][property] = value;
+                updateLabel();
+            }
+        }
+        
+        function updateLabel() {
+            const svg = document.getElementById('perfumeLabel');
+            
+            // Calculate new height based on number of rows
+            const newHeight = 110 + (rows.length * rowHeight);
+            if (newHeight !== labelHeight) {
+                labelHeight = newHeight;
+                svg.setAttribute('viewBox', `0 0 800 ${labelHeight}`);
+                svg.querySelector('rect').setAttribute('height', labelHeight);
+            }
+            
+            // Clear existing dynamic content
+            const existingDynamicElements = svg.querySelectorAll('[data-dynamic="true"]');
+            existingDynamicElements.forEach(el => el.remove());
+            
+            // Update brand section
+            document.getElementById('brandName').textContent = document.getElementById('brandInput').value;
+            document.getElementById('brandName').setAttribute('font-size', document.getElementById('brandFontSize').value);
+            document.getElementById('brandName').setAttribute('text-anchor', document.getElementById('brandAlign').value);
+            document.getElementById('brandName').setAttribute('font-weight', document.getElementById('brandBold').checked ? 'bold' : 'normal');
+            
+            // Update brand name position based on alignment
+            const brandAlign = document.getElementById('brandAlign').value;
+            const brandX = brandAlign === 'start' ? 15 : brandAlign === 'end' ? 385 : 200;
+            document.getElementById('brandName').setAttribute('x', brandX);
+            
+            document.getElementById('productType').textContent = document.getElementById('productTypeInput').value;
+            document.getElementById('productType').setAttribute('font-size', document.getElementById('productTypeFontSize').value);
+            document.getElementById('productType').setAttribute('text-anchor', document.getElementById('productTypeAlign').value);
+            document.getElementById('productType').setAttribute('font-weight', document.getElementById('productTypeBold').checked ? 'bold' : 'normal');
+            
+            // Update product type position based on alignment
+            const productTypeAlign = document.getElementById('productTypeAlign').value;
+            const productTypeX = productTypeAlign === 'start' ? 415 : productTypeAlign === 'end' ? 785 : 600;
+            document.getElementById('productType').setAttribute('x', productTypeX);
+            
+            // Render dynamic rows
+            rows.forEach((row, rowIndex) => {
+                const yPosition = 105 + (rowIndex * rowHeight);
+                
+                // Create row rectangle
+                const rowRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rowRect.setAttribute('x', '5');
+                rowRect.setAttribute('y', yPosition);
+                rowRect.setAttribute('width', '790');
+                rowRect.setAttribute('height', rowHeight);
+                rowRect.setAttribute('fill', 'white');
+                rowRect.setAttribute('stroke', 'black');
+                rowRect.setAttribute('stroke-width', '3');
+                rowRect.setAttribute('data-dynamic', 'true');
+                svg.appendChild(rowRect);
+                
+                // Create cell dividers if there are 2 cells
+                if (row.cells.length === 2) {
+                    const divider = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    divider.setAttribute('x1', '400');
+                    divider.setAttribute('y1', yPosition);
+                    divider.setAttribute('x2', '400');
+                    divider.setAttribute('y2', yPosition + rowHeight);
+                    divider.setAttribute('stroke', 'black');
+                    divider.setAttribute('stroke-width', '3');
+                    divider.setAttribute('data-dynamic', 'true');
+                    svg.appendChild(divider);
+                }
+                
+                // Render cells
+                row.cells.forEach((cell, cellIndex) => {
+                    const cellWidth = row.cells.length === 1 ? 790 : 395;
+                    const cellX = row.cells.length === 1 ? 400 : (cellIndex === 0 ? 200 : 600);
+                    
+                    // Calculate X position based on alignment
+                    let textX = cellX;
+                    if (row.cells.length === 1) {
+                        textX = cell.alignment === 'start' ? 15 : cell.alignment === 'end' ? 785 : 400;
+                    } else {
+                        if (cellIndex === 0) {
+                            textX = cell.alignment === 'start' ? 15 : cell.alignment === 'end' ? 385 : 200;
+                        } else {
+                            textX = cell.alignment === 'start' ? 415 : cell.alignment === 'end' ? 785 : 600;
+                        }
+                    }
+                    
+                    // Calculate vertical centering
+                    const hasHeader = cell.header.trim() !== '';
+                    const textLines = cell.text.split('\n');
+                    const lineHeight = 25;
+                    const totalTextHeight = textLines.length * lineHeight;
+                    const headerHeight = hasHeader ? parseInt(cell.headerFontSize) + 10 : 0;
+                    const totalContentHeight = headerHeight + totalTextHeight;
+                    const rowCenterY = yPosition + (rowHeight / 2);
+                    const contentStartY = rowCenterY - (totalContentHeight / 2);
+                    
+                    // Create header text if exists
+                    if (hasHeader) {
+                        const headerText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                        headerText.setAttribute('x', textX);
+                        headerText.setAttribute('y', contentStartY + parseInt(cell.headerFontSize));
+                        headerText.setAttribute('font-family', 'Arial, sans-serif');
+                        headerText.setAttribute('font-size', cell.headerFontSize);
+                        headerText.setAttribute('text-anchor', cell.alignment);
+                        headerText.setAttribute('fill', 'black');
+                        headerText.setAttribute('font-weight', cell.headerBold ? 'bold' : 'normal');
+                        headerText.setAttribute('data-dynamic', 'true');
+                        headerText.textContent = cell.header;
+                        svg.appendChild(headerText);
+                    }
+                    
+                    // Create main text
+                    const mainText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    const textStartY = contentStartY + headerHeight + parseInt(cell.fontSize);
+                    mainText.setAttribute('x', textX);
+                    mainText.setAttribute('y', textStartY);
+                    mainText.setAttribute('font-family', 'Arial, sans-serif');
+                    mainText.setAttribute('font-size', cell.fontSize);
+                    mainText.setAttribute('text-anchor', cell.alignment);
+                    mainText.setAttribute('fill', 'black');
+                    mainText.setAttribute('font-weight', cell.bold ? 'bold' : 'normal');
+                    mainText.setAttribute('data-dynamic', 'true');
+                    
+                    // Handle multiline text
+                    if (textLines.length === 1) {
+                        mainText.textContent = cell.text;
+                    } else {
+                        textLines.forEach((line, lineIndex) => {
+                            const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                            tspan.textContent = line;
+                            tspan.setAttribute('x', textX);
+                            if (lineIndex === 0) {
+                                tspan.setAttribute('dy', '0');
+                            } else {
+                                tspan.setAttribute('dy', lineHeight);
+                            }
+                            tspan.setAttribute('text-anchor', cell.alignment);
+                            mainText.appendChild(tspan);
+                        });
+                    }
+                    
+                    svg.appendChild(mainText);
+                });
+            });
+        }
+        
+        // Brand section event listeners
+        document.getElementById('brandInput').addEventListener('input', updateLabel);
+        document.getElementById('brandFontSize').addEventListener('input', updateLabel);
+        document.getElementById('brandAlign').addEventListener('change', updateLabel);
+        document.getElementById('brandBold').addEventListener('change', updateLabel);
+        document.getElementById('productTypeInput').addEventListener('input', updateLabel);
+        document.getElementById('productTypeFontSize').addEventListener('input', updateLabel);
+        document.getElementById('productTypeAlign').addEventListener('change', updateLabel);
+        document.getElementById('productTypeBold').addEventListener('change', updateLabel);
         
         // Export functionality
         document.getElementById('exportBtn').addEventListener('click', function() {
@@ -353,11 +627,13 @@ for Unisex</textarea>
 
             img.onload = function() {
                 canvas.width = 800;
-                canvas.height = 500;
+                canvas.height = labelHeight;
                 ctx.drawImage(img, 0, 0);
                 URL.revokeObjectURL(url);
                 const link = document.createElement('a');
-                link.download = brandInput.value.toLowerCase() + '_' + productNameInput.value.toLowerCase().replace(/\s+/g, '_') + '_label.png';
+                const brandName = document.getElementById('brandInput').value.toLowerCase().replace(/\s+/g, '_');
+                const timestamp = new Date().toISOString().slice(0,10);
+                link.download = `${brandName}_perfume_label_${timestamp}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             };
@@ -365,8 +641,11 @@ for Unisex</textarea>
             img.src = url;
         });
         
-        // Initialize the label on page load
-        updateLabel();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderControls();
+            updateLabel();
+        });
     </script>
 </body>
 </html>
