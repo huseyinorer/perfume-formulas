@@ -37,6 +37,7 @@ import { LogIn, UserPlus, LogOut, User } from "lucide-react";
 import LoginDialog from "./components/LoginDialog";
 import axios from "axios";
 import PerfumeManagementDialog from "./components/PerfumeManagementDialog";
+import StockManagementDialog from "./components/StockManagementDialog";
 import PerfumeCard from "./components/PerfumeCard";
 import FavoritesDialog from "./components/FavoritesDialog";
 import FAQDialog from "./components/FAQDialog";
@@ -77,6 +78,7 @@ function App() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPerfumeManagementOpen, setIsPerfumeManagementOpen] = useState(false);
+  const [isStockManagementOpen, setIsStockManagementOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [selectedFormulaId, setSelectedFormulaId] = useState(null);
@@ -185,9 +187,9 @@ function App() {
     }
   };
 
-  const fetchFormulas = async (perfumeId) => {
+  const fetchFormulas = async (perfume_id) => {
     try {
-      const response = await fetch(`${API_URL}/perfumes/${perfumeId}/formulas`);
+      const response = await fetch(`${API_URL}/perfumes/${perfume_id}/formulas`);
       const data = await response.json();
       setFormulas(data);
     } catch (error) {
@@ -237,9 +239,9 @@ function App() {
     }
   };
 
-  const fetchCreativeFormula = async (perfumeId) => {
+  const fetchCreativeFormula = async (perfume_id) => {
     try {
-      const response = await fetch(`${API_URL}/perfumes/${perfumeId}/details`);
+      const response = await fetch(`${API_URL}/perfumes/${perfume_id}/details`);
       const data = await response.json();
       setCreativeFormula(data);
     } catch (error) {
@@ -479,7 +481,7 @@ function App() {
     }
   );
 
-  const handleFavoriteToggle = async (perfumeId) => {
+  const handleFavoriteToggle = async (perfume_id) => {
     if (!isLoggedIn) {
       alert("Favorilere eklemek için giriş yapmalısınız");
       return;
@@ -492,7 +494,7 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ perfume_id: perfumeId }),
+        body: JSON.stringify({ perfume_id: perfume_id }),
       });
 
       if (response.ok) {
@@ -610,6 +612,7 @@ function App() {
                     pendingRequestsCount={pendingRequests.length}
                     onPendingRequestsClick={() => setIsPendingDialogOpen(true)}
                     onAddPerfumeClick={() => setIsPerfumeManagementOpen(true)}
+                    onStockManagementClick={() => setIsStockManagementOpen(true)}
                     onChangePasswordClick={() => setIsChangePasswordOpen(true)}
                     onLogout={handleLogout}
                     username={user?.username}
@@ -1052,6 +1055,10 @@ function App() {
         <PerfumeManagementDialog
           open={isPerfumeManagementOpen}
           onOpenChange={setIsPerfumeManagementOpen}
+        />
+        <StockManagementDialog
+          open={isStockManagementOpen}
+          onOpenChange={setIsStockManagementOpen}
         />
         <FavoritesDialog
           open={isFavoritesOpen}

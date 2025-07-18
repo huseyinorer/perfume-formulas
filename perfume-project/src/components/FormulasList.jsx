@@ -22,7 +22,7 @@ const FormulasList = ({ open, onClose, perfume }) => {
   const fetchFormulas = async () => {
     try {
       const result = await query(
-        `SELECT * FROM "ParfumensFormules" WHERE "parfumesId" = $1 ORDER BY id DESC`,
+        `SELECT * FROM "PerfumeFormulas" WHERE "perfume_id" = $1 ORDER BY id DESC`,
         [perfume.id]
       );
       setFormulas(result.rows);

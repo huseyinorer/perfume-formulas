@@ -242,7 +242,7 @@ app.get('/api/perfumes', async (req, res) => {
       FROM "Perfumes" p
       JOIN "Brands" b ON p.brand_id = b.brand_id
       LEFT JOIN "CreativeFormulasUsageInfo" u ON p.perfume_id = u.perfume_id
-      LEFT JOIN "ParfumeFormulas" pf ON p.perfume_id = pf."parfumesId"
+      LEFT JOIN "PerfumeFormulas" pf ON p.perfume_id = pf.perfume_id
       LEFT JOIN "Favorites" f ON p.perfume_id = f.perfume_id 
         AND f.user_id = $5
       WHERE 
@@ -310,9 +310,9 @@ app.get("/api/perfumes/:id/formulas", async (req, res) => {
       pf.*,
       COALESCE(AVG(fr.rating), 0) as "averageRating",
       COUNT(fr.id) as "reviewCount"
-    FROM "ParfumeFormulas" pf
+    FROM "PerfumeFormulas" pf
     LEFT JOIN "FormulaRatings" fr ON pf.id = fr.formula_id
-    WHERE pf."parfumesId" = $1
+    WHERE pf.perfume_id = $1
     GROUP BY pf.id
     ORDER BY 
       CASE WHEN pf."created_at" IS NULL THEN 0 ELSE 1 END DESC,
@@ -362,23 +362,23 @@ app.get("/api/perfumes/:id/details", async (req, res) => {
 app.post("/api/formulas", async (req, res) => {
   try {
     const {
-      parfumesId,
+      perfume_id,
       fragrancePercentage,
       alcoholPercentage,
       waterPercentage,
       restDay,
     } = req.body;
 
-    if (!parfumesId) {
+    if (!perfume_id) {
       return res.status(400).json({ error: "Parfüm seçilmedi" });
     }
 
     const result = await pool.query(
-      `INSERT INTO "ParfumeFormulas" 
-      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "created_at")
+      `INSERT INTO "PerfumeFormulas" 
+      ("perfume_id", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "created_at")
       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING *`,
       [
-        parfumesId,
+        perfume_id,
         fragrancePercentage,
         alcoholPercentage,
         waterPercentage,
@@ -397,7 +397,7 @@ app.post("/api/formulas", async (req, res) => {
 app.post("/api/formulas/request", async (req, res) => {
   try {
     const {
-      parfumesId,
+      perfume_id,
       fragrancePercentage,
       alcoholPercentage,
       waterPercentage,
@@ -407,11 +407,11 @@ app.post("/api/formulas/request", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO "FormulaPendingRequests" 
-       ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "user_id")
+       ("perfume_id", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "user_id")
        VALUES ($1, $2, $3, $4, $5, $6) 
        RETURNING *`,
       [
-        parfumesId,
+        perfume_id,
         fragrancePercentage,
         alcoholPercentage,
         waterPercentage,
@@ -437,9 +437,9 @@ app.get("/api/formulas/pending", async (req, res) => {
      SELECT 
        fr.*,
        b.brand_name as brand,
-       p.perfume_name as "parfumeName"
+       p.perfume_name as "perfumeName"
      FROM "FormulaPendingRequests" fr
-     JOIN "Perfumes" p ON fr."parfumesId" = p.perfume_id
+     JOIN "Perfumes" p ON fr.perfume_id = p.perfume_id
      JOIN "Brands" b ON p.brand_id = b.brand_id
      WHERE fr.status = 'PENDING'
      ORDER BY fr."created_at" DESC
@@ -471,11 +471,11 @@ app.post("/api/formulas/approve/:id", async (req, res) => {
 
     // Formülü ekle
     await client.query(
-      `INSERT INTO "ParfumeFormulas" 
-      ("parfumesId", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "created_at")
+      `INSERT INTO "PerfumeFormulas" 
+      ("perfume_id", "fragrancePercentage", "alcoholPercentage", "waterPercentage", "restDay", "created_at")
       VALUES ($1, $2, $3, $4, $5, $6)`,
       [
-        formula.parfumesId,
+        formula.perfume_id,
         formula.fragrancePercentage,
         formula.alcoholPercentage,
         formula.waterPercentage,
@@ -520,7 +520,7 @@ app.post("/api/formulas/reject/:id", async (req, res) => {
 app.delete("/api/formulas/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM "ParfumeFormulas" WHERE id = $1', [id]);
+    await pool.query('DELETE FROM "PerfumeFormulas" WHERE id = $1', [id]);
     res.status(200).json({ message: "Formula deleted successfully" });
   } catch (error) {
     console.error("Error deleting formula:", error);
@@ -774,7 +774,7 @@ app.delete("/api/perfumes/:id", authenticateToken, async (req, res) => {
     const { id } = req.params;
 
     // İlişkili formülleri ve usage info'yu kontrol et ve sil
-    await client.query('DELETE FROM "ParfumeFormulas" WHERE "parfumesId" = $1', [id]);
+    await client.query('DELETE FROM "PerfumeFormulas" WHERE "perfume_id" = $1', [id]);
     await client.query('DELETE FROM "CreativeFormulasUsageInfo" WHERE perfume_id = $1', [id]);
     
     // Parfümü sil
@@ -933,7 +933,7 @@ app.post('/api/formulas/:id/ratings', authenticateToken, async (req, res) => {
     
     // Formülün var olup olmadığını kontrol et
     const formulaCheck = await pool.query(
-      'SELECT id FROM "ParfumeFormulas" WHERE id = $1',
+      'SELECT id FROM "PerfumeFormulas" WHERE id = $1',
       [id]
     );
     
@@ -1098,6 +1098,332 @@ app.get('/api/formulas/:id/user-rating', authenticateToken, async (req, res) => 
   } catch (error) {
     console.error('Error fetching user rating:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Parfüm stok
+
+// BONUS: POST /api/perfume-stock - Yeni stok kaydı ekle
+app.post('/api/perfume-stock', async (req, res) => {
+  try {
+    const { perfume_id, price, stock_quantity, category } = req.body;
+    
+    // Input validasyonu
+    if (!perfume_id || !price || stock_quantity === undefined) {
+      return res.status(400).json({ 
+        error: 'perfume_id, price ve stock_quantity gerekli alanlar' 
+      });
+    }
+    
+    // Parfümün var olup olmadığını kontrol et
+    const perfumeCheck = await pool.query(
+      'SELECT perfume_id FROM "Perfumes" WHERE perfume_id = $1',
+      [perfume_id]
+    );
+    
+    if (perfumeCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Parfüm bulunamadı' });
+    }
+    
+    const result = await pool.query(
+      `INSERT INTO "PerfumeStock" (perfume_id, price, stock_quantity, category)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [perfume_id, price, stock_quantity, category]
+    );
+    
+    res.status(201).json({
+      message: 'Stok kaydı oluşturuldu',
+      data: result.rows[0]
+    });
+  } catch (err) {
+    console.error('Error creating perfume stock:', err);
+    res.status(500).json({ error: 'Stok kaydı oluşturulamadı', detail: err.message });
+  }
+});
+
+// GET /api/perfume-stock - Parfüm stok listesi (Pagination + Search)
+app.get('/api/perfume-stock', authenticateToken, async (req, res) => {
+  try {
+    const { 
+      limit = 10, 
+      page = 1, 
+      sortBy = 'name', 
+      sortOrder = 'asc', 
+      search = '' 
+    } = req.query;
+    
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const offset = (pageNumber - 1) * limitNumber;
+    const searchPattern = `%${search.toLowerCase()}%`;
+
+    // Ana sorgu
+    let query = `
+      SELECT 
+        s.id,
+        (b.brand_name || ' - ' || p.perfume_name) AS name,
+        translate_text(p.top_notes) AS top_notes,
+        translate_text(p.middle_notes) AS middle_notes,
+        translate_text(p.base_notes) AS base_notes,
+        s.price,
+        s.stock_quantity,
+        s.category,
+        COALESCE(SUM(m.quantity), 0) AS maturing_quantity,
+        COALESCE(
+          STRING_AGG(
+            m.quantity || ' Adet Demlenen, Ürt. Tar: ' || TO_CHAR(m.maturation_start_date, 'DD.MM.YYYY'),
+            ' / ' 
+            ORDER BY m.maturation_start_date ASC
+          ),
+          ''
+        ) AS maturing_info,
+        p.perfume_id
+      FROM "PerfumeStock" s
+      JOIN "Perfumes" p ON s.perfume_id = p.perfume_id
+      JOIN "Brands" b ON p.brand_id = b.brand_id
+      LEFT JOIN "PerfumeMaturation" m ON s.perfume_id = m.perfume_id
+      WHERE 
+        LOWER(b.brand_name) LIKE $1 
+        OR LOWER(p.perfume_name) LIKE $1
+        OR LOWER(s.category) LIKE $1
+      GROUP BY 
+        s.id, 
+        b.brand_name, 
+        p.perfume_name, 
+        p.top_notes, 
+        p.middle_notes, 
+        p.base_notes, 
+        s.price, 
+        s.stock_quantity, 
+        s.category, 
+        p.perfume_id
+      ORDER BY 
+        CASE WHEN LOWER(b.brand_name) LIKE $1 THEN 0 ELSE 1 END,
+        CASE 
+          WHEN $2 = 'name' THEN (b.brand_name || ' - ' || p.perfume_name)
+          WHEN $2 = 'price' THEN s.price::text
+          WHEN $2 = 'stock_quantity' THEN s.stock_quantity::text
+          WHEN $2 = 'maturing_quantity' THEN COALESCE(SUM(m.quantity), 0)::text
+          WHEN $2 = 'category' THEN s.category
+          ELSE (b.brand_name || ' - ' || p.perfume_name)
+        END ${sortOrder},
+        s.id DESC
+      LIMIT $3 OFFSET $4
+    `;
+
+    const result = await pool.query(query, [
+      searchPattern,    // $1
+      sortBy,          // $2
+      limitNumber,     // $3
+      offset           // $4
+    ]);
+
+    // Toplam kayıt sayısı için ayrı sorgu
+    const countQuery = `
+      SELECT COUNT(DISTINCT s.id)
+      FROM "PerfumeStock" s
+      JOIN "Perfumes" p ON s.perfume_id = p.perfume_id
+      JOIN "Brands" b ON p.brand_id = b.brand_id
+      WHERE 
+        LOWER(b.brand_name) LIKE $1 
+        OR LOWER(p.perfume_name) LIKE $1
+        OR LOWER(s.category) LIKE $1
+    `;
+    
+    const countResult = await pool.query(countQuery, [searchPattern]);
+
+    res.json({
+      data: result.rows,
+      total: parseInt(countResult.rows[0].count),
+      page: pageNumber,
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limitNumber),
+      limit: limitNumber
+    });
+  } catch (err) {
+    console.error('Error fetching perfume stock:', err);
+    res.status(500).json({ error: 'Veri alınamadı', detail: err.message });
+  }
+});
+
+// PUT /api/perfume-stock/:id - Stok miktarını güncelle
+app.put('/api/perfume-stock/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { stock_quantity } = req.body;
+  
+  // Input validasyonu
+  if (typeof stock_quantity !== 'number' || stock_quantity < 0) {
+    return res.status(400).json({ error: 'stock_quantity pozitif bir sayı olmalı' });
+  }
+  
+  try {
+    const result = await pool.query(
+      `UPDATE "PerfumeStock" SET stock_quantity = $1 WHERE id = $2 RETURNING *`,
+      [stock_quantity, id]
+    );
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Kayıt bulunamadı' });
+    }
+    
+    res.json({ 
+      message: 'Stok miktarı güncellendi',
+      data: result.rows[0] 
+    });
+  } catch (err) {
+    console.error('Error updating stock quantity:', err);
+    res.status(500).json({ error: 'Güncelleme başarısız', detail: err.message });
+  }
+});
+
+// PerfumeMaturation endpoints
+
+// POST /api/perfume-maturation - Yeni demlenme kaydı oluştur
+app.post('/api/perfume-maturation', authenticateToken, async (req, res) => {
+  try {
+    const { perfume_id, maturation_start_date, quantity, notes } = req.body;
+
+    // Parfümün var olup olmadığını kontrol et
+    const perfumeCheck = await pool.query(
+      'SELECT * FROM "Perfumes" WHERE perfume_id = $1',
+      [perfume_id]
+    );
+
+    if (perfumeCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Parfüm bulunamadı' });
+    }
+    
+    // Demlenme kaydı oluştur
+    const result = await pool.query(
+      `INSERT INTO "PerfumeMaturation" (perfume_id, maturation_start_date, quantity, notes)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [
+        perfume_id, 
+        maturation_start_date || new Date().toISOString().split('T')[0], // Default bugün
+        quantity, 
+        notes
+      ]
+    );
+    
+    res.status(201).json({
+      message: 'Demlenme kaydı oluşturuldu',
+      data: result.rows[0]
+    });
+  } catch (err) {
+    console.error('Error creating maturation record:', err);
+    res.status(500).json({ error: 'Demlenme kaydı oluşturulamadı', detail: err.message });
+  }
+});
+
+// PUT /api/perfume-maturation/:id/complete - Demlenme tamamla ve stoğa taşı
+app.put('/api/perfume-maturation/:id/complete', authenticateToken, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    
+    const { id } = req.params;
+    
+    // Demlenme kaydını getir
+    const maturationResult = await client.query(
+      'SELECT * FROM "PerfumeMaturation" WHERE id = $1',
+      [id]
+    );
+    
+    if (maturationResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Demlenme kaydı bulunamadı' });
+    }
+    
+    const maturationRecord = maturationResult.rows[0];
+    const { perfume_id, quantity } = maturationRecord;
+    
+    // Stok tablosunda bu parfümün kaydını kontrol et
+    const stockResult = await client.query(
+      'SELECT * FROM "PerfumeStock" WHERE perfume_id = $1',
+      [perfume_id]
+    );
+    
+    if (stockResult.rows.length === 0) {
+      // Stokta kayıt yoksa hata ver (önce stok kaydı oluşturulmalı)
+      return res.status(400).json({ 
+        error: 'Bu parfüm için stok kaydı bulunamadı. Önce stok kaydı oluşturulmalı.' 
+      });
+    }
+    
+    // Stok miktarını artır
+    const currentStock = stockResult.rows[0].stock_quantity;
+    const newStockQuantity = currentStock + quantity;
+    
+    await client.query(
+      'UPDATE "PerfumeStock" SET stock_quantity = $1 WHERE perfume_id = $2',
+      [newStockQuantity, perfume_id]
+    );
+    
+    // Demlenme kaydını sil
+    await client.query(
+      'DELETE FROM "PerfumeMaturation" WHERE id = $1',
+      [id]
+    );
+    
+    await client.query('COMMIT');
+    
+    res.json({
+      message: 'Demlenme tamamlandı ve stok güncellendi',
+      data: {
+        completed_maturation: maturationRecord,
+        previous_stock: currentStock,
+        new_stock: newStockQuantity,
+        added_quantity: quantity
+      }
+    });
+    
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error completing maturation:', err);
+    res.status(500).json({ 
+      error: 'Demlenme tamamlama işlemi başarısız', 
+      detail: err.message 
+    });
+  } finally {
+    client.release();
+  }
+});
+
+app.get('/api/perfume-maturation', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        m.id,
+        m.perfume_id,
+        (b.brand_name || ' ' || p.perfume_name) AS perfume_name,
+        m.maturation_start_date,
+        m.quantity,
+        m.notes,
+        m.created_at,
+        CURRENT_DATE - m.maturation_start_date AS days_maturing
+      FROM "PerfumeMaturation" m
+      JOIN "Perfumes" p ON m.perfume_id = p.perfume_id
+      JOIN "Brands" b ON p.brand_id = b.brand_id
+      ORDER BY m.maturation_start_date ASC
+    `);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching maturation records:', err);
+    res.status(500).json({ error: 'Demlenme kayıtları alınamadı', detail: err.message });
+  }
+});
+
+app.get('/api/perfume-maturation/by-perfume-id/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      'SELECT id, perfume_id, maturation_start_date, quantity, notes FROM "PerfumeMaturation" WHERE perfume_id = $1',
+      [id]
+    );
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching maturation records:', err);
+    res.status(500).json({ error: 'Demlenme kayıtları alınamadı', detail: err.message });
   }
 });
 

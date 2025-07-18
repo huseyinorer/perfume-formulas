@@ -21,6 +21,7 @@ const UserMenu = ({
   pendingRequestsCount = 0,
   onPendingRequestsClick,
   onAddPerfumeClick,
+  onStockManagementClick,
   onChangePasswordClick,
   onLogout,
   username,
@@ -38,7 +39,7 @@ const UserMenu = ({
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="default" 
@@ -85,6 +86,16 @@ const UserMenu = ({
             >
               <Sprout className="h-4 w-4" />
               <span>Parfüm Yönetimi</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                handleMenuItemClick(onStockManagementClick);
+              }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <ClipboardList className="h-4 w-4" />
+              <span>Stok Yönetimi</span>
             </DropdownMenuItem>
           </>
         )}

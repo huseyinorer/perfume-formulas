@@ -8,7 +8,7 @@ import Autocomplete from './Autocomplete'
 
 const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
   const [formData, setFormData] = useState({
-    parfumesId: '',
+    perfume_id: '',
     fragrancePercentage: '0',
     alcoholPercentage: '0',
     waterPercentage: '0',
@@ -31,7 +31,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
     const alcohol = parseFloat(formData.alcoholPercentage)
     const water = parseFloat(formData.waterPercentage)
 
-    if (!formData.parfumesId) {
+    if (!formData.perfume_id) {
       setError('Lütfen bir parfüm seçin.')
       return
     }
@@ -55,7 +55,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
   }
 
   const handlePerfumeSelect = (perfume) => {
-    setFormData(prev => ({ ...prev, parfumesId: perfume.id }))
+    setFormData(prev => ({ ...prev, perfume_id: perfume.id }))
   }
 
   return (
