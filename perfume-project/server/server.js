@@ -1245,6 +1245,154 @@ app.get('/api/perfume-stock', authenticateToken, async (req, res) => {
   }
 });
 
+// YENİ: Make.com için özel automation endpoint
+app.get('/api/automation/perfume-stock', async (req, res) => {
+  try {
+    // API key kontrolü - hem header hem query param kontrol et
+    const apiKey = req.headers['x-api-key'] || 
+                   req.headers['authorization']?.replace('Bearer ', '') ||
+                   req.query.api_key;
+    
+    if (!apiKey || apiKey !== process.env.AUTOMATION_API_KEY) {
+      console.warn(`Unauthorized automation API access attempt from IP: ${req.ip}`);
+      return res.status(401).json({ 
+        error: 'Unauthorized', 
+        message: 'Valid API key required for automation endpoint' 
+      });
+    }
+
+    const { 
+      limit = 100, 
+      page = 1, 
+      sortBy = 'name', 
+      sortOrder = 'asc', 
+      search = '' 
+    } = req.query;
+    
+    const pageNumber = parseInt(page);
+    const limitNumber = Math.min(parseInt(limit), 1000); // Max 1000 kayıt
+    const offset = (pageNumber - 1) * limitNumber;
+    const searchPattern = `%${search.toLowerCase()}%`;
+
+    console.log(`Automation API request: limit=${limitNumber}, page=${pageNumber}, search="${search}"`);
+
+    // Aynı sorgu mantığı
+    let query = `
+      SELECT 
+        s.id,
+        (b.brand_name || ' - ' || p.perfume_name) AS name,
+        translate_text(p.top_notes) AS top_notes,
+        translate_text(p.middle_notes) AS middle_notes,
+        translate_text(p.base_notes) AS base_notes,
+        s.price,
+        s.stock_quantity,
+        s.category,
+        COALESCE(SUM(m.quantity), 0) AS maturing_quantity,
+        COALESCE(
+          STRING_AGG(
+            m.quantity || ' Adet Demlenen, Ürt. Tar: ' || TO_CHAR(m.maturation_start_date, 'DD.MM.YYYY'),
+            ' / ' 
+            ORDER BY m.maturation_start_date ASC
+          ),
+          ''
+        ) AS maturing_info,
+        p.perfume_id
+      FROM "PerfumeStock" s
+      JOIN "Perfumes" p ON s.perfume_id = p.perfume_id
+      JOIN "Brands" b ON p.brand_id = b.brand_id
+      LEFT JOIN "PerfumeMaturation" m ON s.perfume_id = m.perfume_id
+      WHERE 
+        LOWER(b.brand_name) LIKE $1 
+        OR LOWER(p.perfume_name) LIKE $1
+        OR LOWER(s.category) LIKE $1
+      GROUP BY 
+        s.id, 
+        b.brand_name, 
+        p.perfume_name, 
+        p.top_notes, 
+        p.middle_notes, 
+        p.base_notes, 
+        s.price, 
+        s.stock_quantity, 
+        s.category, 
+        p.perfume_id
+      ORDER BY 
+        CASE WHEN LOWER(b.brand_name) LIKE $1 THEN 0 ELSE 1 END,
+        CASE 
+          WHEN $2 = 'name' THEN (b.brand_name || ' - ' || p.perfume_name)
+          WHEN $2 = 'price' THEN s.price::text
+          WHEN $2 = 'stock_quantity' THEN s.stock_quantity::text
+          WHEN $2 = 'maturing_quantity' THEN COALESCE(SUM(m.quantity), 0)::text
+          WHEN $2 = 'category' THEN s.category
+          ELSE (b.brand_name || ' - ' || p.perfume_name)
+        END ${sortOrder},
+        s.id DESC
+      LIMIT $3 OFFSET $4
+    `;
+
+    const result = await pool.query(query, [
+      searchPattern,    // $1
+      sortBy,          // $2
+      limitNumber,     // $3
+      offset           // $4
+    ]);
+
+    // Toplam kayıt sayısı için ayrı sorgu
+    const countQuery = `
+      SELECT COUNT(DISTINCT s.id)
+      FROM "PerfumeStock" s
+      JOIN "Perfumes" p ON s.perfume_id = p.perfume_id
+      JOIN "Brands" b ON p.brand_id = b.brand_id
+      WHERE 
+        LOWER(b.brand_name) LIKE $1 
+        OR LOWER(p.perfume_name) LIKE $1
+        OR LOWER(s.category) LIKE $1
+    `;
+    
+    const countResult = await pool.query(countQuery, [searchPattern]);
+
+    const response = {
+      data: result.rows,
+      total: parseInt(countResult.rows[0].count),
+      page: pageNumber,
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limitNumber),
+      limit: limitNumber,
+      maxLimit: 1000,
+      timestamp: new Date().toISOString(),
+      source: 'automation-api'
+    };
+
+    console.log(`Automation API response: ${result.rows.length} records returned`);
+    res.json(response);
+
+  } catch (err) {
+    console.error('Error fetching perfume stock for automation:', err);
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      message: 'Failed to fetch perfume stock data',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// API key doğrulama endpoint'i (isteğe bağlı)
+app.get('/api/automation/health', (req, res) => {
+  const apiKey = req.headers['x-api-key'] || req.query.api_key;
+  
+  if (!apiKey || apiKey !== process.env.AUTOMATION_API_KEY) {
+    return res.status(401).json({ 
+      status: 'unauthorized',
+      message: 'Invalid API key'
+    });
+  }
+  
+  res.json({ 
+    status: 'ok', 
+    message: 'Automation API is healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // PUT /api/perfume-stock/:id - Stok miktarını güncelle
 app.put('/api/perfume-stock/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
