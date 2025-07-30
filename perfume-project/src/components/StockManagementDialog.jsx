@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 import AddStockDialog from "./AddStockDialog";
 import { Input } from "./ui/input";
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Search, Clock, Eye, Check } from "lucide-react";
+import { Plus, Pencil, Search, Clock, Eye, Check, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -42,6 +42,8 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [editingStock, setEditingStock] = useState(null);
   const [newStockQuantity, setNewStockQuantity] = useState("");
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -226,10 +228,43 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
     } catch (e) {}
   };
 
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortBy(null);
+        setSortDirection("asc"); // default direction
+      }
+    } else {
+      setSortBy(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedStockList = sortBy
+    ? [...stockList].sort((a, b) => {
+        let aValue = a[sortBy];
+        let bValue = b[sortBy];
+        // String sıralama için
+        if (["category", "name"].includes(sortBy)) {
+          aValue = (aValue || "").toLocaleLowerCase();
+          bValue = (bValue || "").toLocaleLowerCase();
+          if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+          if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+          return 0;
+        } else {
+          aValue = Number(aValue) || 0;
+          bValue = Number(bValue) || 0;
+          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+        }
+      })
+    : stockList;
+
   return (
     <>      
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-6xl">
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Stok Yönetimi</DialogTitle>
           </DialogHeader>
@@ -272,20 +307,60 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                 <Table>
                   <TableHeader>
                     <TableRow className="dark:border-gray-700">
-                      <TableHead className="dark:text-gray-300">
-                        Parfüm Adı
+                      <TableHead
+                        className="dark:text-gray-300 cursor-pointer select-none"
+                        onClick={() => handleSort("name")}
+                      >
+                        <span className="flex items-center gap-1">
+                          Parfüm Adı
+                          {sortBy === "name"
+                            ? (sortDirection === "asc"
+                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                            : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
+                        </span>
                       </TableHead>
-                      <TableHead className="dark:text-gray-300">
-                        Stok Miktarı
+                      <TableHead
+                        className="dark:text-gray-300 cursor-pointer select-none"
+                        onClick={() => handleSort("stock_quantity")}
+                      >
+                        <span className="flex items-center gap-1">
+                          Stok Miktarı
+                          {sortBy === "stock_quantity"
+                            ? (sortDirection === "asc"
+                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                            : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
+                        </span>
                       </TableHead>
                       <TableHead className="dark:text-gray-300">
                         Demlenen Miktar
                       </TableHead>
-                      <TableHead className="dark:text-gray-300">
-                        Maliyet
+                      <TableHead
+                        className="dark:text-gray-300 cursor-pointer select-none"
+                        onClick={() => handleSort("price")}
+                      >
+                        <span className="flex items-center gap-1">
+                          Maliyet
+                          {sortBy === "price"
+                            ? (sortDirection === "asc"
+                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                            : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
+                        </span>
                       </TableHead>
-                      <TableHead className="dark:text-gray-300">
-                        Kategori
+                      <TableHead
+                        className="dark:text-gray-300 cursor-pointer select-none"
+                        onClick={() => handleSort("category")}
+                      >
+                        <span className="flex items-center gap-1">
+                          Kategori
+                          {sortBy === "category"
+                            ? (sortDirection === "asc"
+                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                            : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
+                        </span>
                       </TableHead>
                       <TableHead className="dark:text-gray-300">
                         Demlenme Bilgisi
@@ -296,7 +371,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {stockList.map((item) => (
+                    {sortedStockList.map((item) => (
                       <TableRow key={item.id} className="dark:border-gray-700">
                         <TableCell className="font-medium dark:text-gray-300">
                           {item.name}
@@ -544,7 +619,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                       className="border-b border-gray-100 dark:border-gray-800"
                     >
                       <td className="px-3 py-2 text-gray-900 dark:text-gray-100">
-                        {m.maturation_start_date}
+                        {m.maturation_start_date ? new Date(m.maturation_start_date).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"}
                       </td>
                       <td className="px-3 py-2 text-gray-900 dark:text-gray-100">
                         {m.quantity}
