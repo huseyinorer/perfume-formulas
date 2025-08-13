@@ -1396,29 +1396,37 @@ app.get('/api/automation/health', (req, res) => {
 // PUT /api/perfume-stock/:id - Stok miktarını güncelle
 app.put('/api/perfume-stock/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { stock_quantity } = req.body;
-  
+  const { stock_quantity, price } = req.body;
+
   // Input validasyonu
   if (typeof stock_quantity !== 'number' || stock_quantity < 0) {
     return res.status(400).json({ error: 'stock_quantity pozitif bir sayı olmalı' });
   }
-  
+  if (typeof price !== 'undefined' && (typeof price !== 'number' || price < 0)) {
+    return res.status(400).json({ error: 'price pozitif bir sayı olmalı' });
+  }
+
   try {
-    const result = await pool.query(
-      `UPDATE "PerfumeStock" SET stock_quantity = $1 WHERE id = $2 RETURNING *`,
-      [stock_quantity, id]
-    );
-    
+    let query, params;
+    if (typeof price !== 'undefined') {
+      query = `UPDATE "PerfumeStock" SET stock_quantity = $1, price = $2 WHERE id = $3 RETURNING *`;
+      params = [stock_quantity, price, id];
+    } else {
+      query = `UPDATE "PerfumeStock" SET stock_quantity = $1 WHERE id = $2 RETURNING *`;
+      params = [stock_quantity, id];
+    }
+    const result = await pool.query(query, params);
+
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Kayıt bulunamadı' });
     }
-    
-    res.json({ 
-      message: 'Stok miktarı güncellendi',
-      data: result.rows[0] 
+
+    res.json({
+      message: 'Stok ve maliyet güncellendi',
+      data: result.rows[0]
     });
   } catch (err) {
-    console.error('Error updating stock quantity:', err);
+    console.error('Error updating stock quantity/price:', err);
     res.status(500).json({ error: 'Güncelleme başarısız', detail: err.message });
   }
 });

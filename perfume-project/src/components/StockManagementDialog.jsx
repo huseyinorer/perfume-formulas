@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 import AddStockDialog from "./AddStockDialog";
 import { Input } from "./ui/input";
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Search, Clock, Eye, Check, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { Plus, Pencil, Search, Clock, Eye, Check, X, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -140,6 +140,10 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
       alert("Geçerli bir stok miktarı giriniz");
       return;
     }
+    if (!newPrice || newPrice < 0) {
+      alert("Geçerli bir maliyet giriniz");
+      return;
+    }
 
     try {
       const response = await fetch(`${API_URL}/perfume-stock/${id}`, {
@@ -148,12 +152,16 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ stock_quantity: parseInt(newStockQuantity) }),
+        body: JSON.stringify({
+          stock_quantity: parseInt(newStockQuantity),
+          price: parseFloat(newPrice),
+        }),
       });
 
       if (response.ok) {
         setEditingStock(null);
         setNewStockQuantity("");
+        setNewPrice("");
         fetchStockList();
       } else {
         alert("Stok güncellenirken bir hata oluştu");
@@ -167,11 +175,13 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   const handleEditClick = (item) => {
     setEditingStock(item.id);
     setNewStockQuantity(item.stock_quantity.toString());
+    setNewPrice(item.price?.toString() || "");
   };
 
   const handleCancelEdit = () => {
     setEditingStock(null);
     setNewStockQuantity("");
+    setNewPrice("");
   };
 
   const [isMaturationListModalOpen, setIsMaturationListModalOpen] =
@@ -260,6 +270,9 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         }
       })
     : stockList;
+
+  // Eklenen state
+  const [newPrice, setNewPrice] = useState("");
 
   return (
     <>      
@@ -378,32 +391,13 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                         </TableCell>
                         <TableCell className="dark:text-gray-300 text-center">
                           {editingStock === item.id ? (
-                            <div className="flex gap-2 items-center">
-                              <Input
-                                type="number"
-                                value={newStockQuantity}
-                                onChange={(e) =>
-                                  setNewStockQuantity(e.target.value)
-                                }
-                                className="w-20"
-                                min="0"
-                              />
-                              <Button
-                                size="sm"
-                                onClick={() => handleStockUpdate(item.id)}
-                                className="bg-green-500 hover:bg-green-600 text-white px-2"
-                              >
-                                ✓
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleCancelEdit}
-                                className="px-2"
-                              >
-                                ✕
-                              </Button>
-                            </div>
+                            <Input
+                              type="number"
+                              value={newStockQuantity}
+                              onChange={(e) => setNewStockQuantity(e.target.value)}
+                              className="w-20"
+                              min="0"
+                            />
                           ) : (
                             <span className="font-semibold">
                               {item.stock_quantity}
@@ -416,8 +410,19 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           </span>
                         </TableCell>
                         <TableCell className="dark:text-gray-300">
-                          ₺{item.price}
-                        </TableCell>
+  {editingStock === item.id ? (
+    <Input
+      type="number"
+      min="0"
+      step="0.01"
+      value={newPrice}
+      onChange={(e) => setNewPrice(e.target.value)}
+      className="w-24"
+    />
+  ) : (
+    <>₺{item.price}</>
+  )}
+</TableCell>
                         <TableCell className="dark:text-gray-300">
                           {item.category || "-"}
                         </TableCell>
@@ -444,39 +449,58 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex gap-2 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditClick(item)}
-                              disabled={editingStock === item.id}
-                              className="bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/50"
-                              title="Stok Düzenle"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleOpenMaturingModal(item)}
-                              className="bg-green-50 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/50"
-                              title="Demlenen Ekle"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                handleOpenMaturationListModal(item)
-                              }
-                              className="bg-yellow-50 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-100 dark:text-yellow-400 dark:hover:text-yellow-300 dark:hover:bg-yellow-900/50"
-                              title="Demlenenleri Listele"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+  <div className="flex gap-2 justify-end">
+    {editingStock === item.id ? (
+  <>
+    <Button
+  size="sm"
+  onClick={() => handleStockUpdate(item.id)}
+  className="bg-green-500 hover:bg-green-600 text-white px-2 flex items-center justify-center dark:bg-green-600 dark:hover:bg-green-500 dark:text-white"
+  title="Onayla"
+>
+  <Check className="h-4 w-4" />
+</Button>
+<Button
+  size="sm"
+  variant="ghost"
+  onClick={handleCancelEdit}
+  className="bg-red-100 hover:bg-red-200 text-red-600 px-2 flex items-center justify-center dark:bg-red-700 dark:hover:bg-red-600 dark:text-red-200"
+  title="İptal"
+>
+  <X className="h-4 w-4" />
+</Button>
+  </>
+) : (
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => handleEditClick(item)}
+    className="bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/50"
+    title="Stok Düzenle"
+  >
+    <Pencil className="h-4 w-4" />
+  </Button>
+)}
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => handleOpenMaturingModal(item)}
+      className="bg-green-50 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/50"
+      title="Demlenen Ekle"
+    >
+      <Plus className="h-4 w-4" />
+    </Button>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => handleOpenMaturationListModal(item)}
+      className="bg-yellow-50 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-100 dark:text-yellow-400 dark:hover:text-yellow-300 dark:hover:bg-yellow-900/50"
+      title="Demlenenleri Listele"
+    >
+      <Eye className="h-4 w-4" />
+    </Button>
+  </div>
+</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
