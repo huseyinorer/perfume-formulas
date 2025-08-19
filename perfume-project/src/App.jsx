@@ -652,10 +652,10 @@ function App() {
 
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
-            {/* Shopier Store Banner - 6 grid */}
+            {/* Ikas Store Banner - 6 grid */}
             <div className="md:col-span-6">
               <a 
-                href="https://www.shopier.com/soultrace" 
+                href="https://soultraceperfumes.ikas.shop/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="block h-full"
@@ -663,7 +663,7 @@ function App() {
                 <div className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg shadow-lg p-4 transform transition-transform hover:scale-102 hover:shadow-xl h-full">
                   <div className="flex items-center justify-between">
                     <div className="text-white">
-                      <h3 className="text-xl font-bold">Shopier Parfüm Mağazamız</h3>
+                      <h3 className="text-xl font-bold">Satış Mağazamız</h3>
                       <p className="text-sm opacity-90">Kendi yaptığımız parfümleri keşfedin</p>
                     </div>
                     <div className="bg-white rounded-full p-2">
