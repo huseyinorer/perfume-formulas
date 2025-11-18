@@ -1,6 +1,6 @@
 # Parfüm Formülleri Yönetim Sistemi
 
-[![Build and Deploy](https://github.com/huseyinorer/perfume-formulas/actions/workflows/deploy.yml/badge.svg)](https://github.com/huseyinorer/perfume-formulas/actions/workflows/deploy.yml)
+[![Build and Deploy](https://github.com/huseyinorer/perfume-formulas/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/huseyinorer/perfume-formulas/actions/workflows/pages/pages-build-deployment)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
