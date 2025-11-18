@@ -120,3 +120,4 @@ const AddStockDialog = ({ open, onClose, onSuccess }) => {
 };
 
 export default AddStockDialog;
+

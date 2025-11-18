@@ -211,8 +211,7 @@ function App() {
       }
 
       const response = await fetch(
-        `${API_URL}/perfumes?page=${currentPage}&limit=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}${
-          debouncedSearchTerm ? `&search=${debouncedSearchTerm}` : ""
+        `${API_URL}/perfumes?page=${currentPage}&limit=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}${debouncedSearchTerm ? `&search=${debouncedSearchTerm}` : ""
         }`,
         {
           method: "GET",
@@ -242,10 +241,14 @@ function App() {
   const fetchCreativeFormula = async (perfume_id) => {
     try {
       const response = await fetch(`${API_URL}/perfumes/${perfume_id}/details`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch perfume details');
+      }
       const data = await response.json();
       setCreativeFormula(data);
     } catch (error) {
       console.error("Error fetching creative formula:", error);
+      setCreativeFormula(null); // Set null on error
     }
   };
 
@@ -515,7 +518,7 @@ function App() {
     if (event) {
       event.stopPropagation();
     }
-    
+
     // Eğer aynı formülün yorumlarına tıklandıysa kapat
     if (selectedFormulaId === formula.id && showComments) {
       setShowComments(false);
@@ -565,10 +568,9 @@ function App() {
               <Button
                 onClick={() => setIsAddDialogOpen(true)}
                 className={`
-                  ${
-                    isAdmin === true
-                      ? "bg-blue-600 hover:bg-blue-700"
-                      : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                  ${isAdmin === true
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                   }
                   text-white shadow-md hover:shadow-xl 
                   transform hover:-translate-y-0.5 
@@ -654,10 +656,10 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
             {/* Ikas Store Banner - 6 grid */}
             <div className="md:col-span-6">
-              <a 
-                href="https://soultraceperfumes.ikas.shop/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://soultraceperfumes.ikas.shop/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block h-full"
               >
                 <div className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg shadow-lg p-4 transform transition-transform hover:scale-102 hover:shadow-xl h-full">
@@ -675,11 +677,11 @@ function App() {
                 </div>
               </a>
             </div>
-            
+
             {/* Etiket Tasarla Banner - 6 grid */}
             <div className="md:col-span-6">
-              <a 
-                href="/perfume-formulas/label-designer.html" 
+              <a
+                href="/perfume-formulas/label-designer.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block h-full"
@@ -749,9 +751,8 @@ function App() {
           }}
         >
           <DialogContent
-            className={`${
-              showComments ? "max-w-7xl w-full" : "max-w-3xl"
-            } transition-all duration-300 ease-in-out overflow-hidden`}
+            className={`${showComments ? "max-w-7xl w-full" : "max-w-3xl"
+              } transition-all duration-300 ease-in-out overflow-hidden`}
           >
             <DialogHeader className="flex flex-row justify-between items-center">
               <div>
@@ -810,9 +811,8 @@ function App() {
             <div className="flex h-full">
               {/* Ana içerik bölümü - her zaman görünür */}
               <div
-                className={`${
-                  showComments ? "w-8/12 pr-4 border-r" : "w-full"
-                } transition-all duration-300`}
+                className={`${showComments ? "w-8/12 pr-4 border-r" : "w-full"
+                  } transition-all duration-300`}
               >
                 <div className="mt-4">
                   {creativeFormula && (
@@ -924,19 +924,19 @@ function App() {
                     </TableHeader>
                     <TableBody>
                       {formulas.map((formula) => (
-                        
-                          <TableRow 
-                            key={formula.id}
-                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
-                            onClick={(e) => handleOpenComments(formula, e)}
-                          >
+
+                        <TableRow
+                          key={formula.id}
+                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                          onClick={(e) => handleOpenComments(formula, e)}
+                        >
                           <TableCell>
-                            {formula.created_at ? 
+                            {formula.created_at ?
                               new Date(formula.created_at).toLocaleDateString('tr-TR', {
                                 day: '2-digit',
                                 month: '2-digit',
                                 year: 'numeric'
-                              }).replace(/\//g, '.') 
+                              }).replace(/\//g, '.')
                               : ''}
                           </TableCell>
                           <TableCell>{formula.fragrancePercentage}%</TableCell>
@@ -1079,3 +1079,5 @@ function App() {
 }
 
 export default App;
+
+

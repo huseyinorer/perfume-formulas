@@ -669,3 +669,5 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   );
 };
 export default StockManagementDialog;
+
+

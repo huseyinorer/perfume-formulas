@@ -28,21 +28,42 @@ function FavoritesDialog({ open, onOpenChange, onFavoriteToggle, onRowClick }) {
   const fetchFavorites = async () => {
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/favorites?page=${currentPage}&limit=${pageSize}`,
+        `${import.meta.env.VITE_API_URL}/favorites?page=${currentPage}&limit=${pageSize}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch favorites');
+      }
+
       const data = await response.json();
-      setFavorites(data.data);
-      setTotalPages(data.totalPages);
-      setTotalItems(data.total);
+
+      // API'den gelen data yapısını kontrol et
+      if (Array.isArray(data)) {
+        // Eğer direkt array dönüyorsa
+        setFavorites(data);
+        setTotalPages(1);
+        setTotalItems(data.length);
+      } else if (data.data) {
+        // Eğer paginated response dönüyorsa
+        setFavorites(data.data || []);
+        setTotalPages(data.totalPages || 1);
+        setTotalItems(data.total || 0);
+      } else {
+        // Beklenmeyen format
+        setFavorites([]);
+        setTotalPages(1);
+        setTotalItems(0);
+      }
     } catch (error) {
       console.error("Error fetching favorites:", error);
+      setFavorites([]);
+      setTotalPages(1);
+      setTotalItems(0);
     }
   };
 
@@ -73,7 +94,7 @@ function FavoritesDialog({ open, onOpenChange, onFavoriteToggle, onRowClick }) {
           </TableHeader>
           <TableBody>
             {favorites.map((perfume) => (
-              <TableRow 
+              <TableRow
                 key={perfume.id}
                 className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
                 onClick={() => handlePerfumeClick(perfume)}
