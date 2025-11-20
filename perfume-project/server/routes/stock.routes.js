@@ -151,10 +151,10 @@ router.put('/:id', authenticateToken, async (req, res, next) => {
     }
 
     // Validasyonlar (Varsa kontrol et)
-    if (stock_quantity !== undefined && (typeof stock_quantity !== 'number' || stock_quantity < 0)) {
+    if (stock_quantity !== undefined && stock_quantity !== null && (typeof stock_quantity !== 'number' || stock_quantity < 0)) {
         return res.status(400).json({ error: 'stock_quantity pozitif bir sayı olmalı' });
     }
-    if (price !== undefined && (typeof price !== 'number' || price < 0)) {
+    if (price !== undefined && price !== null && (typeof price !== 'number' || price < 0)) {
         return res.status(400).json({ error: 'price pozitif bir sayı olmalı' });
     }
 
@@ -166,11 +166,11 @@ router.put('/:id', authenticateToken, async (req, res, next) => {
         const values = [];
         let paramIndex = 1;
 
-        if (stock_quantity !== undefined) {
+        if (stock_quantity !== undefined && stock_quantity !== null) {
             fields.push(`stock_quantity = $${paramIndex++}`);
             values.push(stock_quantity);
         }
-        if (price !== undefined) {
+        if (price !== undefined && price !== null) {
             fields.push(`price = $${paramIndex++}`);
             values.push(price);
         }
