@@ -194,7 +194,7 @@ router.put('/:id', authenticateToken, async (req, res, next) => {
     }
 });
 
-// Automation API endpoint (API key required)
+// Automation API endpoints (API key required)
 router.get('/automation', async (req, res, next) => {
     try {
         const apiKey = req.headers['x-api-key'] ||
@@ -277,6 +277,70 @@ router.get('/automation', async (req, res, next) => {
             maxLimit: 1000,
             timestamp: new Date().toISOString(),
             source: 'automation-api'
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.put('/automation/:id', async (req, res, next) => {
+    const apiKey = req.headers['x-api-key'] ||
+        req.headers['authorization']?.replace('Bearer ', '') ||
+        req.query.api_key;
+
+    if (!apiKey || apiKey !== process.env.AUTOMATION_API_KEY) {
+        console.warn(`Unauthorized automation API access attempt from IP: ${req.ip}`);
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'Valid API key required for automation endpoint'
+        });
+    }
+    const { id } = req.params;
+    const { stock_quantity, price } = req.body;
+
+    // En az bir değerin gönderildiğini kontrol et
+    if (stock_quantity === undefined && price === undefined) {
+        return res.status(400).json({ error: 'Güncellenecek veri (stok veya fiyat) gönderilmedi.' });
+    }
+
+    // Validasyonlar (Varsa kontrol et)
+    if (stock_quantity !== undefined && stock_quantity !== null && (typeof stock_quantity !== 'number' || stock_quantity < 0)) {
+        return res.status(400).json({ error: 'stock_quantity pozitif bir sayı olmalı' });
+    }
+    if (price !== undefined && price !== null && (typeof price !== 'number' || price < 0)) {
+        return res.status(400).json({ error: 'price pozitif bir sayı olmalı' });
+    }
+
+    try {
+        const pool = req.app.get('pool');
+
+        // Dinamik Query Oluşturma
+        const fields = [];
+        const values = [];
+        let paramIndex = 1;
+
+        if (stock_quantity !== undefined && stock_quantity !== null) {
+            fields.push(`stock_quantity = $${paramIndex++}`);
+            values.push(stock_quantity);
+        }
+        if (price !== undefined && price !== null) {
+            fields.push(`price = $${paramIndex++}`);
+            values.push(price);
+        }
+
+        values.push(id); // ID en son parametre olacak
+
+        const query = `UPDATE "PerfumeStock" SET ${fields.join(', ')} WHERE id = $${paramIndex} RETURNING *`;
+
+        const result = await pool.query(query, values);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Kayıt bulunamadı' });
+        }
+
+        res.json({
+            message: 'Güncelleme başarılı',
+            data: result.rows[0]
         });
     } catch (error) {
         next(error);
