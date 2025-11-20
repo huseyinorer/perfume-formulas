@@ -94,7 +94,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
     } catch (error) {
       alert("Demlenen eklenirken bir hata oluştu");
     }
-  };  
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -136,12 +136,28 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   };
 
   const handleStockUpdate = async (id) => {
-    if (!newStockQuantity || newStockQuantity < 0) {
-      alert("Geçerli bir stok miktarı giriniz");
-      return;
+    const updates = {};
+
+    if (newStockQuantity !== "" && newStockQuantity !== null) {
+      const qty = parseInt(newStockQuantity);
+      if (qty < 0) {
+        alert("Stok miktarı 0'dan küçük olamaz");
+        return;
+      }
+      updates.stock_quantity = qty;
     }
-    if (!newPrice || newPrice < 0) {
-      alert("Geçerli bir maliyet giriniz");
+
+    if (newPrice !== "" && newPrice !== null) {
+      const prc = parseFloat(newPrice);
+      if (prc < 0) {
+        alert("Maliyet 0'dan küçük olamaz");
+        return;
+      }
+      updates.price = prc;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      alert("En az bir değer (stok veya maliyet) girilmelidir");
       return;
     }
 
@@ -152,10 +168,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          stock_quantity: parseInt(newStockQuantity),
-          price: parseFloat(newPrice),
-        }),
+        body: JSON.stringify(updates),
       });
 
       if (response.ok) {
@@ -235,7 +248,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         setMaturationList((prev) => prev.filter((m) => m.id !== maturationId));
         fetchStockList(); // stok güncelle
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleSort = (field) => {
@@ -254,28 +267,28 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
 
   const sortedStockList = sortBy
     ? [...stockList].sort((a, b) => {
-        let aValue = a[sortBy];
-        let bValue = b[sortBy];
-        // String sıralama için
-        if (["category", "name"].includes(sortBy)) {
-          aValue = (aValue || "").toLocaleLowerCase();
-          bValue = (bValue || "").toLocaleLowerCase();
-          if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-          if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-          return 0;
-        } else {
-          aValue = Number(aValue) || 0;
-          bValue = Number(bValue) || 0;
-          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-        }
-      })
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+      // String sıralama için
+      if (["category", "name"].includes(sortBy)) {
+        aValue = (aValue || "").toLocaleLowerCase();
+        bValue = (bValue || "").toLocaleLowerCase();
+        if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+        return 0;
+      } else {
+        aValue = Number(aValue) || 0;
+        bValue = Number(bValue) || 0;
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      }
+    })
     : stockList;
 
   // Eklenen state
   const [newPrice, setNewPrice] = useState("");
 
   return (
-    <>      
+    <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -328,8 +341,8 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           Parfüm Adı
                           {sortBy === "name"
                             ? (sortDirection === "asc"
-                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
-                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                              ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                              : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
                             : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
                         </span>
                       </TableHead>
@@ -341,8 +354,8 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           Stok Miktarı
                           {sortBy === "stock_quantity"
                             ? (sortDirection === "asc"
-                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
-                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                              ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                              : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
                             : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
                         </span>
                       </TableHead>
@@ -357,8 +370,8 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           Maliyet
                           {sortBy === "price"
                             ? (sortDirection === "asc"
-                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
-                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                              ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                              : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
                             : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
                         </span>
                       </TableHead>
@@ -370,8 +383,8 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           Kategori
                           {sortBy === "category"
                             ? (sortDirection === "asc"
-                                ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
-                                : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
+                              ? <ArrowUp className="w-3 h-3 inline text-blue-500" />
+                              : <ArrowDown className="w-3 h-3 inline text-blue-500" />)
                             : <ArrowUpDown className="w-3 h-3 inline text-gray-400" />}
                         </span>
                       </TableHead>
@@ -410,19 +423,19 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           </span>
                         </TableCell>
                         <TableCell className="dark:text-gray-300">
-  {editingStock === item.id ? (
-    <Input
-      type="number"
-      min="0"
-      step="0.01"
-      value={newPrice}
-      onChange={(e) => setNewPrice(e.target.value)}
-      className="w-24"
-    />
-  ) : (
-    <>₺{item.price}</>
-  )}
-</TableCell>
+                          {editingStock === item.id ? (
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={newPrice}
+                              onChange={(e) => setNewPrice(e.target.value)}
+                              className="w-24"
+                            />
+                          ) : (
+                            <>₺{item.price}</>
+                          )}
+                        </TableCell>
                         <TableCell className="dark:text-gray-300">
                           {item.category || "-"}
                         </TableCell>
@@ -449,58 +462,58 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-  <div className="flex gap-2 justify-end">
-    {editingStock === item.id ? (
-  <>
-    <Button
-  size="sm"
-  onClick={() => handleStockUpdate(item.id)}
-  className="bg-green-500 hover:bg-green-600 text-white px-2 flex items-center justify-center dark:bg-green-600 dark:hover:bg-green-500 dark:text-white"
-  title="Onayla"
->
-  <Check className="h-4 w-4" />
-</Button>
-<Button
-  size="sm"
-  variant="ghost"
-  onClick={handleCancelEdit}
-  className="bg-red-100 hover:bg-red-200 text-red-600 px-2 flex items-center justify-center dark:bg-red-700 dark:hover:bg-red-600 dark:text-red-200"
-  title="İptal"
->
-  <X className="h-4 w-4" />
-</Button>
-  </>
-) : (
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={() => handleEditClick(item)}
-    className="bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/50"
-    title="Stok Düzenle"
-  >
-    <Pencil className="h-4 w-4" />
-  </Button>
-)}
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => handleOpenMaturingModal(item)}
-      className="bg-green-50 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/50"
-      title="Demlenen Ekle"
-    >
-      <Plus className="h-4 w-4" />
-    </Button>
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => handleOpenMaturationListModal(item)}
-      className="bg-yellow-50 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-100 dark:text-yellow-400 dark:hover:text-yellow-300 dark:hover:bg-yellow-900/50"
-      title="Demlenenleri Listele"
-    >
-      <Eye className="h-4 w-4" />
-    </Button>
-  </div>
-</TableCell>
+                          <div className="flex gap-2 justify-end">
+                            {editingStock === item.id ? (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleStockUpdate(item.id)}
+                                  className="bg-green-500 hover:bg-green-600 text-white px-2 flex items-center justify-center dark:bg-green-600 dark:hover:bg-green-500 dark:text-white"
+                                  title="Onayla"
+                                >
+                                  <Check className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={handleCancelEdit}
+                                  className="bg-red-100 hover:bg-red-200 text-red-600 px-2 flex items-center justify-center dark:bg-red-700 dark:hover:bg-red-600 dark:text-red-200"
+                                  title="İptal"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditClick(item)}
+                                className="bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/50"
+                                title="Stok Düzenle"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenMaturingModal(item)}
+                              className="bg-green-50 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/50"
+                              title="Demlenen Ekle"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenMaturationListModal(item)}
+                              className="bg-yellow-50 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-100 dark:text-yellow-400 dark:hover:text-yellow-300 dark:hover:bg-yellow-900/50"
+                              title="Demlenenleri Listele"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
