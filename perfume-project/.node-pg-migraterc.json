@@ -1,0 +1,10 @@
+{
+  "databaseUrl": {
+    "env": "DATABASE_URL"
+  },
+  "dir": "migrations",
+  "schema": "public",
+  "migrationsTable": "pgmigrations",
+  "checkOrder": true,
+  "decamelize": true
+}

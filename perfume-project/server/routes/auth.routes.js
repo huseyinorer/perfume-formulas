@@ -1,6 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { validateLogin, validateRegister, validateChangePassword } from '../validators/auth.validator.js';
+import { authLimiter } from '../middleware/rateLimit.middleware.js';
 
 const router = express.Router();
 
@@ -11,9 +13,9 @@ const hashPassword = async (password) => {
 };
 
 // Login
-router.post('/login', async (req, res, next) => {
+router.post('/login', authLimiter, validateLogin, async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { username, password } = req.validatedData;
         const pool = req.app.get('pool');
 
         const result = await pool.query(
@@ -42,8 +44,16 @@ router.post('/login', async (req, res, next) => {
             { expiresIn: '30d' }
         );
 
+        // Set httpOnly cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
         res.json({
-            token,
+            token, // Still send token for backward compatibility
             user: {
                 id: user.id,
                 username: user.username,
@@ -57,21 +67,12 @@ router.post('/login', async (req, res, next) => {
 });
 
 // Register
-router.post('/register', async (req, res, next) => {
+router.post('/register', authLimiter, validateRegister, async (req, res, next) => {
     const pool = req.app.get('pool');
     const client = await pool.connect();
 
     try {
-        const { username, email, password } = req.body;
-
-        if (!username || !email || !password) {
-            return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ error: 'Invalid email format' });
-        }
+        const { username, email, password } = req.validatedData;
 
         const existingUser = await client.query(
             'SELECT username, email FROM "Users" WHERE username = $1 OR email = $2',
@@ -114,9 +115,9 @@ router.post('/register', async (req, res, next) => {
 });
 
 // Change password
-router.post('/change-password', async (req, res, next) => {
+router.post('/change-password', validateChangePassword, async (req, res, next) => {
     try {
-        const { userId, oldPassword, newPassword } = req.body;
+        const { userId, oldPassword, newPassword } = req.validatedData;
         const pool = req.app.get('pool');
 
         const user = await pool.query('SELECT * FROM "Users" WHERE id = $1', [userId]);

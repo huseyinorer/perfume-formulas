@@ -1,9 +1,11 @@
 import express from 'express';
+import { validateFormula } from '../validators/formula.validator.js';
+import { formulaSubmitLimiter } from '../middleware/rateLimit.middleware.js';
 
 const router = express.Router();
 
 // Add formula (admin only)
-router.post('/', async (req, res, next) => {
+router.post('/', formulaSubmitLimiter, validateFormula, async (req, res, next) => {
     try {
         const {
             perfume_id,
@@ -11,11 +13,7 @@ router.post('/', async (req, res, next) => {
             alcoholPercentage,
             waterPercentage,
             restDay,
-        } = req.body;
-
-        if (!perfume_id) {
-            return res.status(400).json({ error: 'Parfüm seçilmedi' });
-        }
+        } = req.validatedData;
 
         const pool = req.app.get('pool');
         const result = await pool.query(
@@ -38,7 +36,7 @@ router.post('/', async (req, res, next) => {
 });
 
 // Request formula (user)
-router.post('/request', async (req, res, next) => {
+router.post('/request', formulaSubmitLimiter, validateFormula, async (req, res, next) => {
     try {
         const {
             perfume_id,
@@ -47,7 +45,7 @@ router.post('/request', async (req, res, next) => {
             waterPercentage,
             restDay,
             userId
-        } = req.body;
+        } = req.validatedData;
 
         const pool = req.app.get('pool');
         const result = await pool.query(

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Production
+dist/
+build/
+
+# Misc
+.env
+.env.local
+.env.production
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+
+# Migrations (preserve formatting)
+migrations/

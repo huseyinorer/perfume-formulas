@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import pkg from 'pg';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 // Import routes
 import authRoutes from './routes/auth.routes.js';
+import logoutRoute from './routes/logout.route.js';
 import perfumesRoutes from './routes/perfumes.routes.js';
 import formulasRoutes from './routes/formulas.routes.js';
 import favoritesRoutes from './routes/favorites.routes.js';
@@ -15,6 +17,7 @@ import stockRoutes from './routes/stock.routes.js';
 // Import middleware
 import { authenticateToken } from './middleware/auth.middleware.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
+import { apiLimiter } from './middleware/rateLimit.middleware.js';
 
 const { Pool } = pkg;
 dotenv.config();
@@ -30,9 +33,14 @@ app.use(
       'https://huseyinorer.github.io',
       'https://huseyinorer.github.io/perfume-formulas'
     ],
+    credentials: true, // Allow cookies to be sent
   })
 );
 app.use(express.json());
+app.use(cookieParser());
+
+// Apply rate limiting to all API routes
+app.use('/api', apiLimiter);
 
 // Database connection pool
 const pool = new Pool({
@@ -51,6 +59,7 @@ app.set('pool', pool);
 
 // Routes
 app.use('/api', authRoutes);
+app.use('/api', logoutRoute);
 app.use('/api/perfumes', perfumesRoutes);
 app.use('/api/formulas', formulasRoutes);
 app.use('/api/favorites', favoritesRoutes);

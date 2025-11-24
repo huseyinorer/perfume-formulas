@@ -326,7 +326,7 @@ function App() {
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-fr">
-              {perfumes.slice(0, 20).map((perfume) => (
+              {perfumes.map((perfume) => (
                 <PerfumeCard
                   key={perfume.id}
                   perfume={perfume}
