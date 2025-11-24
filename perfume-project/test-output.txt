@@ -1,0 +1,2039 @@
+﻿
+> test
+> vitest
+
+
+[1m[44m DEV [49m[22m [34mv4.0.13 [39m[90mC:/Users/krofosyonel/Desktop/perfume-formulas/perfume-project[39m
+
+ [32mÔ£ô[39m src/hooks/useAuth.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+node.exe : Error: useTheme mu
+st be used within a ThemeProv
+ider
+At C:\Program Files\nodejs\np
+m.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS $
+args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+    + CategoryInfo           
+   : NotSpecified    : (Error
+: useTheme.    ..a ThemeProvi
+der:S    tring) [], RemoteEx 
+   ception
+    + FullyQualifiedErr    or
+Id : NativeComman    dError
+ 
+    at useTheme (C:/Users/kro
+fosyonel/Desktop/perfume-form
+ulas/perfume-project/src/cont
+ext/ThemeContext.jsx:33:11)
+    at ThemeToggle (C:/Users/
+krofosyonel/Desktop/perfume-f
+ormulas/perfume-project/src/c
+omponents/ThemeToggle.jsx:6:3
+1)
+    at renderWithHooks (C:\Us
+ers\krofosyonel\Desktop\perfu
+me-formulas\perfume-project\n
+ode_modules\react-dom\cjs\rea
+ct-dom.development.js:15486:1
+8)
+    at mountIndeterminateComp
+onent (C:\Users\krofosyonel\D
+esktop\perfume-formulas\perfu
+me-project\node_modules\react
+-dom\cjs\react-dom.developmen
+t.js:20103:13)
+    at beginWork (C:\Users\kr
+ofosyonel\Desktop\perfume-for
+mulas\perfume-project\node_mo
+dules\react-dom\cjs\react-dom
+.development.js:21626:16)
+    at HTMLUnknownElement.cal
+lCallback (C:\Users\krofosyon
+el\Desktop\perfume-formulas\p
+erfume-project\node_modules\r
+eact-dom\cjs\react-dom.develo
+pment.js:4164:14)
+    at HTMLUnknownElement.cal
+lTheUserObjectsOperation (C:\
+Users\krofosyonel\Desktop\per
+fume-formulas\perfume-project
+\node_modules\jsdom\lib\jsdom
+\living\generated\EventListen
+er.js:26:30)
+    at innerInvokeEventListen
+ers (C:\Users\krofosyonel\Des
+ktop\perfume-formulas\perfume
+-project\node_modules\jsdom\l
+ib\jsdom\living\events\EventT
+arget-impl.js:360:16)
+    at invokeEventListeners (
+C:\Users\krofosyonel\Desktop\
+perfume-formulas\perfume-proj
+ect\node_modules\jsdom\lib\js
+dom\living\events\EventTarget
+-impl.js:296:3)
+    at HTMLUnknownElementImpl
+._dispatch (C:\Users\krofosyo
+nel\Desktop\perfume-formulas\
+perfume-project\node_modules\
+jsdom\lib\jsdom\living\events
+\EventTarget-impl.js:243:9)
+Error: useTheme must be used 
+within a ThemeProvider
+    at useTheme (C:/Users/kro
+fosyonel/Desktop/perfume-form
+ulas/perfume-project/src/cont
+ext/ThemeContext.jsx:33:11)
+    at ThemeToggle (C:/Users/
+krofosyonel/Desktop/perfume-f
+ormulas/perfume-project/src/c
+omponents/ThemeToggle.jsx:6:3
+1)
+    at renderWithHooks (C:\Us
+ers\krofosyonel\Desktop\perfu
+me-formulas\perfume-project\n
+ode_modules\react-dom\cjs\rea
+ct-dom.development.js:15486:1
+8)
+    at mountIndeterminateComp
+onent (C:\Users\krofosyonel\D
+esktop\perfume-formulas\perfu
+me-project\node_modules\react
+-dom\cjs\react-dom.developmen
+t.js:20103:13)
+    at beginWork (C:\Users\kr
+ofosyonel\Desktop\perfume-for
+mulas\perfume-project\node_mo
+dules\react-dom\cjs\react-dom
+.development.js:21626:16)
+    at HTMLUnknownElement.cal
+lCallback (C:\Users\krofosyon
+el\Desktop\perfume-formulas\p
+erfume-project\node_modules\r
+eact-dom\cjs\react-dom.develo
+pment.js:4164:14)
+    at HTMLUnknownElement.cal
+lTheUserObjectsOperation (C:\
+Users\krofosyonel\Desktop\per
+fume-formulas\perfume-project
+\node_modules\jsdom\lib\jsdom
+\living\generated\EventListen
+er.js:26:30)
+    at innerInvokeEventListen
+ers (C:\Users\krofosyonel\Des
+ktop\perfume-formulas\perfume
+-project\node_modules\jsdom\l
+ib\jsdom\living\events\EventT
+arget-impl.js:360:16)
+    at invokeEventListeners (
+C:\Users\krofosyonel\Desktop\
+perfume-formulas\perfume-proj
+ect\node_modules\jsdom\lib\js
+dom\living\events\EventTarget
+-impl.js:296:3)
+    at HTMLUnknownElementImpl
+._dispatch (C:\Users\krofosyo
+nel\Desktop\perfume-formulas\
+perfume-project\node_modules\
+jsdom\lib\jsdom\living\events
+\EventTarget-impl.js:243:9)
+[90mstderr[2m | src/App.tes
+t.tsx[2m > [22m[2mApp Comp
+onent[2m > [22m[2mrenders 
+without crashing
+[22m[39mThe above error occ
+urred in the <ThemeToggle> co
+mponent:
+
+    at ThemeToggle (C:/Users/
+krofosyonel/Desktop/perfume-f
+ormulas/perfume-project/src/c
+omponents/ThemeToggle.jsx:11:
+65)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at Layout (C:/Users/krofo
+syonel/Desktop/perfume-formul
+as/perfume-project/src/compon
+ents/Layout.tsx:6:19)
+    at App (C:/Users/krofosyo
+nel/Desktop/perfume-formulas/
+perfume-project/src/App.tsx:8
+8:83)
+
+Consider adding an error boun
+dary to your tree to customiz
+e error handling behavior.
+Visit https://reactjs.org/lin
+k/error-boundaries to learn m
+ore about error boundaries.
+
+Error: useTheme must be used 
+within a ThemeProvider
+    at useTheme (C:/Users/kro
+fosyonel/Desktop/perfume-form
+ulas/perfume-project/src/cont
+ext/ThemeContext.jsx:33:11)
+    at ThemeToggle (C:/Users/
+krofosyonel/Desktop/perfume-f
+ormulas/perfume-project/src/c
+omponents/ThemeToggle.jsx:6:3
+1)
+    at renderWithHooks (C:\Us
+ers\krofosyonel\Desktop\perfu
+me-formulas\perfume-project\n
+ode_modules\react-dom\cjs\rea
+ct-dom.development.js:15486:1
+8)
+    at mountIndeterminateComp
+onent (C:\Users\krofosyonel\D
+esktop\perfume-formulas\perfu
+me-project\node_modules\react
+-dom\cjs\react-dom.developmen
+t.js:20103:13)
+    at beginWork (C:\Users\kr
+ofosyonel\Desktop\perfume-for
+mulas\perfume-project\node_mo
+dules\react-dom\cjs\react-dom
+.development.js:21626:16)
+    at HTMLUnknownElement.cal
+lCallback (C:\Users\krofosyon
+el\Desktop\perfume-formulas\p
+erfume-project\node_modules\r
+eact-dom\cjs\react-dom.develo
+pment.js:4164:14)
+    at HTMLUnknownElement.cal
+lTheUserObjectsOperation (C:\
+Users\krofosyonel\Desktop\per
+fume-formulas\perfume-project
+\node_modules\jsdom\lib\jsdom
+\living\generated\EventListen
+er.js:26:30)
+    at innerInvokeEventListen
+ers (C:\Users\krofosyonel\Des
+ktop\perfume-formulas\perfume
+-project\node_modules\jsdom\l
+ib\jsdom\living\events\EventT
+arget-impl.js:360:16)
+    at invokeEventListeners (
+C:\Users\krofosyonel\Desktop\
+perfume-formulas\perfume-proj
+ect\node_modules\jsdom\lib\js
+dom\living\events\EventTarget
+-impl.js:296:3)
+    at HTMLUnknownElementImpl
+._dispatch (C:\Users\krofosyo
+nel\Desktop\perfume-formulas\
+perfume-project\node_modules\
+jsdom\lib\jsdom\living\events
+\EventTarget-impl.js:243:9)
+Error: useTheme must be used 
+within a ThemeProvider
+    at useTheme (C:/Users/kro
+fosyonel/Desktop/perfume-form
+ulas/perfume-project/src/cont
+ext/ThemeContext.jsx:33:11)
+    at ThemeToggle (C:/Users/
+krofosyonel/Desktop/perfume-f
+ormulas/perfume-project/src/c
+omponents/ThemeToggle.jsx:6:3
+1)
+    at renderWithHooks (C:\Us
+ers\krofosyonel\Desktop\perfu
+me-formulas\perfume-project\n
+ode_modules\react-dom\cjs\rea
+ct-dom.development.js:15486:1
+8)
+    at mountIndeterminateComp
+onent (C:\Users\krofosyonel\D
+esktop\perfume-formulas\perfu
+me-project\node_modules\react
+-dom\cjs\react-dom.developmen
+t.js:20103:13)
+    at beginWork (C:\Users\kr
+ofosyonel\Desktop\perfume-for
+mulas\perfume-project\node_mo
+dules\react-dom\cjs\react-dom
+.development.js:21626:16)
+    at HTMLUnknownElement.cal
+lCallback (C:\Users\krofosyon
+el\Desktop\perfume-formulas\p
+erfume-project\node_modules\r
+eact-dom\cjs\react-dom.develo
+pment.js:4164:14)
+    at HTMLUnknownElement.cal
+lTheUserObjectsOperation (C:\
+Users\krofosyonel\Desktop\per
+fume-formulas\perfume-project
+\node_modules\jsdom\lib\jsdom
+\living\generated\EventListen
+er.js:26:30)
+    at innerInvokeEventListen
+ers (C:\Users\krofosyonel\Des
+ktop\perfume-formulas\perfume
+-project\node_modules\jsdom\l
+ib\jsdom\living\events\EventT
+arget-impl.js:360:16)
+    at invokeEventListeners (
+C:\Users\krofosyonel\Desktop\
+perfume-formulas\perfume-proj
+ect\node_modules\jsdom\lib\js
+dom\living\events\EventTarget
+-impl.js:296:3)
+    at HTMLUnknownElementImpl
+._dispatch (C:\Users\krofosyo
+nel\Desktop\perfume-formulas\
+perfume-project\node_modules\
+jsdom\lib\jsdom\living\events
+\EventTarget-impl.js:243:9)
+[90mstderr[2m | src/App.tes
+t.tsx[2m > [22m[2mApp Comp
+onent[2m > [22m[2mshows lo
+gin button when not logged in
+[22m[39mThe above error occ
+urred in the <ThemeToggle> co
+mponent:
+
+    at ThemeToggle (C:/Users/
+krofosyonel/Desktop/perfume-f
+ormulas/perfume-project/src/c
+omponents/ThemeToggle.jsx:11:
+65)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at Layout (C:/Users/krofo
+syonel/Desktop/perfume-formul
+as/perfume-project/src/compon
+ents/Layout.tsx:6:19)
+    at App (C:/Users/krofosyo
+nel/Desktop/perfume-formulas/
+perfume-project/src/App.tsx:8
+8:83)
+
+Consider adding an error boun
+dary to your tree to customiz
+e error handling behavior.
+Visit https://reactjs.org/lin
+k/error-boundaries to learn m
+ore about error boundaries.
+
+ [31mÔØ»[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 62[2mms[22m[39m
+[31m     [31m├ù[31m renders without crashing[39m[32m 45[2mms[22m[39m
+[31m     [31m├ù[31m shows login button when not logged in[39m[32m 16[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3
+9m[1m[41m Failed Tests 2 [
+49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m > [22mApp 
+Component[2m > [22mrenders 
+without crashing
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m > [22mApp 
+Component[2m > [22mshows lo
+gin button when not logged in
+[31m[1mError[22m: useTheme
+ must be used within a ThemeP
+rovider[39m
+[36m [2mÔØ»[22m useTheme s
+rc/context/ThemeContext.jsx:
+[2m33:11[22m[39m
+    [90m 31| [39m  [35mcon
+st[39m context [33m=[39m 
+[34museContext[39m([33mThem
+eContext[39m)
+    [90m 32| [39m  [35mif
+[39m (context [33m===[39m u
+ndefined) {
+    [90m 33| [39m    [35mt
+hrow[39m [35mnew[39m [33m
+Error[39m([32m"useTheme mus
+t be used within a ThemeProvi
+der"[39m)
+    [90m   | [39m          
+[31m^[39m
+    [90m 34| [39m  }
+    [90m 35| [39m  [35mret
+urn[39m context
+[90m [2mÔØ»[22m ThemeToggl
+e src/components/ThemeToggle.
+jsx:[2m6:31[22m[39m
+[90m [2mÔØ»[22m renderWith
+Hooks node_modules/react-dom/
+cjs/react-dom.development.js:
+[2m15486:18[22m[39m
+[90m [2mÔØ»[22m mountIndet
+erminateComponent node_module
+s/react-dom/cjs/react-dom.dev
+elopment.js:[2m20103:13[22m
+[39m
+[90m [2mÔØ»[22m beginWork 
+node_modules/react-dom/cjs/re
+act-dom.development.js:[2m21
+626:16[22m[39m
+[90m [2mÔØ»[22m beginWork$
+1 node_modules/react-dom/cjs/
+react-dom.development.js:[2m
+27465:14[22m[39m
+[90m [2mÔØ»[22m performUni
+tOfWork node_modules/react-do
+m/cjs/react-dom.development.j
+s:[2m26599:12[22m[39m
+[90m [2mÔØ»[22m workLoopSy
+nc node_modules/react-dom/cjs
+/react-dom.development.js:[2
+m26505:5[22m[39m
+[90m [2mÔØ»[22m renderRoot
+Sync node_modules/react-dom/c
+js/react-dom.development.js:
+[2m26473:7[22m[39m
+[90m [2mÔØ»[22m recoverFro
+mConcurrentError node_modules
+/react-dom/cjs/react-dom.deve
+lopment.js:[2m25889:20[22m
+[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/2]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+[2m   Start at [22m 00:30:28
+[2m   Duration [22m 1.28s[2m (transform 345ms, setup 140ms, collect 676ms, tests 74ms, environment 934ms, prepare 17ms)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.test.tsx [22m[34mx1 [34m[39m
+
+ [31mÔØ»[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 67[2mms[22m[39m
+[31m     [31m├ù[31m renders without crashing[39m[32m 53[2mms[22m[39m
+     [32mÔ£ô[39m shows login button when not logged in[32m 13[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3
+9m[1m[41m Failed Tests 1 [
+49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m > [22mApp 
+Component[2m > [22mrenders 
+without crashing
+[31m[1mTestingLibraryElemen
+tError[22m[39m: Found multi
+ple elements with the text: /
+Parf├╝m Form├╝lleri/i
+
+Here are the matching element
+s:
+
+Ignored nodes: comments, scri
+pt, style
+[36m<h1[39m
+  [33mclass[39m=[32m"text 
+font-bold text-white"[39m
+[36m>[39m
+  [0mParf├╝m Form├╝lleri[0m
+[36m</h1>[39m
+
+Ignored nodes: comments, scri
+pt, style
+[36m<p[39m
+  [33mclass[39m=[32m"text-
+gray-600 dark:text-gray-400"
+[39m
+[36m>[39m
+  [0mParf├╝m Form├╝lleri, pa
+rf├╝m tutkunlar─▒ i├ğin olu┼ş
+turulmu┼ş bir platformdur. Ke
+ndi parf├╝m├╝n├╝z├╝ yaratman─
+▒za yard─▒mc─▒ oluyoruz.[0m
+[36m</p>[39m
+
+Ignored nodes: comments, scri
+pt, style
+[36m<p[39m
+  [33mclass[39m=[32m"text-
+gray-600 dark:text-gray-400"
+[39m
+[36m>[39m
+  [0m┬® [0m
+  [0m2025[0m
+  [0m Parf├╝m Form├╝lleri. T
+├╝m haklar─▒ sakl─▒d─▒r.[0m
+[36m</p>[39m
+
+(If this is intentional, then
+ use the `*AllBy*` variant of
+ the query (like `queryAllByT
+ext`, `getAllByText`, or `fin
+dAllByText`)).
+
+Ignored nodes: comments, scri
+pt, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"m
+in-h-screen bg-background"[3
+9m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m
+"container max-w-[1800px] mx-
+auto p-4 dark:bg-gray-900"[3
+9m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[3
+2m"bg-white dark:bg-gray-800 
+shadow-lg rounded-lg p-6 mb-8
+"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=
+[32m"flex flex-col md:flex-ro
+w justify-between items-cente
+r gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m
+=[32m"flex items-center gap-
+3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[3
+9m=[32m"bg-gradient-to-r fro
+m-gray-900 to-gray-700 p-3 ro
+unded-lg"[39m
+              [36m>[39m
+                [36m<h1[39m
+                  [33mclass
+[39m=[32m"text font-bold tex
+t-white"[39m
+                [36m>[39m
+                  [0mParf├╝m
+ Form├╝lleri[0m
+                [36m</h1>[3
+9m
+              [36m</div>[39
+m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m
+=[32m"flex flex-wrap justify
+-center md:justify-end items-
+center gap-3"[39m
+            [36m>[39m
+              [36m<button[3
+9m
+                [33mclass[3
+9m=[32m"rounded-md text-sm f
+ont-medium focus:outline-none
+ focus-visible:ring-2 focus-v
+isible:ring-slate-500 focus-v
+isible:ring-offset-2 disabled
+:opacity-50 disabled:pointer-
+events-none dark:focus-visibl
+e:ring-gray-400 bg-blue-900 h
+over:bg-blue-700 dark:bg-gray
+-700 dark:hover:bg-gray-600 d
+ark:text-gray-100 h-10 px-4 p
+y-2 bg-gradient-to-r from-gre
+en-500 to-emerald-600 hover:f
+rom-green-600 hover:to-emeral
+d-700 text-white shadow-md ho
+ver:shadow-xl transform hover
+:-translate-y-0.5 transition-
+all duration-200 flex items-c
+enter gap-2 min-w-[200px] jus
+tify-center"[39m
+              [36m>[39m
+                [36m<svg[39
+m
+                  [33mclass
+[39m=[32m"h-5 w-5"[39m
+                  [33mfill[
+39m=[32m"none"[39m
+                  [33mheight
+[39m=[32m"24"[39m
+                  [33mstroke
+[39m=[32m"currentColor"[39
+m
+                  [33mstroke
+-linecap[39m=[32m"round"[3
+9m
+                  [33mstroke
+-linejoin[39m=[32m"round"[
+39m
+                  [33mstroke
+-width[39m=[32m"2"[39m
+                  [33mviewBo
+x[39m=[32m"0 0 24 24"[39m
+                  [33mwidth
+[39m=[32m"24"[39m
+                  [33mxmlns
+[39m=[32m"http://www.w3.org/
+2000/svg"[39m
+                [36m>[39m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"M19 14c1.49-1.46 3-3
+.21 3-5.5A5.5 5.5 0 0 0 16.5 
+3c-1.76 0-3 .5-4.5 2-1.5-1.5-
+2.74-2-4.5-2A5.5 5.5 0 0 0 2 
+8.5c0 2.3 1.5 4.05 3 5.5l7 7Z
+"[39m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"M12 5 9.04 7.96a2.17
+ 2.17 0 0 0 0 3.08v0c.82.82 2
+.13.85 3 .07l2.07-1.9a2.82 2.
+82 0 0 1 3.79 0l2.96 2.66"[3
+9m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"m18 15-2-2"[39m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"m15 18-2-2"[39m
+                  [36m/>[39
+m
+                [36m</svg>[
+39m
+                [0mKendi For
+m├╝l├╝m├╝ Payla┼şmak ─░stiyor
+um ÔÖÑ[0m
+              [36m</button>
+[39m
+              [36m<button[3
+9m
+                [33mclass[3
+9m=[32m"rounded-md text-sm f
+ont-medium focus:outline-none
+ focus-visible:ring-2 focus-v
+isible:ring-slate-500 focus-v
+isible:ring-offset-2 disabled
+:opacity-50 disabled:pointer-
+events-none dark:focus-visibl
+e:ring-gray-400 bg-blue-900 h
+over:bg-blue-700 dark:bg-gray
+-700 dark:hover:bg-gray-600 d
+ark:text-gray-100 h-10 px-4 p
+y-2 bg-gradient-to-r from-pur
+ple-600 to-pink-600 text-whit
+e hover:from-purple-700 hover
+:to-pink-700 shadow-md hover:
+shadow-xl transform hover:-tr
+anslate-y-0.5 transition-all 
+duration-900 animate-pulse ho
+ver:animate-none flex items-c
+enter gap-2 min-w-[180px] jus
+tify-center"[39m
+              [36m>[39m
+                [36m<svg[39
+m
+                  [33mclass
+[39m=[32m"h-4 w-4"[39m
+                  [33mfill[
+39m=[32m"none"[39m
+                  [33mheight
+[39m=[32m"24"[39m
+                  [33mstroke
+[39m=[32m"currentColor"[39
+m
+                  [33mstroke
+-linecap[39m=[32m"round"[3
+9m
+                  [33mstroke
+-linejoin[39m=[32m"round"[
+39m
+                  [33mstroke
+-width[39m=[32m"2"[39m
+                  [33mviewBo
+x[39m=[32m"0 0 24 24"[39m
+                  [33mwidth
+[39m=[32m"24"[39m
+                  [33mxmlns
+[39m=[32m"http://www.w3.org/
+2000/svg"[39m
+                [36m>[39m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"m12 3-1.912 5.813a2 
+2 0 0 1-1.275 1.275L3 12l5.81
+3 1.912a2 2 0 0 1 1.275 1.275
+L12 21l1.912-5.813a2 2 0 0 1 
+1.275-1.275L21 12l-5.813-1.91
+2a2 2 0 0 1-1.275-1.275L12 3Z
+"[39m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"M5 3v4"[39m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"M19 17v4"[39m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"M3 5h4"[39m
+                  [36m/>[39
+m
+                  [36m<path
+[39m
+                    [33md[3
+9m=[32m"M17 19h4"[39m
+                  [36m/>[39
+m
+                [36m</svg>[
+39m
+                [0mNas─▒l Pa
+rf├╝m Yap─▒l─▒r?[0m
+              [36m</button>
+[39m
+              [36m<button[3
+9m
+                [33mclass[3
+9m=[32m"rounded-md text-sm f
+ont-medium focus:outline-none
+ focus-visible:ring-2 focus-v
+isible:ring-slate-500 focus-v
+isible:ring-offset-2 disabled
+:opacity-50 disabled:pointer-
+events-none dark:focus-visibl
+e:ring-gray-400 bg-blue-900 h
+over:bg-blue-700 dark:bg-gray
+-700 dark:hover:bg-gray-600 d
+ark:text-gray-100 h-10 px-4 p
+y-2 bg-gradient-to-r from-cya
+n-500 to-blue-500 text-white 
+hover:from-cyan-600 hover:to-
+blue-600 shadow-md hover:shad
+ow-xl transform hover:-transl
+ate-y-0.5 transition-all dura
+tion-200 flex items-center ga
+p-2 min-w-[180px] justify-cen
+ter"[39m
+              [36m>[39m
+                [36m<svg[39
+m
+                  [33mclass
+[39m=[32m"h-4 w-4"[39m
+                  [33mfill[
+39m=[32m"none"[39m
+                  [33mheight
+[39m=[32m"24"[39m
+                  [33mstroke
+[39m=[32m"currentColor"[39
+m
+                  [33mstroke
+-linecap[39m=[32m"round"[3
+9m
+                  [33mstroke
+-linejoin[39m=[32m"round"[
+39m
+                  [33mstroke
+-width[39m=[32m"2"[39m
+                  [33mviewBo
+x[39m=[32m"0 0 24 24"[39m
+                  [33mwidth
+[39m=[32m"24"[39m
+                  [33mxmlns
+[39m=[32m"http://www.w3.org/
+2000/svg"[39m
+                [36m>[39m
+                  [36m<circl
+e[39m
+                    [33mcx[
+39m=[32m"12"[39m
+                    [33mcy[
+39m=[32m"12"[39m
+                    [33mr[3
+9m=[32m"10"[39m
+             ...
+[90m [2mÔØ»[22m Object.get
+ElementError node_modules/@te
+sting-library/dom/dist/config
+.js:[2m37:19[22m[39m
+[90m [2mÔØ»[22m getElement
+Error node_modules/@testing-l
+ibrary/dom/dist/query-helpers
+.js:[2m20:35[22m[39m
+[90m [2mÔØ»[22m getMultipl
+eElementsFoundError node_modu
+les/@testing-library/dom/dist
+/query-helpers.js:[2m23:10[
+22m[39m
+[90m [2mÔØ»[22m node_modul
+es/@testing-library/dom/dist/
+query-helpers.js:[2m55:13[2
+2m[39m
+[90m [2mÔØ»[22m node_modul
+es/@testing-library/dom/dist/
+query-helpers.js:[2m95:19[2
+2m[39m
+[36m [2mÔØ»[22m src/App.te
+st.tsx:[2m59:19[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 00:32:00
+[2m   Duration [22m 438ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+    [90m 57| [39m  [34mit
+[39m([32m'renders without cr
+ashing'[39m[33m,[39m () [
+33m=>[39m {
+    [90m 58| [39m    [34mr
+enderWithProviders[39m([33m
+<[39m[33mApp[39m [33m/[3
+9m[33m>[39m)[33m;[39m
+    [90m 59| [39m    [34me
+xpect[39m(screen[33m.[39m
+[34mgetByText[39m([36m/Parf
+├╝m Form├╝lleri/i[39m))[33m
+.[39m[34mtoBeInTheDocument
+[39m()[33m;[39m
+    [90m   | [39m          
+        [31m^[39m
+    [90m 60| [39m  })[33m;
+[39m
+    [90m 61| [39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.test.tsx [22m[34mx2 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 269[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 00:38:59
+[2m   Duration [22m 692ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/hooks/useAuth.test.ts [22m[34mx1 [34m[39m
+
+ [32mÔ£ô[39m src/hooks/useAuth.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 13[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 00:41:06
+[2m   Duration [22m 174ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx3 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 411[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 00:56:54
+[2m   Duration [22m 1.07s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/AddFormulaDialog.jsx [22m[34mx4 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 468[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:08:18
+[2m   Duration [22m 1.14s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/PerfumeGuideDialog.jsx [22m[34mx5 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 429[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:08:21
+[2m   Duration [22m 1.11s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx6 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 452[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:10:13
+[2m   Duration [22m 1.18s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx7 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 453[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:10:58
+[2m   Duration [22m 1.27s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx8 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 299[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:14:35
+[2m   Duration [22m 762ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx9 [34m[39m
+
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 9 errors:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:409:25: ERROR
+: The character "}" is not va
+lid inside a JSX element
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:411:22: ERROR
+: Unexpected closing "Accordi
+onContent" tag does not match
+ opening "div" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:412:20: ERROR
+: Unexpected closing "Accordi
+onItem" tag does not match op
+ening "div" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:413:18: ERROR
+: Unexpected closing "Accordi
+on" tag does not match openin
+g "AccordionContent" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:414:16: ERROR
+: Unexpected closing "div" ta
+g does not match opening "Acc
+ordionItem" tag
+...[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/App.tsx
+[39m:409:25
+[33m  
+  [33mThe character "}" is n
+ot valid inside a JSX element
+[33m
+  407 |                      
+        </div>
+  408 |                      
+      </div>
+  409 |                      
+    )}
+      |                      
+     ^
+  410 |                      
+  </div>
+  411 |                      
+</AccordionContent>
+  
+  [33mUnexpected closing "Ac
+cordionContent" tag does not 
+match opening "div" tag[33m
+  409 |                      
+    )}
+  410 |                      
+  </div>
+  411 |                      
+</AccordionContent>
+      |                      
+  ^
+  412 |                    </
+AccordionItem>
+  413 |                  </Ac
+cordion>
+  
+  [33mUnexpected closing "Ac
+cordionItem" tag does not mat
+ch opening "div" tag[33m
+  410 |                      
+  </div>
+  411 |                      
+</AccordionContent>
+  412 |                    </
+AccordionItem>
+      |                      
+^
+  413 |                  </Ac
+cordion>
+  414 |                </div>
+  
+  [33mUnexpected closing "Ac
+cordion" tag does not match o
+pening "AccordionContent" tag
+[33m
+  411 |                      
+</AccordionContent>
+  412 |                    </
+AccordionItem>
+  413 |                  </Ac
+cordion>
+      |                    ^
+  414 |                </div>
+  415 |              )}
+  
+  [33mUnexpected closing "di
+v" tag does not match opening
+ "AccordionItem" tag[33m
+  412 |                    </
+AccordionItem>
+  413 |                  </Ac
+cordion>
+  414 |                </div>
+      |                  ^
+  415 |              )}
+  416 |  
+  
+  [33mThe character "}" is n
+ot valid inside a JSX element
+[33m
+  413 |                  </Ac
+cordion>
+  414 |                </div>
+  415 |              )}
+      |               ^
+  416 |  
+  417 |              {/* Form
+├╝ller Grid - Tek Sat─▒r */}
+  
+  [33mUnexpected closing "Di
+alogContent" tag does not mat
+ch opening "Accordion" tag[3
+3m
+  509 |                </div>
+  510 |              </div>
+  511 |            </DialogCo
+ntent>
+      |              ^
+  512 |          </Dialog>
+  513 |  
+  
+  [33mUnexpected closing "Di
+alog" tag does not match open
+ing "div" tag[33m
+  510 |              </div>
+  511 |            </DialogCo
+ntent>
+  512 |          </Dialog>
+      |            ^
+  513 |  
+  514 |          {/* Other Di
+alogs */}
+  
+  [33mExpected ")" but found
+ "{"[33m
+  512 |          </Dialog>
+  513 |  
+  514 |          {/* Other Di
+alogs */}
+      |          ^
+  515 |          <AddFormulaD
+ialog
+  516 |            open={isAd
+dDialogOpen}
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 01:15:18
+[2m   Duration [22m 115ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx10 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 431[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:21:10
+[2m   Duration [22m 1.10s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx11 [34m[39m
+
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 2 errors:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:445:24: ERROR
+: The character ">" is not va
+lid inside a JSX element
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:448:26: ERROR
+: Unexpected closing "Button"
+ tag does not match opening "
+span" tag[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/App.tsx
+[39m:445:24
+[33m  
+  [33mThe character ">" is n
+ot valid inside a JSX element
+[33m
+  443 |                      
+      className="flex items-c
+enter gap-1 text-gray-600 dar
+k:text-gray-400"
+  444 |                      
+      onClick={(e: React.Mous
+eEvent) => handleOpenComments
+(formula, e)}
+  445 |                      
+    >
+      |                      
+    ^
+  446 |                      
+      <MessageSquare classNam
+e="h-4 w-4" />
+  447 |                      
+      <span className="text-x
+s">{formula.reviewCount || 0}
+</span>
+  
+  [33mUnexpected closing "Bu
+tton" tag does not match open
+ing "span" tag[33m
+  446 |                      
+      <MessageSquare classNam
+e="h-4 w-4" />
+  447 |                      
+      <span className="text-x
+s">{formula.reviewCount || 0}
+</span>
+  448 |                      
+    </Button>
+      |                      
+      ^
+  449 |                      
+  </div>
+  450 |                      
+  {isAdmin && (
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 01:21:35
+[2m   Duration [22m 99ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx12 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 444[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:26:27
+[2m   Duration [22m 1.14s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx13 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 471[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 01:32:07
+[2m   Duration [22m 1.17s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx14 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 273[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:13:47
+[2m   Duration [22m 747ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/FormulaComments.jsx [22m[34mx15 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 263[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:14:25
+[2m   Duration [22m 693ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/FormulaComments.jsx [22m[34mx16 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 274[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:14:27
+[2m   Duration [22m 690ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx17 [34m[39m
+
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 2 errors:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:551:15: ERROR
+: The character "}" is not va
+lid inside a JSX element
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:553:18: ERROR
+: Unterminated regular expres
+sion[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/App.tsx
+[39m:551:15
+[33m  
+  [33mThe character "}" is n
+ot valid inside a JSX element
+[33m
+  549 |                    />
+  550 |                  </di
+v>
+  551 |                )}
+      |                 ^
+  552 |              </div>
+  553 |              </div>
+  
+  [33mUnterminated regular e
+xpression[33m
+  551 |                )}
+  552 |              </div>
+  553 |              </div>
+      |                    ^
+  554 |            </DialogCo
+ntent>
+  555 |          </Dialog>
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 02:18:31
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+[2m   Duration [22m 111ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx18 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 426[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:18:43
+[2m   Duration [22m 1.08s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx19 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 451[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:38:11
+[2m   Duration [22m 1.18s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx20 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 467[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:41:51
+[2m   Duration [22m 1.16s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx21 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 489[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:41:54
+[2m   Duration [22m 1.16s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx22 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 426[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:41:57
+[2m   Duration [22m 1.10s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx23 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 273[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:44:32
+[2m   Duration [22m 709ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/PendingFormulasDialog.jsx [22m[34mx24 [34m[39m
+
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 1 error:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/components/PendingFor
+mulasDialog.jsx:1:21: ERROR: 
+Expected ";" but found "Form├
+╝l"[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/componen
+ts/PendingFormulasDialog.jsx
+[39m:1:21
+[33m  
+  [33mExpected ";" but found
+ "Form├╝l"[33m
+  1  |              Bekleyen 
+Form├╝l ─░stekleri
+     |                       
+^
+  2  |            </Dialog.Ti
+tle>
+  3  |  
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 02:45:25
+[2m   Duration [22m 114ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/components/PendingFormulasDialog.jsx [22m[34mx25 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 444[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:45:49
+[2m   Duration [22m 1.09s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx26 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 430[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:48:45
+[2m   Duration [22m 1.14s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx27 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 432[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:48:52
+[2m   Duration [22m 1.10s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx28 [34m[39m
+
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 1 error:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:14:7: ERROR: 
+Expected "as" but found "Perf
+umeManagementDialog"[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/App.tsx
+[39m:14:7
+[33m  
+  [33mExpected "as" but foun
+d "PerfumeManagementDialog"[
+33m
+  12 |    AccordionItem,
+  13 |    AccordionTrigger,
+  14 |  import PerfumeManagem
+entDialog from "./components/
+PerfumeManagementDialog.jsx";
+     |         ^
+  15 |  import StockManagemen
+tDialog from "./components/St
+ockManagementDialog.jsx";
+  16 |  import PerfumeCard fr
+om "./components/PerfumeCard.
+jsx";
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 02:49:15
+[2m   Duration [22m 121ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx29 [34m[39m
+
+ [32mÔ£ô[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 251[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:50:58
+[2m   Duration [22m 760ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/App.tsx [22m[34mx30 [34m[39m
+
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 4 errors:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:369:18: ERROR
+: Unexpected closing "div" ta
+g does not match opening "Dia
+log" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:370:15: ERROR
+: The character "}" is not va
+lid inside a JSX element
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:371:14: ERROR
+: Unexpected closing "div" ta
+g does not match opening "Lay
+out" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:372:26: ERROR
+: Unterminated regular expres
+sion[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/App.tsx
+[39m:369:18
+[33m  
+  [33mUnexpected closing "di
+v" tag does not match opening
+ "Dialog" tag[33m
+  367 |            <DialogCon
+tent 
+  368 |                    />
+  369 |                  </di
+v>
+      |                    ^
+  370 |                )}
+  371 |              </div>
+  
+  [33mThe character "}" is n
+ot valid inside a JSX element
+[33m
+  368 |                    />
+  369 |                  </di
+v>
+  370 |                )}
+      |                 ^
+  371 |              </div>
+  372 |            </DialogCo
+ntent>
+  
+  [33mUnexpected closing "di
+v" tag does not match opening
+ "Layout" tag[33m
+  369 |                  </di
+v>
+  370 |                )}
+  371 |              </div>
+      |                ^
+  372 |            </DialogCo
+ntent>
+  373 |          </Dialog>
+  
+  [33mUnterminated regular e
+xpression[33m
+  370 |                )}
+  371 |              </div>
+  372 |            </DialogCo
+ntent>
+      |                      
+      ^
+  373 |          </Dialog>
+  374 |  
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 02:51:40
+[2m   Duration [22m 110ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+[1m[35m
+Restarting due to config changes...[39m[22m
+
+[1m[44m DEV [49m[22m [34mv4.0.13 [39m[90mC:/Users/krofosyonel/Desktop/perfume-formulas/perfume-project[39m
+
+ [31mÔØ»[39m src/hooks/useAuth.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m should initialize with default state[39m[32m 2[2mms[22m[39m
+ [31mÔØ»[39m src/App.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 6[2mms[22m[39m
+[31m     [31m├ù[31m renders without crashing[39m[32m 4[2mms[22m[39m
+[31m     [31m├ù[31m shows login button when not logged in[39m[32m 1[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3
+9m[1m[41m Failed Tests 3 [
+49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m > [22mApp 
+Component[2m > [22mrenders 
+without crashing
+[31m[1mReferenceError[22m:
+ document is not defined[39m
+[90m [2mÔØ»[22m Proxy.rend
+er node_modules/@testing-libr
+ary/react/dist/pure.js:[2m25
+7:5[22m[39m
+[36m [2mÔØ»[22m renderWith
+Providers src/App.test.tsx:[
+2m53:10[22m[39m
+    [90m 51| [39m
+    [90m 52| [39m[35mconst
+[39m renderWithProviders [3
+3m=[39m (component[33m:[39
+m [33mReact[39m[33m.[39m
+[33mReactElement[39m) [33m=
+>[39m {
+    [90m 53| [39m  [35mret
+urn[39m [34mrender[39m([3
+3m<[39m[33mThemeProvider[3
+9m[33m>[39m[33m{[39mcompo
+nent[33m}[39m[33m<[39m[3
+3m/[39m[33mThemeProvider[3
+9m[33m>[39m)[33m;[39m
+    [90m   | [39m         
+[31m^[39m
+    [90m 54| [39m}[33m;[3
+9m
+    [90m 55| [39m
+[90m [2mÔØ»[22m src/App.te
+st.tsx:[2m58:5[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/3]Ô
+Ä»[22m[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m > [22mApp 
+Component[2m > [22mshows lo
+gin button when not logged in
+[31m[1mReferenceError[22m:
+ document is not defined[39m
+[90m [2mÔØ»[22m Proxy.rend
+er node_modules/@testing-libr
+ary/react/dist/pure.js:[2m25
+7:5[22m[39m
+[36m [2mÔØ»[22m renderWith
+Providers src/App.test.tsx:[
+2m53:10[22m[39m
+    [90m 51| [39m
+    [90m 52| [39m[35mconst
+[39m renderWithProviders [3
+3m=[39m (component[33m:[39
+m [33mReact[39m[33m.[39m
+[33mReactElement[39m) [33m=
+>[39m {
+    [90m 53| [39m  [35mret
+urn[39m [34mrender[39m([3
+3m<[39m[33mThemeProvider[3
+9m[33m>[39m[33m{[39mcompo
+nent[33m}[39m[33m<[39m[3
+3m/[39m[33mThemeProvider[3
+9m[33m>[39m)[33m;[39m
+    [90m   | [39m         
+[31m^[39m
+    [90m 54| [39m}[33m;[3
+9m
+    [90m 55| [39m
+[90m [2mÔØ»[22m src/App.te
+st.tsx:[2m64:5[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/3]Ô
+Ä»[22m[39m
+
+[41m[1m FAIL [22m[49m src
+/hooks/useAuth.test.ts[2m > 
+[22museAuth Hook[2m > [22m
+should initialize with defaul
+t state
+[31m[1mReferenceError[22m:
+ localStorage is not defined
+[39m
+[36m [2mÔØ»[22m src/hooks/
+useAuth.test.ts:[2m11:5[22m
+[39m
+    [90m  9| [39m  [34mbef
+oreEach[39m(() [33m=>[39m 
+{
+    [90m 10| [39m    vi[33
+m.[39m[34mclearAllMocks[39
+m()[33m;[39m
+    [90m 11| [39m    localS
+torage[33m.[39m[34mclear[
+39m()[33m;[39m
+    [90m   | [39m    [31m^
+[39m
+    [90m 12| [39m  })[33m;
+[39m
+    [90m 13| [39m
+
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/3]Ô
+Ä»[22m[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m   Start at [22m 02:52:40
+[2m   Duration [22m 1.17s[2m (transform 517ms, setup 0ms, collect 1.41s, tests 9ms, environment 0ms, prepare 14ms)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+[1m[35m
+Restarting due to config changes...[39m[22m
+
+[1m[44m DEV [49m[22m [34mv4.0.13 [39m[90mC:/Users/krofosyonel/Desktop/perfume-formulas/perfume-project[39m
+
+ [32mÔ£ô[39m src/hooks/useAuth.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+[1m[41m Failed Suites 1 [49
+m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m src
+/App.test.tsx[2m [ src/App.t
+est.tsx ][22m
+[31m[1mError[22m: Transfor
+m failed with 4 errors:
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:369:18: ERROR
+: Unexpected closing "div" ta
+g does not match opening "Dia
+log" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:370:15: ERROR
+: The character "}" is not va
+lid inside a JSX element
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:371:14: ERROR
+: Unexpected closing "div" ta
+g does not match opening "Lay
+out" tag
+C:/Users/krofosyonel/Desktop/
+perfume-formulas/perfume-proj
+ect/src/App.tsx:372:26: ERROR
+: Unterminated regular expres
+sion[39m
+  Plugin: [35mvite:esbuild[
+39m
+  File: [36mC:/Users/krofosy
+onel/Desktop/perfume-formulas
+/perfume-project/src/App.tsx
+[39m:369:18
+[33m  
+  [33mUnexpected closing "di
+v" tag does not match opening
+ "Dialog" tag[33m
+  367 |            <DialogCon
+tent 
+  368 |                    />
+  369 |                  </di
+v>
+      |                    ^
+  370 |                )}
+  371 |              </div>
+  
+  [33mThe character "}" is n
+ot valid inside a JSX element
+[33m
+  368 |                    />
+  369 |                  </di
+v>
+  370 |                )}
+      |                 ^
+  371 |              </div>
+  372 |            </DialogCo
+ntent>
+  
+  [33mUnexpected closing "di
+v" tag does not match opening
+ "Layout" tag[33m
+  369 |                  </di
+v>
+  370 |                )}
+  371 |              </div>
+      |                ^
+  372 |            </DialogCo
+ntent>
+  373 |          </Dialog>
+  
+  [33mUnterminated regular e
+xpression[33m
+  370 |                )}
+  371 |              </div>
+  372 |            </DialogCo
+ntent>
+      |                      
+      ^
+  373 |          </Dialog>
+  374 |  
+  [39m
+[90m [2mÔØ»[22m failureErr
+orWithLog node_modules/vitest
+/node_modules/esbuild/lib/mai
+n.js:[2m1467:15[22m[39m
+[90m [2mÔØ»[22m node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m736:50[22m
+[39m
+[90m [2mÔØ»[22m responseCa
+llbacks.<computed> node_modul
+es/vitest/node_modules/esbuil
+d/lib/main.js:[2m603:9[22m
+[39m
+[90m [2mÔØ»[22m handleInco
+mingPacket node_modules/vites
+t/node_modules/esbuild/lib/ma
+in.js:[2m658:12[22m[39m
+[90m [2mÔØ»[22m Socket.rea
+dFromStdout node_modules/vite
+st/node_modules/esbuild/lib/m
+ain.js:[2m581:7[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 02:53:37
+[2m   Duration [22m 1.20s[2m (transform 43ms, setup 203ms, collect 141ms, tests 12ms, environment 1.52s, prepare 22ms)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m

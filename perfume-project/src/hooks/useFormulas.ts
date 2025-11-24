@@ -1,131 +1,124 @@
 import { useState, useCallback } from 'react';
-import { formulasApi } from '@/services';
-import type { Formula, FormulaRequest, PendingRequest } from '@/types/api.types';
+import { Formula, FormulaRequest } from '../types/api.types';
 
-export const useFormulas = () => {
-    const [formulas, setFormulas] = useState<Formula[]>([]);
-    const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+const API_URL = import.meta.env.VITE_API_URL;
 
-    const fetchFormulas = useCallback(async (perfumeId: number | string) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await formulasApi.getByPerfumeId(perfumeId);
-            setFormulas(data);
-            return data;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to fetch formulas';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
+export const useFormulas = (isLoggedIn: boolean, userId?: number) => {
+  const [formulas, setFormulas] = useState<Formula[]>([]);
+  const [creativeFormula, setCreativeFormula] = useState<any>(null); // Type this properly if possible
+
+  const handleRatingChange = (formulaId: number, averageRating: number, reviewCount: number) => {
+    const updatedFormulas = formulas.map((formula) => {
+      if (formula.id === formulaId) {
+        return {
+          ...formula,
+          averageRating: averageRating,
+          reviewCount: reviewCount,
+        };
+      }
+      return formula;
+    });
+    setFormulas(updatedFormulas);
+  };
+
+  const fetchFormulas = useCallback(async (perfume_id: number) => {
+    try {
+      const response = await fetch(`${API_URL}/perfumes/${perfume_id}/formulas`);
+      const data = await response.json();
+      setFormulas(data);
+    } catch (error) {
+      console.error("Error fetching formulas:", error);
+    }
+  }, []);
+
+  const fetchCreativeFormula = useCallback(async (perfume_id: number) => {
+    try {
+      const response = await fetch(`${API_URL}/perfumes/${perfume_id}/details`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch perfume details');
+      }
+      const data = await response.json();
+      setCreativeFormula(data);
+    } catch (error) {
+      console.error("Error fetching creative formula:", error);
+      setCreativeFormula(null);
+    }
+  }, []);
+
+  const handleSaveFormula = async (formulaData: FormulaRequest, onSuccess?: () => void) => {
+    try {
+      const response = await fetch(`${API_URL}/formulas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(formulaData),
+      });
+
+      if (response.ok) {
+        if (onSuccess) onSuccess();
+      }
+    } catch (error) {
+      console.error("Error saving formula:", error);
+    }
+  };
+
+  const handleFormulaRequest = async (formulaData: FormulaRequest, onSuccess?: () => void) => {
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (isLoggedIn) {
+        const token = localStorage.getItem("token");
+        if (token) headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_URL}/formulas/request`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          ...formulaData,
+          userId: userId || null,
+        }),
+      });
+
+      if (response.ok) {
+        alert(
+          "Formül isteğiniz başarıyla gönderildi. Admin onayından sonra eklenecektir."
+        );
+        if (onSuccess) onSuccess();
+      }
+    } catch (error) {
+      console.error("Error saving formula request:", error);
+    }
+  };
+
+  const handleDeleteFormula = async (formulaId: number, onSuccess?: () => void) => {
+    if (window.confirm("Bu formülü silmek istediğinizden emin misiniz?")) {
+      try {
+        const response = await fetch(`${API_URL}/formulas/${formulaId}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          if (onSuccess) onSuccess();
         }
-    }, []);
+      } catch (error) {
+        console.error("Error deleting formula:", error);
+      }
+    }
+  };
 
-    const fetchPendingRequests = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await formulasApi.getPending();
-            setPendingRequests(data);
-            return data;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to fetch pending requests';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const createFormula = useCallback(async (data: FormulaRequest) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const formula = await formulasApi.create(data);
-            return formula;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to create formula';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const requestFormula = useCallback(async (data: FormulaRequest) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await formulasApi.request(data);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to submit formula request';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const approveRequest = useCallback(async (requestId: number | string) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await formulasApi.approve(requestId);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to approve request';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const rejectRequest = useCallback(async (requestId: number | string) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await formulasApi.reject(requestId);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to reject request';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const deleteFormula = useCallback(async (formulaId: number | string) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await formulasApi.delete(formulaId);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Failed to delete formula';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    return {
-        formulas,
-        pendingRequests,
-        loading,
-        error,
-        fetchFormulas,
-        fetchPendingRequests,
-        createFormula,
-        requestFormula,
-        approveRequest,
-        rejectRequest,
-        deleteFormula,
-    };
+  return {
+    formulas,
+    creativeFormula,
+    fetchFormulas,
+    fetchCreativeFormula,
+    handleSaveFormula,
+    handleFormulaRequest,
+    handleDeleteFormula,
+    setFormulas,
+    handleRatingChange
+  };
 };

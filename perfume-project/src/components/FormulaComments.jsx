@@ -9,6 +9,7 @@ const FormulaComments = ({
   userId,
   isAdmin,
   onRatingChange,
+  isLoggedIn = false,
 }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -441,7 +442,16 @@ const FormulaComments = ({
 
       <div className="sticky bottom-0 bg-white dark:bg-gray-800 p-2 rounded-lg">
         <div className="border-t pt-3">
-          {userHasComment ? (
+          {!isLoggedIn ? (
+            <div className="text-center py-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                Değerlendirme yapabilmek için giriş yapmanız gerekmektedir.
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                Yorumları okuyabilir ancak yorum yapamazsınız.
+              </p>
+            </div>
+          ) : userHasComment ? (
             <div className="text-center text-sm text-gray-500 mb-4">
               Bu formülü zaten değerlendirdiniz. Değerlendirmenizi silip yeniden
               değerlendirme yapabilirsiniz.

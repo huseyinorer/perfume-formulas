@@ -1,26 +1,31 @@
-// src/components/SearchBox.jsx
-import React, { useState, useCallback } from "react";
+// src/components/SearchBox.tsx
+import React, { useState, useCallback, ChangeEvent } from "react";
 import debounce from "lodash/debounce";
 
-const SearchBox = ({ onSearch }) => {
+interface SearchBoxProps {
+  onSearch: (value: string) => void;
+  className?: string;
+}
+
+const SearchBox: React.FC<SearchBoxProps> = ({ onSearch, className }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Debounce search için useCallback kullanıyoruz
   const debouncedSearch = useCallback(
-    debounce((value) => {
+    debounce((value: string) => {
       onSearch(value);
     }, 300),
     [onSearch]
   );
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
     debouncedSearch(value);
   };
 
   return (
-    <div className="mb-4">
+    <div className={`mb-4 ${className || ''}`}>
       <input 
         type="text" 
         value={searchTerm}

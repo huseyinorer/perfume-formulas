@@ -96,3 +96,42 @@
     max-width: 1536px;
   }
 }
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  /* Webkit browsers (Chrome, Safari, newer Edge) */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background-color: rgb(209 213 219);
+    border-radius: 4px;
+  }
+
+  .scrollbar-track-gray-100::-webkit-scrollbar-track {
+    background-color: rgb(243 244 246);
+  }
+
+  /* Dark mode */
+  .dark .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb,
+  .dark .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background-color: rgb(75 85 99);
+    border-radius: 4px;
+  }
+
+  .dark .scrollbar-track-gray-800::-webkit-scrollbar-track,
+  .dark .scrollbar-track-gray-100::-webkit-scrollbar-track {
+    background-color: rgb(31 41 55);
+  }
+
+  /* Hover effects */
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(156 163 175);
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(107 114 128);
+  }
+}

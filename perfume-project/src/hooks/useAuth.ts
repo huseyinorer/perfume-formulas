@@ -1,122 +1,94 @@
-import { useState, useCallback } from 'react';
-import { authApi } from '@/services';
-import { STORAGE_KEYS } from '@/utils/constants';
-import type { User, LoginRequest, RegisterRequest } from '@/types/api.types';
+import { useState, useEffect, useCallback } from 'react';
+import { User, LoginResponse } from '../types/api.types';
 
 export const useAuth = () => {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-    const login = useCallback(async (credentials: LoginRequest) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await authApi.login(credentials);
-            localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
-            setUser(response.user);
-            setIsLoggedIn(true);
-            setIsAdmin(response.user.isAdmin);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Login failed';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("token");
+    setUser(null);
+    setIsLoggedIn(false);
+    setIsAdmin(false);
+  }, []);
 
-    const register = useCallback(async (data: RegisterRequest) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await authApi.register(data);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Registration failed';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+  const loadUserFromToken = useCallback(() => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const logout = useCallback(() => {
-        localStorage.removeItem(STORAGE_KEYS.TOKEN);
-        setUser(null);
-        setIsLoggedIn(false);
-        setIsAdmin(false);
-    }, []);
+      if (!token) {
+        return;
+      }
 
-    const changePassword = useCallback(async (oldPassword: string, newPassword: string) => {
-        if (!user) throw new Error('User not logged in');
+      // JWT token decode etme
+      const base64Url = token.split(".")[1];
+      if (!base64Url) {
+        console.error("Invalid token format");
+        handleLogout();
+        return;
+      }
 
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await authApi.changePassword(user.id, oldPassword, newPassword);
-            return response;
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.error || 'Password change failed';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, [user]);
+      // Base64 decode işlemi
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
 
-    const loadUserFromToken = useCallback(() => {
-        try {
-            const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-            if (!token) return;
+      const payload = JSON.parse(jsonPayload);
 
-            // Decode JWT token
-            const base64Url = token.split('.')[1];
-            if (!base64Url) {
-                logout();
-                return;
-            }
+      // Token expire kontrolü
+      const expirationTime = payload.exp * 1000;
 
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(
-                atob(base64)
-                    .split('')
-                    .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                    .join('')
-            );
+      if (Date.now() >= expirationTime) {
+        console.log("Token expired, logging out");
+        handleLogout();
+        return;
+      }
 
-            const payload = JSON.parse(jsonPayload);
+      // Token geçerli, kullanıcıyı set et
+      setUser(payload);
+      setIsLoggedIn(true);
+      setIsAdmin(!!payload.isAdmin);
 
-            // Check token expiration
-            const expirationTime = payload.exp * 1000;
-            if (Date.now() >= expirationTime) {
-                logout();
-                return;
-            }
+      // Token süresi dolmadan önce otomatik logout için timer
+      const timeUntilExpiry = expirationTime - Date.now();
+      const maxTimeout = Math.min(timeUntilExpiry, 60 * 60 * 1000); // 1 saat veya token süresinin dolmasına kalan süre
 
-            // Set user from token
-            setUser(payload);
-            setIsLoggedIn(true);
-            setIsAdmin(!!payload.isAdmin);
-        } catch (err) {
-            console.error('Error parsing token:', err);
-            logout();
-        }
-    }, [logout]);
+      const timer = setTimeout(() => {
+        loadUserFromToken();
+      }, maxTimeout);
 
-    return {
-        user,
-        isLoggedIn,
-        isAdmin,
-        loading,
-        error,
-        login,
-        register,
-        logout,
-        changePassword,
-        loadUserFromToken,
-    };
+      return () => clearTimeout(timer);
+    } catch (error) {
+      console.error("Error parsing token:", error);
+      handleLogout();
+    }
+  }, [handleLogout]);
+
+  useEffect(() => {
+    loadUserFromToken();
+  }, [loadUserFromToken]);
+
+  const handleLogin = async (response: LoginResponse) => {
+    const { token, user } = response;
+    localStorage.setItem("token", token);
+    setUser(user);
+    setIsLoggedIn(true);
+    setIsAdmin(!!user.isAdmin);
+  };
+
+  return {
+    user,
+    isLoggedIn,
+    isAdmin,
+    handleLogin,
+    handleLogout,
+    loadUserFromToken
+  };
 };

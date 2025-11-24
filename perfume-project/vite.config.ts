@@ -1,6 +1,10 @@
 import react from '@vitejs/plugin-react'
 import path from "path"
-import { defineConfig } from 'vite'
+import { fileURLToPath } from "url"
+import { defineConfig } from 'vitest/config'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react()],
@@ -18,5 +22,11 @@ export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/perfume-formulas/' : '/',
   build: {
     outDir: 'dist', // Çıktı dizinini belirtir
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    css: true,
   },
 })

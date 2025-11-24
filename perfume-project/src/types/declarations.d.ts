@@ -1,14 +1,3 @@
-/// <reference types="vite/client" />
-
-interface ImportMetaEnv {
-    readonly VITE_API_URL: string;
-    // Diğer env değişkenlerini buraya ekleyebilirsiniz
-}
-
-interface ImportMeta {
-    readonly env: ImportMetaEnv;
-}
-
 declare module './components/ui/button';
 declare module './components/ui/dialog';
 declare module './components/AddFormulaDialog';
@@ -28,4 +17,3 @@ declare module './components/FAQDialog';
 declare module './components/FormulaComments';
 declare module './components/ui/starRating';
 declare module './components/Footer';
-declare module '*.jsx';

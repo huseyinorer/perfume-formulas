@@ -3,9 +3,9 @@ import React from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 
-const PendingFormulasDialog = ({ open, onClose, requests = [], onApprove, onReject }) => {
+const PendingFormulasDialog = ({ open, onOpenChange, requests = [], onApprove, onReject }) => {
   return (
-    <Dialog.Root open={open} onOpenChange={onClose}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
         <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] 

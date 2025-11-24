@@ -6,7 +6,7 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import Autocomplete from './Autocomplete'
 
-const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
+const AddFormulaDialog = ({ open, onOpenChange, onSubmit, perfumes, initialPerfume }) => {
   const [formData, setFormData] = useState({
     perfume_id: '',
     fragrancePercentage: '0',
@@ -51,7 +51,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
       return
     }
 
-    onSave(formData)
+    onSubmit(formData)
   }
 
   const handlePerfumeSelect = (perfume) => {
@@ -59,7 +59,7 @@ const AddFormulaDialog = ({ open, onClose, onSave, perfumes }) => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Yeni Formül Ekle</DialogTitle>
