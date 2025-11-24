@@ -1,11 +1,12 @@
 import express from 'express';
 import { validateFormula } from '../validators/formula.validator.js';
 import { formulaSubmitLimiter } from '../middleware/rateLimit.middleware.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 // Add formula (admin only)
-router.post('/', formulaSubmitLimiter, validateFormula, async (req, res, next) => {
+router.post('/', authenticateToken, requireAdmin, formulaSubmitLimiter, validateFormula, async (req, res, next) => {
     try {
         const {
             perfume_id,
@@ -73,7 +74,7 @@ router.post('/request', formulaSubmitLimiter, validateFormula, async (req, res, 
 });
 
 // Get pending requests (admin only)
-router.get('/pending', async (req, res, next) => {
+router.get('/pending', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const pool = req.app.get('pool');
         const result = await pool.query(`
@@ -94,7 +95,7 @@ router.get('/pending', async (req, res, next) => {
 });
 
 // Approve formula request (admin only)
-router.post('/approve/:id', async (req, res, next) => {
+router.post('/approve/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     const pool = req.app.get('pool');
     const client = await pool.connect();
 
@@ -143,7 +144,7 @@ router.post('/approve/:id', async (req, res, next) => {
 });
 
 // Reject formula request (admin only)
-router.post('/reject/:id', async (req, res, next) => {
+router.post('/reject/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const { id } = req.params;
         const pool = req.app.get('pool');
@@ -159,7 +160,7 @@ router.post('/reject/:id', async (req, res, next) => {
 });
 
 // Delete formula (admin only)
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const { id } = req.params;
         const pool = req.app.get('pool');

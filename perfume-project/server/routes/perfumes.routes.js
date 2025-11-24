@@ -1,5 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import { authenticateToken, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -223,8 +224,8 @@ router.get('/search', async (req, res, next) => {
     }
 });
 
-// CREATE - Add new perfume (requires auth)
-router.post('/', async (req, res, next) => {
+// CREATE - Add new perfume (requires admin)
+router.post('/', authenticateToken, requireAdmin, async (req, res, next) => {
     const pool = req.app.get('pool');
     const client = await pool.connect();
 
@@ -277,8 +278,8 @@ router.post('/', async (req, res, next) => {
     }
 });
 
-// UPDATE - Update perfume (requires auth)
-router.put('/:id', async (req, res, next) => {
+// UPDATE - Update perfume (requires admin)
+router.put('/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     const pool = req.app.get('pool');
     const client = await pool.connect();
 
@@ -335,8 +336,8 @@ router.put('/:id', async (req, res, next) => {
     }
 });
 
-// DELETE - Delete perfume (requires auth)
-router.delete('/:id', async (req, res, next) => {
+// DELETE - Delete perfume (requires admin)
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     const pool = req.app.get('pool');
     const client = await pool.connect();
 

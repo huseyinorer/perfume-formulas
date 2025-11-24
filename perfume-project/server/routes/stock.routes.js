@@ -1,10 +1,10 @@
 import express from 'express';
-import { authenticateToken } from '../middleware/auth.middleware.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Create stock record (requires auth)
-router.post('/', authenticateToken, async (req, res, next) => {
+// Create stock record (requires admin)
+router.post('/', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const { perfume_id, price, stock_quantity, category } = req.body;
         const pool = req.app.get('pool');
@@ -39,8 +39,8 @@ router.post('/', authenticateToken, async (req, res, next) => {
     }
 });
 
-// Get stock list with pagination and search (requires auth)
-router.get('/', authenticateToken, async (req, res, next) => {
+// Get stock list with pagination and search (requires admin)
+router.get('/', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const {
             limit = 10,
@@ -140,8 +140,8 @@ router.get('/', authenticateToken, async (req, res, next) => {
     }
 });
 
-// Update stock (requires auth)
-router.put('/:id', authenticateToken, async (req, res, next) => {
+// Update stock (requires admin)
+router.put('/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     const { id } = req.params;
     const { stock_quantity, price } = req.body;
 
@@ -349,8 +349,8 @@ router.put('/automation/:id', async (req, res, next) => {
 
 // Maturation endpoints
 
-// Create maturation record (requires auth)
-router.post('/maturation', authenticateToken, async (req, res, next) => {
+// Create maturation record (requires admin)
+router.post('/maturation', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const { perfume_id, maturation_start_date, quantity, notes } = req.body;
         const pool = req.app.get('pool');
@@ -384,8 +384,8 @@ router.post('/maturation', authenticateToken, async (req, res, next) => {
     }
 });
 
-// Get all maturation records (requires auth)
-router.get('/maturation', authenticateToken, async (req, res, next) => {
+// Get all maturation records (requires admin)
+router.get('/maturation', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const pool = req.app.get('pool');
         const result = await pool.query(`
@@ -410,8 +410,8 @@ router.get('/maturation', authenticateToken, async (req, res, next) => {
     }
 });
 
-// Get maturation records by perfume ID (requires auth)
-router.get('/maturation/by-perfume/:id', authenticateToken, async (req, res, next) => {
+// Get maturation records by perfume ID (requires admin)
+router.get('/maturation/by-perfume/:id', authenticateToken, requireAdmin, async (req, res, next) => {
     try {
         const { id } = req.params;
         const pool = req.app.get('pool');
@@ -427,8 +427,8 @@ router.get('/maturation/by-perfume/:id', authenticateToken, async (req, res, nex
     }
 });
 
-// Complete maturation and move to stock (requires auth)
-router.put('/maturation/:id/complete', authenticateToken, async (req, res, next) => {
+// Complete maturation and move to stock (requires admin)
+router.put('/maturation/:id/complete', authenticateToken, requireAdmin, async (req, res, next) => {
     const pool = req.app.get('pool');
     const client = await pool.connect();
 
