@@ -1,4 +1,6 @@
-# Parfüm Formülleri Yönetim Sistemi
+# Perfume Formulas - Parfüm Formülleri Platformu
+
+A full-stack web application for perfume formula management, sharing, and collaboration. Users can browse perfume formulas, submit their own recipes, rate and comment on formulas, and manage perfume stock.
 
 [![Build and Deploy](https://github.com/huseyinorer/perfume-formulas/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/huseyinorer/perfume-formulas/actions/workflows/pages/pages-build-deployment)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -8,80 +10,197 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Bu proje, parfüm formüllerinin yönetimi ve paylaşımı için geliştirilmiş bir platformdur.
+## Features
 
-## 🌟 Özellikler
+- 🔐 User authentication with JWT
+- 👥 Role-based access (Admin/User)
+- 📝 Formula submission and approval workflow
+- ⭐ Rating and commenting system
+- ❤️ Favorites management
+- 📦 Stock management and maturation tracking
+- 🌓 Dark mode support
+- 📱 Responsive design
 
-- Parfüm formüllerini oluşturma ve düzenleme
-- Formülleri paylaşma ve yedekleme
-- Kullanıcı yönetimi ve yetkilendirme
-- Favorilere ekleme
-- Formül değerlendirme sistemi
-- Stok yönetimi
+## Tech Stack
 
-## 🛠️ Teknolojiler
+### Frontend
 
-**Frontend:**
-- React 18 + TypeScript
-- Vite
-- Tailwind CSS
-- Radix UI
-- Axios
+- React 18 with TypeScript
+- Vite for build tooling
+- TailwindCSS for styling
+- Radix UI components
+- Axios for API calls
+- Vitest for testing
 
-**Backend:**
-- Node.js + Express
-- PostgreSQL
-- JWT Authentication
-- bcrypt
+### Backend
 
-## 💻 Kurulum
+- Node.js with Express.js
+- PostgreSQL database
+- JWT authentication
+- bcrypt for password hashing
 
-### Gereksinimler
-- Node.js 18+
-- PostgreSQL 14+
+## Prerequisites
 
-### Adımlar
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- npm or yarn
 
-1. Repoyu klonlayın:
+## Installation
+
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/huseyinorer/perfume-formulas.git
 cd perfume-formulas/perfume-project
 ```
 
-2. Bağımlılıkları yükleyin:
+### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
-3. Environment variables ayarlayın:
+### 3. Setup Database
+
+Create a PostgreSQL database:
+
+```sql
+CREATE DATABASE perfume_formulas;
+```
+
+Run the database schema (you'll need to create the tables - see Database Schema section below)
+
+### 4. Configure Environment Variables
+
+**Frontend (.env in root):**
+
 ```bash
-# .env dosyası oluşturun
 cp .env.example .env
 ```
 
-4. Geliştirme sunucusunu başlatın:
+Edit `.env` and set:
+
+```
+VITE_API_URL=http://localhost:10000/api
+```
+
+**Backend (server/.env):**
+
+```bash
+cp server/.env.example server/.env
+```
+
+Edit `server/.env` and set your database credentials and JWT secret.
+
+### 5. Start Development Servers
+
+Run both frontend and backend:
+
 ```bash
 npm run dev
 ```
 
-## 🚀 Deployment
+Or run them separately:
 
-Production build:
 ```bash
-npm run build
-npm run deploy
+# Terminal 1 - Frontend (port 5173)
+npm run dev:frontend
+
+# Terminal 2 - Backend (port 10000)
+npm run dev:backend
 ```
 
-## 📝 Lisans
+### 6. Access the Application
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+Open your browser and navigate to:
 
-## 📞 İletişim
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:10000/api
 
-Hüseyin Örer - [@huseyinorer](https://github.com/huseyinorer)
+## Database Schema
 
-Proje Linki: [https://github.com/huseyinorer/perfume-formulas](https://github.com/huseyinorer/perfume-formulas)
+Key tables:
 
-## ✨ Teşekkürler
+- `Users` - User accounts with authentication
+- `Brands` - Perfume brands
+- `Perfumes` - Perfume catalog
+- `PerfumeFormulas` - Approved formulas
+- `FormulaPendingRequests` - User-submitted formulas awaiting approval
+- `FormulaRatings` - Ratings and comments
+- `Favorites` - User favorite perfumes
+- `PerfumeStock` - Stock management
 
-Bu projeye katkıda bulunan herkese teşekkürler!
+## Available Scripts
+
+### Development
+
+- `npm run dev` - Run both frontend and backend concurrently
+- `npm run dev:frontend` - Run Vite dev server only
+- `npm run dev:backend` - Run Express server only
+
+### Testing
+
+- `npm test` - Run all tests with Vitest
+
+### Build & Deploy
+
+- `npm run build` - Build frontend for production
+- `npm run deploy` - Deploy to GitHub Pages
+- `npm start` - Start production server
+
+## User Roles
+
+### Admin
+
+- Add/delete perfumes and formulas directly
+- Approve or reject user-submitted formulas
+- Manage stock and maturation records
+- All user permissions
+
+### User
+
+- Browse perfume formulas
+- Submit formula requests (requires approval)
+- Rate and comment on formulas
+- Manage favorites
+- View stock information
+
+## Project Structure
+
+```
+perfume-project/
+├── src/                    # Frontend source
+│   ├── components/         # React components
+│   ├── hooks/             # Custom React hooks
+│   ├── services/          # API service layer
+│   ├── types/             # TypeScript type definitions
+│   ├── utils/             # Utility functions
+│   └── App.tsx            # Main app component
+├── server/                # Backend source
+│   ├── routes/            # Express route handlers
+│   ├── middleware/        # Express middleware
+│   ├── db.js              # Database connection
+│   └── server.js          # Server entry point
+├── public/                # Static assets
+└── dist/                  # Production build output
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is open source and available under the MIT License.
+
+## Support
+
+For issues and questions, please open an issue on GitHub: https://github.com/huseyinorer/perfume-formulas/issues
+
+## Live Demo
+
+Visit: https://huseyinorer.github.io/perfume-formulas
