@@ -21,7 +21,7 @@ async function reviewCode(diff) {
   const prompt = `Sen bir kod reviewer'sın. Bu git diff'i Türkçe incele ve kısa bir review yap:\n\n${diff}`;
   
   const body = JSON.stringify({
-    model: 'claude-3-5-sonnet-20240620',
+    model: 'claude-3-7-sonnet-20250219',
     max_tokens: 4096,
     messages: [{ role: 'user', content: prompt }]
   });
