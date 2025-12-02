@@ -90,13 +90,32 @@ Eğer hiç sorun yoksa, sadece "✅ Code review tamamlandı. Kritik sorun buluna
 
       res.on('end', () => {
         try {
+          console.log('API Response Status:', res.statusCode);
+          console.log('API Response Body:', body.substring(0, 500));
+          
+          if (res.statusCode !== 200) {
+            console.error('HTTP Error:', res.statusCode);
+            console.error('Response:', body);
+            reject(new Error(`HTTP ${res.statusCode}: ${body.substring(0, 200)}`));
+            return;
+          }
+          
           const response = JSON.parse(body);
-          if (response.content && response.content[0]) {
+          
+          if (response.error) {
+            reject(new Error(`Anthropic API Error: ${response.error.message || JSON.stringify(response.error)}`));
+            return;
+          }
+          
+          if (response.content && response.content[0] && response.content[0].text) {
             resolve(response.content[0].text);
           } else {
-            reject(new Error('Beklenmeyen API response'));
+            console.error('Unexpected response structure:', JSON.stringify(response, null, 2));
+            reject(new Error(`Beklenmeyen API response yapısı. Status: ${res.statusCode}`));
           }
         } catch (error) {
+          console.error('JSON Parse Error:', error);
+          console.error('Raw body:', body);
           reject(error);
         }
       });
@@ -167,6 +186,20 @@ ${reviewText}
 // Ana fonksiyon
 async function main() {
   try {
+    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === '') {
+      console.error('❌ ANTHROPIC_API_KEY bulunamadı!');
+      console.error('GitHub Secrets\'a ANTHROPIC_API_KEY eklediğinden emin ol.');
+      process.exit(1);
+    }
+    
+    if (!ANTHROPIC_API_KEY.startsWith('sk-')) {
+      console.error('❌ ANTHROPIC_API_KEY geçersiz format!');
+      console.error('API key "sk-" ile başlamalı.');
+      console.error('Mevcut key ilk 10 karakter:', ANTHROPIC_API_KEY.substring(0, 10));
+      process.exit(1);
+    }
+    
+    console.log('✅ API key kontrolü başarılı');
     console.log('🔍 Git diff alınıyor...');
     const diff = getGitDiff();
 
@@ -175,8 +208,9 @@ async function main() {
       return;
     }
 
-    // Diff çok büyükse kısalt
-    const maxDiffLength = 100000; // ~100KB
+    console.log(`📊 Diff boyutu: ${diff.length} karakter`);
+
+    const maxDiffLength = 100000;
     const truncatedDiff =
       diff.length > maxDiffLength
         ? diff.substring(0, maxDiffLength) +
@@ -186,12 +220,14 @@ async function main() {
     console.log('🤖 Claude ile kod inceleniyor...');
     const review = await reviewCode(truncatedDiff);
 
+    console.log('📝 Review uzunluğu:', review.length, 'karakter');
     console.log('💬 GitHub PR\'a comment ekleniyor...');
     await postComment(review);
 
     console.log('✅ İşlem tamamlandı!');
   } catch (error) {
-    console.error('❌ Hata:', error);
+    console.error('❌ Hata:', error.message);
+    console.error('Stack:', error.stack);
     process.exit(1);
   }
 }
