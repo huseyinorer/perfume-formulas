@@ -25,35 +25,21 @@ async function reviewCode(diff) {
   const prompt = `Sen deneyimli bir kod reviewer'sın. Aşağıdaki git diff'i inceleyip Türkçe olarak detaylı bir code review yap.
 
 İnceleme kriterleri:
-1. **Güvenlik**: SQL injection, XSS, authentication/authorization sorunları, secret'ların kodda olup olmadığı
+1. **Güvenlik**: SQL injection, XSS, authentication/authorization sorunları
 2. **Performans**: N+1 query, gereksiz döngüler, memory leak riski
 3. **Kod Kalitesi**: Clean code prensipleri, DRY, SOLID, okunabilirlik
-4. **Best Practices**: React hooks kullanımı, async/await pattern, error handling
-5. **TypeScript**: Type safety, interface kullanımı
-6. **Database**: Migration'lar, index kullanımı, query optimizasyonu
-7. **Test**: Test edilebilirlik, edge case'ler
+4. **Best Practices**: React hooks, async/await, error handling
 
 Git Diff:
 \`\`\`diff
 ${diff}
 \`\`\`
 
-Lütfen bulguları şu formatta sun:
-
-## 🔴 Kritik Sorunlar
-- [Varsa kritik güvenlik/bug sorunları]
-
-## 🟡 Öneriler
-- [İyileştirme önerileri]
-
-## 🟢 İyi Yapılanlar
-- [Övgüye değer kodlar]
-
-Eğer hiç sorun yoksa, sadece "✅ Code review tamamlandı. Kritik sorun bulunamadı." yaz.`;
+Kısa ve öz bir review yap.`;
 
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022', // Eski stabil model
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -63,50 +49,86 @@ Eğer hiç sorun yoksa, sadece "✅ Code review tamamlandı. Kritik sorun buluna
       path: '/v1/messages',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'content-type': 'application/json',
         'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
       },
     };
 
+    console.log('📡 API Request gönderiliyor...');
+    console.log('Model:', 'claude-3-5-sonnet-20241022');
+    console.log('API Version:', '2023-06-01');
+
     const req = https.request(options, (res) => {
       let body = '';
-      res.on('data', (chunk) => (body += chunk));
+      
+      res.on('data', (chunk) => {
+        body += chunk;
+      });
+      
       res.on('end', () => {
-        console.log('=== API Response Debug ===');
-        console.log('Status Code:', res.statusCode);
-        console.log('Headers:', JSON.stringify(res.headers, null, 2));
-        console.log('Body (first 1000 chars):', body.substring(0, 1000));
+        console.log('\n=== API RESPONSE ===');
+        console.log('Status:', res.statusCode);
+        console.log('Content-Type:', res.headers['content-type']);
         console.log('Body length:', body.length);
-        console.log('========================');
+        console.log('Body preview:', body.substring(0, 500));
+        console.log('===================\n');
 
         if (res.statusCode !== 200) {
-          reject(new Error(`HTTP ${res.statusCode}: ${body}`));
+          console.error('❌ HTTP Error:', res.statusCode);
+          console.error('Full response:', body);
+          reject(new Error(`HTTP ${res.statusCode}: ${body.substring(0, 200)}`));
           return;
         }
 
         try {
           const response = JSON.parse(body);
           
+          console.log('✅ JSON parsed successfully');
+          console.log('Response keys:', Object.keys(response));
+          
           if (response.error) {
-            reject(new Error(`API Error: ${JSON.stringify(response.error)}`));
+            console.error('❌ API returned error:', response.error);
+            reject(new Error(`API Error: ${response.error.type} - ${response.error.message}`));
             return;
           }
 
-          if (response.content?.[0]?.text) {
-            resolve(response.content[0].text);
-          } else {
-            console.error('Unexpected structure:', JSON.stringify(response, null, 2));
-            reject(new Error('Response missing content[0].text'));
+          if (!response.content) {
+            console.error('❌ No content field in response');
+            console.error('Response structure:', JSON.stringify(response, null, 2));
+            reject(new Error('Response missing content field'));
+            return;
           }
+
+          if (!response.content[0]) {
+            console.error('❌ content[0] is empty');
+            reject(new Error('content[0] is undefined'));
+            return;
+          }
+
+          if (!response.content[0].text) {
+            console.error('❌ content[0].text is empty');
+            console.error('content[0]:', JSON.stringify(response.content[0], null, 2));
+            reject(new Error('content[0].text is undefined'));
+            return;
+          }
+
+          console.log('✅ Review text extracted successfully');
+          resolve(response.content[0].text);
+          
         } catch (err) {
-          console.error('Parse error:', err);
-          reject(new Error(`JSON parse failed: ${err.message}`));
+          console.error('❌ JSON Parse Error:', err.message);
+          console.error('Raw body:', body);
+          reject(new Error(`Parse failed: ${err.message}`));
         }
       });
     });
 
-    req.on('error', reject);
+    req.on('error', (err) => {
+      console.error('❌ Request Error:', err);
+      reject(err);
+    });
+
     req.write(data);
     req.end();
   });
@@ -119,7 +141,7 @@ async function postComment(reviewText) {
 ${reviewText}
 
 ---
-*Bu review [Claude Sonnet 4](https://www.anthropic.com/claude) tarafından otomatik olarak oluşturuldu.*`;
+*Bu review Claude AI tarafından otomatik oluşturuldu.*`;
 
     const data = JSON.stringify({ body: comment });
 
@@ -128,9 +150,9 @@ ${reviewText}
       path: `/repos/${REPO_NAME}/issues/${PR_NUMBER}/comments`,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'User-Agent': 'AI-Code-Review-Action',
+        'content-type': 'application/json',
+        'authorization': `token ${GITHUB_TOKEN}`,
+        'user-agent': 'AI-Code-Review-Action',
       },
     };
 
@@ -139,11 +161,11 @@ ${reviewText}
       res.on('data', (chunk) => (body += chunk));
       res.on('end', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          console.log('✅ Comment başarıyla eklendi');
+          console.log('✅ Comment eklendi');
           resolve();
         } else {
-          console.error('GitHub API Error:', body);
-          reject(new Error(`GitHub API error: ${res.statusCode}`));
+          console.error('GitHub API Error:', res.statusCode, body);
+          reject(new Error(`GitHub API: ${res.statusCode}`));
         }
       });
     });
@@ -156,49 +178,54 @@ ${reviewText}
 
 async function main() {
   try {
-    console.log('=== Environment Check ===');
-    console.log('API Key exists:', !!ANTHROPIC_API_KEY);
-    console.log('API Key prefix:', ANTHROPIC_API_KEY?.substring(0, 7));
-    console.log('API Key length:', ANTHROPIC_API_KEY?.length);
-    console.log('PR Number:', PR_NUMBER);
-    console.log('Repo:', REPO_NAME);
-    console.log('========================');
+    console.log('\n=== BAŞLANGIÇ KONTROLLERI ===');
+    console.log('✓ ANTHROPIC_API_KEY:', ANTHROPIC_API_KEY ? 'Mevcut' : '❌ YOK');
+    console.log('✓ Key prefix:', ANTHROPIC_API_KEY?.substring(0, 10));
+    console.log('✓ Key length:', ANTHROPIC_API_KEY?.length);
+    console.log('✓ GitHub Token:', GITHUB_TOKEN ? 'Mevcut' : '❌ YOK');
+    console.log('✓ PR Number:', PR_NUMBER);
+    console.log('✓ Repo:', REPO_NAME);
+    console.log('============================\n');
 
     if (!ANTHROPIC_API_KEY) {
-      throw new Error('ANTHROPIC_API_KEY bulunamadı!');
+      throw new Error('ANTHROPIC_API_KEY environment variable bulunamadı!');
     }
 
     if (!ANTHROPIC_API_KEY.startsWith('sk-ant-')) {
-      throw new Error(`API key formatı yanlış. Başlangıç: ${ANTHROPIC_API_KEY.substring(0, 10)}`);
+      throw new Error(`API key "sk-ant-" ile başlamalı! Mevcut: ${ANTHROPIC_API_KEY.substring(0, 15)}`);
     }
 
     console.log('🔍 Git diff alınıyor...');
     const diff = getGitDiff();
 
     if (!diff || diff.trim().length === 0) {
-      console.log('ℹ️ Değişiklik bulunamadı');
+      console.log('ℹ️ Değişiklik yok, çıkılıyor.');
       return;
     }
 
     console.log(`📊 Diff boyutu: ${diff.length} karakter`);
 
-    const maxDiffLength = 80000;
+    const maxDiffLength = 50000; // Daha küçük limit
     const truncatedDiff = diff.length > maxDiffLength 
-      ? diff.substring(0, maxDiffLength) + '\n\n... (diff kısaltıldı)'
+      ? diff.substring(0, maxDiffLength) + '\n\n... (diff çok uzun, kısaltıldı)'
       : diff;
 
-    console.log('🤖 Claude ile kod inceleniyor...');
+    console.log('🤖 Claude API çağrılıyor...\n');
     const review = await reviewCode(truncatedDiff);
 
-    console.log('✅ Review alındı, uzunluk:', review.length);
-    console.log('💬 GitHub PR\'a comment ekleniyor...');
+    console.log(`\n✅ Review alındı (${review.length} karakter)`);
+    console.log('💬 GitHub\'a comment ekleniyor...');
+    
     await postComment(review);
 
-    console.log('✅ İşlem tamamlandı!');
+    console.log('\n🎉 İşlem başarıyla tamamlandı!\n');
+    
   } catch (error) {
-    console.error('❌ FATAL ERROR ❌');
-    console.error('Message:', error.message);
+    console.error('\n❌❌❌ HATA ❌❌❌');
+    console.error('Tip:', error.constructor.name);
+    console.error('Mesaj:', error.message);
     console.error('Stack:', error.stack);
+    console.error('❌❌❌❌❌❌❌❌❌\n');
     process.exit(1);
   }
 }
