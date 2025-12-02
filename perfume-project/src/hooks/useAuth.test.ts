@@ -16,7 +16,7 @@ describe('useAuth Hook', () => {
     expect(result.current.user).toBeNull();
     expect(result.current.isLoggedIn).toBe(false);
     expect(result.current.isAdmin).toBe(false);
-  });
+  }); 
 
   // Add more tests here for login/logout logic if needed
   // For now, checking initialization is enough to verify setup
