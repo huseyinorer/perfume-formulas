@@ -43,7 +43,7 @@ async function reviewCode(diff) {
         console.log('Status:', res.statusCode);
         console.log('Response:', data.substring(0, 300));
         
-        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
+        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: ${data}`));
         
         try {
           const json = JSON.parse(data);
