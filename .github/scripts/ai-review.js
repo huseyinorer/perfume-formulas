@@ -8,12 +8,11 @@ const REPO_NAME = process.env.REPO_NAME;
 const BASE_SHA = process.env.BASE_SHA;
 const HEAD_SHA = process.env.HEAD_SHA;
 
-// Git diff'i al
 function getGitDiff() {
   try {
     const diff = execSync(`git diff ${BASE_SHA}..${HEAD_SHA}`, {
       encoding: 'utf-8',
-      maxBuffer: 10 * 1024 * 1024, // 10MB
+      maxBuffer: 10 * 1024 * 1024,
     });
     return diff;
   } catch (error) {
@@ -22,51 +21,27 @@ function getGitDiff() {
   }
 }
 
-// Claude API ile review yap
 async function reviewCode(diff) {
   const prompt = `Sen deneyimli bir kod reviewer'sın. Aşağıdaki git diff'i inceleyip Türkçe olarak detaylı bir code review yap.
 
 İnceleme kriterleri:
-1. **Güvenlik**: SQL injection, XSS, authentication/authorization sorunları, secret'ların kodda olup olmadığı
+1. **Güvenlik**: SQL injection, XSS, authentication/authorization sorunları
 2. **Performans**: N+1 query, gereksiz döngüler, memory leak riski
 3. **Kod Kalitesi**: Clean code prensipleri, DRY, SOLID, okunabilirlik
-4. **Best Practices**: React hooks kullanımı, async/await pattern, error handling
-5. **TypeScript**: Type safety, interface kullanımı
-6. **Database**: Migration'lar, index kullanımı, query optimizasyonu
-7. **Test**: Test edilebilirlik, edge case'ler
-8. **Proje Uyumu**: Bu proje CLAUDE.md'ye göre bir perfume management uygulaması. Proje mimarisiyle uyumlu mu?
+4. **Best Practices**: React hooks, async/await, error handling
 
 Git Diff:
 \`\`\`diff
 ${diff}
 \`\`\`
 
-Lütfen bulguları şu formatta sun:
-
-## 🔴 Kritik Sorunlar
-- [Varsa kritik güvenlik/bug sorunları]
-
-## 🟡 Öneriler
-- [İyileştirme önerileri]
-
-## 🟢 İyi Yapılanlar
-- [Övgüye değer kodlar]
-
-## 📝 Notlar
-- [Diğer gözlemler]
-
-Eğer hiç sorun yoksa, sadece "✅ Code review tamamlandı. Kritik sorun bulunamadı." yaz.`;
+Kısa ve öz bir review yap.`;
 
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022', // Eski stabil model
       max_tokens: 4096,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
+      messages: [{ role: 'user', content: prompt }],
     });
 
     const options = {
@@ -74,55 +49,84 @@ Eğer hiç sorun yoksa, sadece "✅ Code review tamamlandı. Kritik sorun buluna
       path: '/v1/messages',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'content-type': 'application/json',
         'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
-        'Content-Length': data.length,
       },
     };
 
+    console.log('📡 API Request gönderiliyor...');
+    console.log('Model:', 'claude-3-5-sonnet-20241022');
+    console.log('API Version:', '2023-06-01');
+
     const req = https.request(options, (res) => {
       let body = '';
-
+      
       res.on('data', (chunk) => {
         body += chunk;
       });
-
+      
       res.on('end', () => {
+        console.log('\n=== API RESPONSE ===');
+        console.log('Status:', res.statusCode);
+        console.log('Content-Type:', res.headers['content-type']);
+        console.log('Body length:', body.length);
+        console.log('Body preview:', body.substring(0, 500));
+        console.log('===================\n');
+
+        if (res.statusCode !== 200) {
+          console.error('❌ HTTP Error:', res.statusCode);
+          console.error('Full response:', body);
+          reject(new Error(`HTTP ${res.statusCode}: ${body.substring(0, 200)}`));
+          return;
+        }
+
         try {
-          console.log('API Response Status:', res.statusCode);
-          console.log('API Response Body:', body.substring(0, 500));
-          
-          if (res.statusCode !== 200) {
-            console.error('HTTP Error:', res.statusCode);
-            console.error('Response:', body);
-            reject(new Error(`HTTP ${res.statusCode}: ${body.substring(0, 200)}`));
-            return;
-          }
-          
           const response = JSON.parse(body);
           
+          console.log('✅ JSON parsed successfully');
+          console.log('Response keys:', Object.keys(response));
+          
           if (response.error) {
-            reject(new Error(`Anthropic API Error: ${response.error.message || JSON.stringify(response.error)}`));
+            console.error('❌ API returned error:', response.error);
+            reject(new Error(`API Error: ${response.error.type} - ${response.error.message}`));
             return;
           }
-          
-          if (response.content && response.content[0] && response.content[0].text) {
-            resolve(response.content[0].text);
-          } else {
-            console.error('Unexpected response structure:', JSON.stringify(response, null, 2));
-            reject(new Error(`Beklenmeyen API response yapısı. Status: ${res.statusCode}`));
+
+          if (!response.content) {
+            console.error('❌ No content field in response');
+            console.error('Response structure:', JSON.stringify(response, null, 2));
+            reject(new Error('Response missing content field'));
+            return;
           }
-        } catch (error) {
-          console.error('JSON Parse Error:', error);
+
+          if (!response.content[0]) {
+            console.error('❌ content[0] is empty');
+            reject(new Error('content[0] is undefined'));
+            return;
+          }
+
+          if (!response.content[0].text) {
+            console.error('❌ content[0].text is empty');
+            console.error('content[0]:', JSON.stringify(response.content[0], null, 2));
+            reject(new Error('content[0].text is undefined'));
+            return;
+          }
+
+          console.log('✅ Review text extracted successfully');
+          resolve(response.content[0].text);
+          
+        } catch (err) {
+          console.error('❌ JSON Parse Error:', err.message);
           console.error('Raw body:', body);
-          reject(error);
+          reject(new Error(`Parse failed: ${err.message}`));
         }
       });
     });
 
-    req.on('error', (error) => {
-      reject(error);
+    req.on('error', (err) => {
+      console.error('❌ Request Error:', err);
+      reject(err);
     });
 
     req.write(data);
@@ -130,7 +134,6 @@ Eğer hiç sorun yoksa, sadece "✅ Code review tamamlandı. Kritik sorun buluna
   });
 }
 
-// GitHub'a comment ekle
 async function postComment(reviewText) {
   return new Promise((resolve, reject) => {
     const comment = `## 🤖 AI Code Review
@@ -138,96 +141,91 @@ async function postComment(reviewText) {
 ${reviewText}
 
 ---
-*Bu review [Claude Sonnet 4](https://www.anthropic.com/claude) tarafından otomatik olarak oluşturuldu.*`;
+*Bu review Claude AI tarafından otomatik oluşturuldu.*`;
 
-    const data = JSON.stringify({
-      body: comment,
-    });
+    const data = JSON.stringify({ body: comment });
 
     const options = {
       hostname: 'api.github.com',
       path: `/repos/${REPO_NAME}/issues/${PR_NUMBER}/comments`,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `token ${GITHUB_TOKEN}`,
-        'User-Agent': 'AI-Code-Review-Action',
-        'Content-Length': data.length,
+        'content-type': 'application/json',
+        'authorization': `token ${GITHUB_TOKEN}`,
+        'user-agent': 'AI-Code-Review-Action',
       },
     };
 
     const req = https.request(options, (res) => {
       let body = '';
-
-      res.on('data', (chunk) => {
-        body += chunk;
-      });
-
+      res.on('data', (chunk) => (body += chunk));
       res.on('end', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          console.log('✅ Comment başarıyla eklendi');
+          console.log('✅ Comment eklendi');
           resolve();
         } else {
-          console.error('GitHub API Error:', body);
-          reject(new Error(`GitHub API error: ${res.statusCode}`));
+          console.error('GitHub API Error:', res.statusCode, body);
+          reject(new Error(`GitHub API: ${res.statusCode}`));
         }
       });
     });
 
-    req.on('error', (error) => {
-      reject(error);
-    });
-
+    req.on('error', reject);
     req.write(data);
     req.end();
   });
 }
 
-// Ana fonksiyon
 async function main() {
   try {
-    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === '') {
-      console.error('❌ ANTHROPIC_API_KEY bulunamadı!');
-      console.error('GitHub Secrets\'a ANTHROPIC_API_KEY eklediğinden emin ol.');
-      process.exit(1);
+    console.log('\n=== BAŞLANGIÇ KONTROLLERI ===');
+    console.log('✓ ANTHROPIC_API_KEY:', ANTHROPIC_API_KEY ? 'Mevcut' : '❌ YOK');
+    console.log('✓ Key prefix:', ANTHROPIC_API_KEY?.substring(0, 10));
+    console.log('✓ Key length:', ANTHROPIC_API_KEY?.length);
+    console.log('✓ GitHub Token:', GITHUB_TOKEN ? 'Mevcut' : '❌ YOK');
+    console.log('✓ PR Number:', PR_NUMBER);
+    console.log('✓ Repo:', REPO_NAME);
+    console.log('============================\n');
+
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error('ANTHROPIC_API_KEY environment variable bulunamadı!');
     }
-    
-    if (!ANTHROPIC_API_KEY.startsWith('sk-')) {
-      console.error('❌ ANTHROPIC_API_KEY geçersiz format!');
-      console.error('API key "sk-" ile başlamalı.');
-      console.error('Mevcut key ilk 10 karakter:', ANTHROPIC_API_KEY.substring(0, 10));
-      process.exit(1);
+
+    if (!ANTHROPIC_API_KEY.startsWith('sk-ant-')) {
+      throw new Error(`API key "sk-ant-" ile başlamalı! Mevcut: ${ANTHROPIC_API_KEY.substring(0, 15)}`);
     }
-    
-    console.log('✅ API key kontrolü başarılı');
+
     console.log('🔍 Git diff alınıyor...');
     const diff = getGitDiff();
 
     if (!diff || diff.trim().length === 0) {
-      console.log('ℹ️ Değişiklik bulunamadı');
+      console.log('ℹ️ Değişiklik yok, çıkılıyor.');
       return;
     }
 
     console.log(`📊 Diff boyutu: ${diff.length} karakter`);
 
-    const maxDiffLength = 100000;
-    const truncatedDiff =
-      diff.length > maxDiffLength
-        ? diff.substring(0, maxDiffLength) +
-          '\n\n... (diff çok uzun, kısaltıldı)'
-        : diff;
+    const maxDiffLength = 50000; // Daha küçük limit
+    const truncatedDiff = diff.length > maxDiffLength 
+      ? diff.substring(0, maxDiffLength) + '\n\n... (diff çok uzun, kısaltıldı)'
+      : diff;
 
-    console.log('🤖 Claude ile kod inceleniyor...');
+    console.log('🤖 Claude API çağrılıyor...\n');
     const review = await reviewCode(truncatedDiff);
 
-    console.log('📝 Review uzunluğu:', review.length, 'karakter');
-    console.log('💬 GitHub PR\'a comment ekleniyor...');
+    console.log(`\n✅ Review alındı (${review.length} karakter)`);
+    console.log('💬 GitHub\'a comment ekleniyor...');
+    
     await postComment(review);
 
-    console.log('✅ İşlem tamamlandı!');
+    console.log('\n🎉 İşlem başarıyla tamamlandı!\n');
+    
   } catch (error) {
-    console.error('❌ Hata:', error.message);
+    console.error('\n❌❌❌ HATA ❌❌❌');
+    console.error('Tip:', error.constructor.name);
+    console.error('Mesaj:', error.message);
     console.error('Stack:', error.stack);
+    console.error('❌❌❌❌❌❌❌❌❌\n');
     process.exit(1);
   }
 }
