@@ -21,7 +21,7 @@ async function reviewCode(diff) {
   const prompt = `Sen bir kod reviewer'sın. Bu git diff'i Türkçe incele ve kısa bir review yap:\n\n${diff}`;
   
   const body = JSON.stringify({
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-3-5-sonnet-20240620',
     max_tokens: 4096,
     messages: [{ role: 'user', content: prompt }]
   });
@@ -43,7 +43,7 @@ async function reviewCode(diff) {
         console.log('Status:', res.statusCode);
         console.log('Response:', data.substring(0, 300));
         
-        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
+        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: ${data}`));
         
         try {
           const json = JSON.parse(data);
