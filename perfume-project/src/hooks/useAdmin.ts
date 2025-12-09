@@ -9,7 +9,11 @@ export const useAdmin = (isAdmin: boolean) => {
   const fetchPendingRequests = useCallback(async () => {
     if (!isAdmin) return;
     try {
-      const response = await fetch(`${API_URL}/formulas/pending`);
+      const response = await fetch(`${API_URL}/formulas/pending`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       const data = await response.json();
       setPendingRequests(data);
     } catch (error) {
@@ -27,6 +31,9 @@ export const useAdmin = (isAdmin: boolean) => {
     try {
       const response = await fetch(`${API_URL}/formulas/approve/${requestId}`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       if (response.ok) {
         if (onSuccess) onSuccess();
@@ -41,6 +48,9 @@ export const useAdmin = (isAdmin: boolean) => {
     try {
       const response = await fetch(`${API_URL}/formulas/reject/${requestId}`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       if (response.ok) {
         fetchPendingRequests();

@@ -19,13 +19,16 @@ export const usePerfumes = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
   const fetchPerfumes = useCallback(async () => {
     setLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     try {
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -42,6 +45,7 @@ export const usePerfumes = () => {
         {
           method: "GET",
           headers,
+          signal,
         }
       );
 
@@ -57,11 +61,17 @@ export const usePerfumes = () => {
       setFilteredPerfumes(data.data);
       setTotalPages(data.totalPages);
       setTotalItems(data.total);
-    } catch (error) {
-      console.error("Error fetching perfumes:", error);
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error("Error fetching perfumes:", error);
+      }
     } finally {
+      if (!signal.aborted) {
         setLoading(false);
+      }
     }
+
+    return () => controller.abort();
   }, [currentPage, pageSize, sortBy, sortOrder, debouncedSearchTerm]);
 
   useEffect(() => {
@@ -77,9 +87,9 @@ export const usePerfumes = () => {
     }
   };
 
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
       setSearchTerm(value);
-  };
+  }, []);
 
   return {
     perfumes,

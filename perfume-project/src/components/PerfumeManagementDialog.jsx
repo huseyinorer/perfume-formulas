@@ -22,18 +22,20 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
   useEffect(() => {
     if (open) {
-      fetchPerfumes();
+      const abortController = new AbortController();
+      fetchPerfumes(abortController.signal);
+      return () => abortController.abort();
     }
   }, [currentPage, pageSize, debouncedSearchTerm, open]);
 
-  const fetchPerfumes = async () => {
+  const fetchPerfumes = async (signal) => {
     try {
       console.log('Fetching perfumes...'); // Debug log
       const response = await fetch(
@@ -41,7 +43,8 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          },
+          signal
         }
       );
       const data = await response.json();
@@ -50,7 +53,9 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
       setTotalPages(data.totalPages);
       setTotalItems(data.total);
     } catch (error) {
-      console.error('Error fetching perfumes:', error);
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching perfumes:', error);
+      }
     }
   };
 
@@ -186,4 +191,4 @@ const PerfumeManagementDialog = ({ open, onOpenChange }) => {
   );
 };
 
-export default PerfumeManagementDialog; 
+export default PerfumeManagementDialog;
