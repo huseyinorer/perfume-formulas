@@ -99,18 +99,20 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
   useEffect(() => {
     if (open) {
-      fetchStockList();
+      const abortController = new AbortController();
+      fetchStockList(abortController.signal);
+      return () => abortController.abort();
     }
   }, [open, debouncedSearchTerm, currentPage, pageSize]);
 
-  const fetchStockList = async () => {
+  const fetchStockList = async (signal) => {
     setLoading(true);
     setError(null);
     try {
@@ -119,6 +121,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          signal,
         }
       );
       if (!response.ok) {
@@ -129,9 +132,13 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
       setTotalPages(data.totalPages);
       setTotalItems(data.total);
     } catch (err) {
-      setError(err.message);
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
   };
 

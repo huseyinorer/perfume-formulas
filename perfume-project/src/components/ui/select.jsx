@@ -53,38 +53,6 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
       position={position}
       {...props}
     >
-      <style jsx global>{`
-        /* Added !important to force scrollbar display */
-        [data-radix-select-content] {
-          max-height: 300px !important;
-          overflow-y: auto !important;
-        }
-        
-        [data-radix-select-content]::-webkit-scrollbar {
-          width: 10px !important;
-          display: block !important;
-        }
-        
-        [data-radix-select-content]::-webkit-scrollbar-track {
-          background: transparent !important;
-        }
-        
-        [data-radix-select-content]::-webkit-scrollbar-thumb {
-          background-color: rgba(203, 213, 224, 0.8) !important;
-          border-radius: 20px !important;
-          border: 3px solid transparent !important;
-          background-clip: padding-box !important;
-        }
-        
-        .dark [data-radix-select-content]::-webkit-scrollbar-thumb {
-          background-color: rgba(74, 85, 104, 0.8) !important;
-        }
-        
-        [data-radix-select-viewport] {
-          max-height: none !important;
-          overflow: visible !important;
-        }
-      `}</style>
       <SelectPrimitive.Viewport
         className={cn(
           "p-1",

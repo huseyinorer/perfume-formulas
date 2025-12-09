@@ -1,6 +1,6 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @layer base {
   :root {
@@ -55,7 +55,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 
@@ -134,4 +136,35 @@
   .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: rgb(107 114 128);
   }
+}
+
+/* Select Content Scrollbar Overrides */
+[data-radix-select-content] {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+[data-radix-select-content]::-webkit-scrollbar {
+  width: 10px !important;
+  display: block !important;
+}
+
+[data-radix-select-content]::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+[data-radix-select-content]::-webkit-scrollbar-thumb {
+  background-color: rgba(203, 213, 224, 0.8) !important;
+  border-radius: 20px !important;
+  border: 3px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+.dark [data-radix-select-content]::-webkit-scrollbar-thumb {
+  background-color: rgba(74, 85, 104, 0.8) !important;
+}
+
+[data-radix-select-viewport] {
+  max-height: none !important;
+  overflow: visible !important;
 }

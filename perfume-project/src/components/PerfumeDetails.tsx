@@ -95,12 +95,14 @@ export const PerfumeDetails: React.FC<PerfumeDetailsProps> = ({
               )}
 
               {/* Önerilen Kullanım Oranı */}
-              {perfume.recommended_usage && (
-                <div className="border-t pt-2 mt-2 text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">Önerilen Kullanım Oranı:</span>
+              <div className="border-t pt-2 mt-2 text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Önerilen Kullanım Oranı:</span>
+                {perfume.recommended_usage ? (
                   <div className="font-medium mt-1">{perfume.recommended_usage}</div>
-                </div>
-              )}
+                ) : (
+                  <div className="font-medium mt-1 text-red-500">Kullanım oranı bulunamadı</div>
+                )}
+              </div>
             </div>
           </AccordionContent>
         </AccordionItem>

@@ -20,6 +20,9 @@ const Autocomplete = ({ onSelect }) => {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const searchPerfumes = async () => {
       if (!query.trim()) {
         setResults([]);
@@ -28,19 +31,31 @@ const Autocomplete = ({ onSelect }) => {
 
       setLoading(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/perfumes/search?query=${query}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/perfumes/search?query=${query}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          signal
+        });
         const data = await response.json();
         setResults(data);
         setIsOpen(true);
       } catch (error) {
-        console.error('Search error:', error);
+        if (error.name !== 'AbortError') {
+          console.error('Search error:', error);
+        }
       } finally {
-        setLoading(false);
+        if (!signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
-    const timeoutId = setTimeout(searchPerfumes, 300);
-    return () => clearTimeout(timeoutId);
+    const timeoutId = setTimeout(searchPerfumes, 800);
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [query]);
 
   const handleSelect = (perfume) => {

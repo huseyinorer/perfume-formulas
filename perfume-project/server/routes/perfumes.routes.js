@@ -112,6 +112,33 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+// Search perfumes
+router.get('/search', async (req, res, next) => {
+    try {
+        const { query } = req.query;
+        const pool = req.app.get('pool');
+
+        const result = await pool.query(
+            `SELECT 
+       p.perfume_id as id,
+       b.brand_name as brand,
+       p.perfume_name as name
+     FROM "Perfumes" p
+     JOIN "Brands" b ON p.brand_id = b.brand_id
+     WHERE 
+       LOWER(b.brand_name) LIKE $1 OR 
+       LOWER(p.perfume_name) LIKE $1
+     ORDER BY b.brand_name, p.perfume_name
+     LIMIT 10`,
+            [`%${query.toLowerCase()}%`]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        next(error);
+    }
+});
+
 // Get single perfume
 router.get('/:id', async (req, res, next) => {
     try {
@@ -197,32 +224,7 @@ router.get('/:id/formulas', async (req, res, next) => {
     }
 });
 
-// Search perfumes
-router.get('/search', async (req, res, next) => {
-    try {
-        const { query } = req.query;
-        const pool = req.app.get('pool');
 
-        const result = await pool.query(
-            `SELECT 
-       p.perfume_id as id,
-       b.brand_name as brand,
-       p.perfume_name as name
-     FROM "Perfumes" p
-     JOIN "Brands" b ON p.brand_id = b.brand_id
-     WHERE 
-       LOWER(b.brand_name) LIKE $1 OR 
-       LOWER(p.perfume_name) LIKE $1
-     ORDER BY b.brand_name, p.perfume_name
-     LIMIT 10`,
-            [`%${query.toLowerCase()}%`]
-        );
-
-        res.json(result.rows);
-    } catch (error) {
-        next(error);
-    }
-});
 
 // CREATE - Add new perfume (requires admin)
 router.post('/', authenticateToken, requireAdmin, async (req, res, next) => {

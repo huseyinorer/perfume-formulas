@@ -407,6 +407,7 @@ function App() {
                   });
                 }}
                 isAdmin={isAdmin}
+                onAddFormulaClick={() => setIsAddDialogOpen(true)}
               />
             </div>
 
