@@ -70,8 +70,8 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
     if (!selectedPerfume) return;
     // Backend integration: send new maturing info
     try {
-      // Example: POST to /perfume-stock/:id/maturing
-      const response = await fetch(`${API_URL}/perfume-maturation`, {
+      // Example: POST to /perfume-stock/maturation
+      const response = await fetch(`${API_URL}/perfume-stock/maturation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -216,7 +216,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
       setIsMaturationListModalOpen(true);
       try {
         const response = await fetch(
-          `${API_URL}/perfume-maturation/by-perfume-id/${perfume.perfume_id}`,
+          `${API_URL}/perfume-stock/maturation/by-perfume/${perfume.perfume_id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -245,7 +245,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   const handleCompleteMaturation = async (maturationId) => {
     try {
       const response = await fetch(
-        `${API_URL}/perfume-maturation/${maturationId}/complete`,
+        `${API_URL}/perfume-stock/maturation/${maturationId}/complete`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
