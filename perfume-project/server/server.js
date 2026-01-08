@@ -25,23 +25,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 10000;
 
-// Middleware
-app.use(
-  cors({
-    origin: [
-      'http://localhost:5173',
-      'https://huseyinorer.github.io',
-      'https://huseyinorer.github.io/perfume-formulas'
-    ],
-    credentials: true, // Allow cookies to be sent
-  })
-);
-app.use(express.json());
-app.use(cookieParser());
-
-// Apply rate limiting to all API routes
-app.use('/api', apiLimiter);
-
 // Database connection pool
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -56,6 +39,46 @@ const pool = new Pool({
 
 // Make pool available to routes
 app.set('pool', pool);
+
+// Middleware
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      'https://huseyinorer.github.io',
+      'https://huseyinorer.github.io/perfume-formulas'
+    ],
+    credentials: true, // Allow cookies to be sent
+  })
+);
+app.use(express.json());
+app.use(cookieParser());
+
+// Health check endpoint (before rate limiting for monitoring tools)
+app.get('/health', async (req, res) => {
+  try {
+    // Optional: Check database connection
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+
+    res.status(200).json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected'
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected'
+    });
+  }
+});
+
+// Apply rate limiting to all API routes
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api', authRoutes);
