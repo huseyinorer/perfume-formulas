@@ -427,6 +427,23 @@ router.get('/maturation/by-perfume/:id', authenticateToken, requireAdmin, async 
     }
 });
 
+// Alias route for backward compatibility
+router.get('/by-perfume-id/:id', authenticateToken, requireAdmin, async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const pool = req.app.get('pool');
+
+        const result = await pool.query(
+            'SELECT id, perfume_id, maturation_start_date, quantity, notes FROM "PerfumeMaturation" WHERE perfume_id = $1',
+            [id]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        next(error);
+    }
+});
+
 // Complete maturation and move to stock (requires admin)
 router.put('/maturation/:id/complete', authenticateToken, requireAdmin, async (req, res, next) => {
     const pool = req.app.get('pool');

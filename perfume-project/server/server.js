@@ -89,6 +89,8 @@ app.use('/api/favorites', favoritesRoutes);
 app.use('/api/formulas', ratingsRoutes);
 app.use('/api/brands', brandsRoutes);
 app.use('/api/perfume-stock', stockRoutes);
+// Alias for backward compatibility
+app.use('/api/perfume-maturation', stockRoutes);
 
 // Protected routes example (if needed)
 app.get('/api/protected-route', authenticateToken, (req, res) => {
