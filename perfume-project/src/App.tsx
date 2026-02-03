@@ -6,7 +6,7 @@ import PendingFormulasDialog from './components/PendingFormulasDialog.jsx';
 import SearchBox from './components/SearchBox';
 import Pagination from './components/Pagination.jsx';
 import { PerfumeGuideDialog } from './components/PerfumeGuideDialog.jsx';
-import { Sparkles, HelpCircle, HeartHandshake, LogIn, UserPlus } from 'lucide-react';
+import { Sparkles, HelpCircle, HeartHandshake, LogIn, UserPlus, Heart } from 'lucide-react';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 import UserMenu from './components/UserMenu.jsx';
 import ChangePasswordDialog from './components/ChangePasswordDialog.jsx';
@@ -377,7 +377,22 @@ function App() {
           } max-h-[90vh] overflow-hidden transition-all duration-300`}
         >
           <DialogHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {selectedPerfume && isLoggedIn && (
+                <button
+                  onClick={() => handleFavoriteToggle(selectedPerfume.id)}
+                  title={selectedPerfume.is_favorite ? 'Favorilerden Çıkar' : 'Favoriye Ekle'}
+                  className="focus:outline-none hover:scale-110 transition-transform"
+                >
+                  <Heart
+                    className={`h-6 w-6 ${
+                      selectedPerfume.is_favorite
+                        ? 'fill-red-500 text-red-500'
+                        : 'text-gray-400 dark:text-gray-500 hover:text-red-400'
+                    }`}
+                  />
+                </button>
+              )}
               <DialogTitle className="text-xl font-bold">
                 {selectedPerfume?.brand} - {selectedPerfume?.name} Formülleri
               </DialogTitle>
@@ -388,11 +403,7 @@ function App() {
             {/* Sol Taraf - Parfüm Bilgileri ve Formül Listesi */}
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
               {selectedPerfume && (
-                <PerfumeDetails
-                  perfume={selectedPerfume}
-                  creativeFormula={creativeFormula}
-                  onFavoriteToggle={handleFavoriteToggle}
-                />
+                <PerfumeDetails perfume={selectedPerfume} creativeFormula={creativeFormula} />
               )}
 
               <UserFormulas
