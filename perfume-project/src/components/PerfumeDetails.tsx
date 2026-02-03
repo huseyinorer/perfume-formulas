@@ -1,37 +1,16 @@
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { Button } from './ui/button';
-import { Sparkles, Heart } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Perfume } from '../types/api.types';
 
 interface PerfumeDetailsProps {
   perfume: Perfume;
   creativeFormula: any; // TODO: Type this properly if possible, currently 'any' in App.tsx usage context
-  onFavoriteToggle: (id: number) => void;
 }
 
-export const PerfumeDetails: React.FC<PerfumeDetailsProps> = ({
-  perfume,
-  creativeFormula,
-  onFavoriteToggle,
-}) => {
+export const PerfumeDetails: React.FC<PerfumeDetailsProps> = ({ perfume, creativeFormula }) => {
   return (
     <div className="mb-4">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onFavoriteToggle(perfume.id)}
-        className="flex items-center gap-2 mb-2 pl-0 hover:bg-transparent"
-      >
-        <Heart
-          className={`h-4 w-4 ${
-            perfume.is_favorite ? 'fill-red-500 text-red-500' : 'text-gray-400 dark:text-gray-500'
-          }`}
-        />
-        <span className="text-sm">
-          {perfume.is_favorite ? 'Favorilerden Çıkar' : 'Favoriye Ekle'}
-        </span>
-      </Button>
       <Accordion type="single" collapsible defaultValue="perfume-info">
         <AccordionItem value="perfume-info">
           <AccordionTrigger className="bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-lg hover:no-underline">
