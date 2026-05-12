@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "shopier",
+      "source": "@shopier/v1.0",
+      "integrity": "sha512-8ingzRMbj3jryqHVPvsa6XfKxDUCYV97VWRmxVjFRBOvkIcxzFp2QLDzyf6TLpaTGGbvQf05vETgxE+j4WOHQw==",
+      "installerVersion": "6.1.3"
+    }
+  ]
+}

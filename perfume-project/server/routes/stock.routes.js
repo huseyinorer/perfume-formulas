@@ -1,7 +1,164 @@
 import express from 'express';
 import { authenticateToken, requireAdmin } from '../middleware/auth.middleware.js';
+import {
+  createShopierProduct,
+  getShopierProduct,
+  listStoreProducts,
+} from '../services/storeCatalog.service.js';
 
 const router = express.Router();
+
+const SHOPIER_CATEGORY = {
+  FEMALE: {
+    id: '9d99fc7eefb60892',
+    title: 'Kadın',
+    imageKey: 'female',
+    titleSuffix: 'kadın',
+  },
+  MALE: {
+    id: '6aee837bc71ba3f3',
+    title: 'Erkek',
+    imageKey: 'male',
+    titleSuffix: 'erkek',
+  },
+  UNISEX: {
+    id: '9806ee2567a27cf4',
+    title: 'Unisex',
+    imageKey: 'unisex',
+    titleSuffix: 'unisex',
+  },
+};
+
+const SHOPIER_CATEGORY_BY_STOCK_CATEGORY = {
+  kadin: SHOPIER_CATEGORY.FEMALE,
+  erkek: SHOPIER_CATEGORY.MALE,
+  unisex: SHOPIER_CATEGORY.UNISEX,
+};
+
+function normalizeCategoryKey(category) {
+  return String(category || '')
+    .trim()
+    .toLocaleLowerCase('tr-TR')
+    .replace('ı', 'i');
+}
+
+function getShopierCategory(category) {
+  return SHOPIER_CATEGORY_BY_STOCK_CATEGORY[normalizeCategoryKey(category)] || null;
+}
+
+function getPublicFrontendOrigin(req) {
+  const origin = req.get('origin');
+
+  if (origin) {
+    return origin;
+  }
+
+  const forwardedProto = req.get('x-forwarded-proto');
+  const forwardedHost = req.get('x-forwarded-host');
+
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto.split(',')[0]}://${forwardedHost.split(',')[0]}`;
+  }
+
+  return '';
+}
+
+function getShopierImageBaseUrl(req) {
+  const baseUrl = process.env.SHOPIER_PRODUCT_IMAGE_BASE_URL;
+
+  if (baseUrl) {
+    return baseUrl.replace(/\/$/, '');
+  }
+
+  const publicFrontendOrigin = getPublicFrontendOrigin(req);
+
+  if (!publicFrontendOrigin) {
+    return '';
+  }
+
+  return `${publicFrontendOrigin.replace(/\/$/, '')}/perfume-formulas/shopier-products`;
+}
+
+function getShopierImageUrl(req, imageKey) {
+  const baseUrl = getShopierImageBaseUrl(req);
+
+  if (!baseUrl) {
+    return '';
+  }
+
+  return `${baseUrl}/${imageKey}.jpg`;
+}
+
+function isPublicMediaUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return false;
+    }
+
+    return !(
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '0.0.0.0' ||
+      hostname.startsWith('10.') ||
+      hostname.startsWith('192.168.') ||
+      /^172\.(1[6-9]|2\d|3[0-1])\./.test(hostname)
+    );
+  } catch (error) {
+    return false;
+  }
+}
+
+function formatShopierPrice(value) {
+  return Number(value || 0).toFixed(2);
+}
+
+function buildShopierDescription(stockRecord) {
+  return [
+    stockRecord.top_notes ? `Üst Notalar: ${stockRecord.top_notes}` : null,
+    stockRecord.middle_notes ? `Orta Notalar: ${stockRecord.middle_notes}` : null,
+    stockRecord.base_notes ? `Alt Notalar: ${stockRecord.base_notes}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function buildShopierPayload(req, stockRecord, overrides = {}) {
+  const category = getShopierCategory(overrides.category || stockRecord.category);
+
+  if (!category) {
+    throw new Error('Shopier kategorisi eslestirilemedi');
+  }
+
+  const mediaUrl = overrides.mediaUrl || getShopierImageUrl(req, category.imageKey);
+  const title =
+    overrides.title ||
+    `${stockRecord.brand_name} - ${stockRecord.perfume_name} - 50 ml ${category.titleSuffix} parfüm`;
+
+  return {
+    title,
+    description: overrides.description ?? buildShopierDescription(stockRecord),
+    type: 'physical',
+    media: [
+      {
+        type: 'image',
+        url: mediaUrl,
+        placement: 1,
+      },
+    ],
+    priceData: {
+      currency: 'TRY',
+      price: formatShopierPrice(overrides.price ?? stockRecord.shopier_price),
+      shippingPrice: formatShopierPrice(overrides.shippingPrice ?? 50),
+      discount: Boolean(overrides.discount ?? false),
+    },
+    stockQuantity: Number(overrides.stockQuantity ?? stockRecord.stock_quantity),
+    shippingPayer: 'sellerPays',
+    categories: [{ categoryId: overrides.categoryId || category.id }],
+  };
+}
 
 function getAutomationApiKey(req) {
   return (
@@ -37,6 +194,10 @@ function buildStockBaseQuery({ includeMaturingInfo = false } = {}) {
         translate_text(p.middle_notes) AS middle_notes,
         translate_text(p.base_notes) AS base_notes,
         s.price,
+        s.shopier_product_id,
+        s.shopier_product_name,
+        s.ikas_product_id,
+        s.ikas_product_name,
         FLOOR((((s.price + GREATEST(s.price * 0.50, 100) + 60) / 0.85) / 10)) * 10 AS dolap_price,
         CASE
           WHEN FLOOR((s.price + GREATEST(s.price * 0.80, 100)) / 10) * 10 < 300
@@ -79,6 +240,10 @@ function buildStockGroupByQuery() {
         p.middle_notes,
         p.base_notes,
         s.price,
+        s.shopier_product_id,
+        s.shopier_product_name,
+        s.ikas_product_id,
+        s.ikas_product_name,
         s.stock_quantity,
         s.category,
         p.perfume_id
@@ -127,6 +292,19 @@ async function updateStockRecord(pool, id, { stock_quantity, price }) {
 
   const query = `UPDATE "PerfumeStock" SET ${fields.join(', ')} WHERE id = $${paramIndex} RETURNING *`;
   return pool.query(query, values);
+}
+
+async function getStockRecordForShopier(pool, id) {
+  const result = await pool.query(
+    `
+      ${buildStockBaseQuery()}
+      WHERE s.id = $1
+      ${buildStockGroupByQuery()}
+    `,
+    [id]
+  );
+
+  return result.rows[0] || null;
 }
 
 // Create stock record (requires admin)
@@ -430,6 +608,263 @@ router.put('/automation/:id', async (req, res, next) => {
 
     res.json({
       message: 'Güncelleme başarılı',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/store-links', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { provider = 'shopier' } = req.query;
+    const pool = req.app.get('pool');
+
+    const stockResult = await pool.query(
+      `SELECT
+        id,
+        shopier_product_id,
+        shopier_product_name,
+        ikas_product_id,
+        ikas_product_name
+      FROM "PerfumeStock"
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (stockResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Kayıt bulunamadı' });
+    }
+
+    const stockRecord = stockResult.rows[0];
+    const products = await listStoreProducts({ provider });
+
+    res.json({
+      provider,
+      current: {
+        shopier: {
+          product_id: stockRecord.shopier_product_id,
+          product_name: stockRecord.shopier_product_name,
+        },
+        ikas: {
+          product_id: stockRecord.ikas_product_id,
+          product_name: stockRecord.ikas_product_name,
+        },
+      },
+      products,
+      providers: [
+        { id: 'shopier', label: 'Shopier', enabled: true },
+        { id: 'ikas', label: 'ikas', enabled: false },
+      ],
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/store-details', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const pool = req.app.get('pool');
+
+    const stockResult = await pool.query(
+      `SELECT
+        id,
+        shopier_product_id,
+        shopier_product_name
+      FROM "PerfumeStock"
+      WHERE id = $1`,
+      [id]
+    );
+
+    if (stockResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Kayit bulunamadi' });
+    }
+
+    const stockRecord = stockResult.rows[0];
+
+    if (!stockRecord.shopier_product_id) {
+      return res.json({
+        provider: 'shopier',
+        current: {
+          product_id: null,
+          product_name: null,
+        },
+        product: null,
+      });
+    }
+
+    const product = await getShopierProduct(stockRecord.shopier_product_id);
+
+    res.json({
+      provider: 'shopier',
+      current: {
+        product_id: stockRecord.shopier_product_id,
+        product_name: stockRecord.shopier_product_name,
+      },
+      product,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/shopier-product-preview', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const pool = req.app.get('pool');
+    const stockRecord = await getStockRecordForShopier(pool, id);
+
+    if (!stockRecord) {
+      return res.status(404).json({ error: 'Kayit bulunamadi' });
+    }
+
+    if (Number(stockRecord.stock_quantity) <= 0) {
+      return res.status(400).json({ error: 'Stok miktari 0 olan urun Shopier e eklenemez' });
+    }
+
+    if (stockRecord.shopier_product_id) {
+      return res.status(400).json({ error: 'Bu stok kaydi zaten Shopier urunu ile eslesmis' });
+    }
+
+    const category = getShopierCategory(stockRecord.category);
+
+    if (!category) {
+      return res.status(400).json({ error: 'Shopier kategorisi eslestirilemedi' });
+    }
+
+    const payload = buildShopierPayload(req, stockRecord);
+
+    res.json({
+      payload,
+      category,
+      imageBaseUrl: getShopierImageBaseUrl(req),
+      imageBaseUrlConfigured: Boolean(getShopierImageBaseUrl(req)),
+      mediaOptions: SHOPIER_CATEGORY,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/:id/shopier-product', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const pool = req.app.get('pool');
+    const stockRecord = await getStockRecordForShopier(pool, id);
+
+    if (!stockRecord) {
+      return res.status(404).json({ error: 'Kayit bulunamadi' });
+    }
+
+    if (Number(stockRecord.stock_quantity) <= 0) {
+      return res.status(400).json({ error: 'Stok miktari 0 olan urun Shopier e eklenemez' });
+    }
+
+    if (stockRecord.shopier_product_id) {
+      return res.status(400).json({ error: 'Bu stok kaydi zaten Shopier urunu ile eslesmis' });
+    }
+
+    const payload = buildShopierPayload(req, stockRecord, req.body || {});
+    const mediaUrl = payload.media?.[0]?.url;
+
+    if (!mediaUrl || !isPublicMediaUrl(mediaUrl)) {
+      return res.status(400).json({
+        error: 'Shopier icin public media URL gerekli. localhost veya local network adresi kullanilamaz.',
+      });
+    }
+
+    const product = await createShopierProduct(payload);
+
+    if (!product?.id) {
+      return res.status(502).json({ error: 'Shopier urun ID donmedi' });
+    }
+
+    const updateResult = await pool.query(
+      `UPDATE "PerfumeStock"
+      SET shopier_product_id = $1,
+          shopier_product_name = $2
+      WHERE id = $3
+      RETURNING id, shopier_product_id, shopier_product_name`,
+      [product.id, product.name || payload.title, id]
+    );
+
+    res.status(201).json({
+      message: 'Shopier urunu olusturuldu ve eslestirildi',
+      product,
+      data: updateResult.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/:id/store-links', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { provider, product_id, product_name } = req.body;
+    const pool = req.app.get('pool');
+
+    if (!provider || !['shopier', 'ikas'].includes(provider)) {
+      return res.status(400).json({ error: 'Geçerli bir provider gerekli' });
+    }
+
+    if (provider === 'ikas') {
+      return res.status(400).json({ error: 'ikas eşleştirmesi henüz aktif değil' });
+    }
+
+    if (!product_id || !product_name) {
+      return res.status(400).json({ error: 'product_id ve product_name gerekli' });
+    }
+
+    const result = await pool.query(
+      `UPDATE "PerfumeStock"
+      SET shopier_product_id = $1,
+          shopier_product_name = $2
+      WHERE id = $3
+      RETURNING id, shopier_product_id, shopier_product_name`,
+      [String(product_id), String(product_name), id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Kayıt bulunamadı' });
+    }
+
+    res.json({
+      message: 'Mağaza ürünü eşleştirildi',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/:id/store-links', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { provider = 'shopier' } = req.query;
+    const pool = req.app.get('pool');
+
+    if (provider !== 'shopier') {
+      return res.status(400).json({ error: 'Sadece Shopier eslestirmesi silinebilir' });
+    }
+
+    const result = await pool.query(
+      `UPDATE "PerfumeStock"
+      SET shopier_product_id = NULL,
+          shopier_product_name = NULL
+      WHERE id = $1
+      RETURNING id, shopier_product_id, shopier_product_name`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Kayit bulunamadi' });
+    }
+
+    res.json({
+      message: 'Shopier eslestirmesi silindi',
       data: result.rows[0],
     });
   } catch (error) {
