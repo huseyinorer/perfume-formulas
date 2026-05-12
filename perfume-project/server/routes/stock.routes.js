@@ -79,14 +79,14 @@ function getShopierImageBaseUrl(req) {
   return `${publicFrontendOrigin.replace(/\/$/, '')}/perfume-formulas/shopier-products`;
 }
 
-function getShopierImageUrl(req, imageKey) {
+function getShopierImageUrl(req, category) {
   const baseUrl = getShopierImageBaseUrl(req);
 
   if (!baseUrl) {
     return '';
   }
 
-  return `${baseUrl}/${imageKey}.jpg`;
+  return `${baseUrl}/${category.imageKey}.png`;
 }
 
 function isPublicMediaUrl(url) {
@@ -132,7 +132,7 @@ function buildShopierPayload(req, stockRecord, overrides = {}) {
     throw new Error('Shopier kategorisi eslestirilemedi');
   }
 
-  const mediaUrl = overrides.mediaUrl || getShopierImageUrl(req, category.imageKey);
+  const mediaUrl = overrides.mediaUrl || getShopierImageUrl(req, category);
   const title =
     overrides.title ||
     `${stockRecord.brand_name} - ${stockRecord.perfume_name} - 50 ml ${category.titleSuffix} parfüm`;
