@@ -4,6 +4,7 @@ import {
   createShopierProduct,
   getShopierProduct,
   listStoreProducts,
+  updateShopierProduct,
 } from '../services/storeCatalog.service.js';
 
 const router = express.Router();
@@ -794,6 +795,40 @@ router.post('/:id/shopier-product', authenticateToken, requireAdmin, async (req,
       message: 'Shopier urunu olusturuldu ve eslestirildi',
       product,
       data: updateResult.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/:id/shopier-product/sync', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const pool = req.app.get('pool');
+    const stockRecord = await getStockRecordForShopier(pool, id);
+
+    if (!stockRecord) {
+      return res.status(404).json({ error: 'Kayit bulunamadi' });
+    }
+
+    if (!stockRecord.shopier_product_id) {
+      return res.status(400).json({ error: 'Bu stok kaydi Shopier urunu ile eslesmemis' });
+    }
+
+    const updates = {
+      price: formatShopierPrice(stockRecord.shopier_price),
+      stockQuantity: Number(stockRecord.stock_quantity),
+    };
+    const product = await updateShopierProduct(stockRecord.shopier_product_id, updates);
+
+    res.json({
+      message: 'Shopier urunu guncellendi',
+      updates,
+      current: {
+        product_id: stockRecord.shopier_product_id,
+        product_name: stockRecord.shopier_product_name,
+      },
+      product,
     });
   } catch (error) {
     next(error);

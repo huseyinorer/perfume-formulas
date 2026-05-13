@@ -13,6 +13,7 @@ import favoritesRoutes from './routes/favorites.routes.js';
 import ratingsRoutes from './routes/ratings.routes.js';
 import brandsRoutes from './routes/brands.routes.js';
 import stockRoutes from './routes/stock.routes.js';
+import shopierWebhookRoutes from './routes/shopierWebhook.routes.js';
 
 // Import middleware
 import { authenticateToken } from './middleware/auth.middleware.js';
@@ -54,6 +55,11 @@ app.use(
     ],
     credentials: true, // Allow cookies to be sent
   })
+);
+app.use(
+  '/api/shopier/webhooks',
+  express.raw({ type: 'application/json' }),
+  shopierWebhookRoutes
 );
 app.use(express.json());
 app.use(cookieParser());

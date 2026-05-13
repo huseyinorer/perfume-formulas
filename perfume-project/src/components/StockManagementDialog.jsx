@@ -77,6 +77,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   const [selectedDetailPerfume, setSelectedDetailPerfume] = useState(null);
   const [shopierDetail, setShopierDetail] = useState(null);
   const [loadingShopierDetail, setLoadingShopierDetail] = useState(false);
+  const [updatingShopierProduct, setUpdatingShopierProduct] = useState(false);
   const [shopierDetailError, setShopierDetailError] = useState(null);
 
   const [isMaturationModalOpen, setIsMaturationModalOpen] = useState(false);
@@ -201,6 +202,35 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
       }
     } finally {
       if (!signal?.aborted) setLoadingShopierDetail(false);
+    }
+  };
+
+  const handleUpdateShopierProduct = async () => {
+    if (!selectedDetailPerfume?.shopier_product_id) return;
+
+    setUpdatingShopierProduct(true);
+    setShopierDetailError(null);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/perfume-stock/${selectedDetailPerfume.id}/shopier-product/sync`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Shopier urunu guncellenemedi');
+
+      setShopierDetail({
+        provider: 'shopier',
+        current: data.current,
+        product: data.product,
+      });
+    } catch (err) {
+      setShopierDetailError(err.message);
+    } finally {
+      setUpdatingShopierProduct(false);
     }
   };
 
@@ -920,19 +950,23 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                           Shopier Bilgileri
                         </h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                          Detail acildiginda eslesen Shopier urunu API'den sorgulanir.
+                          Stok adedi ve Shopier satis fiyati magaza urunune gonderilir.
                         </p>
                       </div>
                     </div>
 
                     <Button
                       type="button"
-                      disabled={loadingShopierDetail || !selectedDetailPerfume.shopier_product_id}
-                      onClick={() => loadShopierDetail(selectedDetailPerfume.id)}
+                      disabled={
+                        loadingShopierDetail ||
+                        updatingShopierProduct ||
+                        !selectedDetailPerfume.shopier_product_id
+                      }
+                      onClick={handleUpdateShopierProduct}
                       className="bg-slate-900 text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 dark:disabled:bg-slate-700 dark:disabled:text-slate-300"
                     >
                       <RefreshCcw className="mr-2 h-4 w-4" />
-                      Senkron Et
+                      {updatingShopierProduct ? 'Guncelleniyor...' : "Shopier'i Guncelle"}
                     </Button>
                   </div>
 
