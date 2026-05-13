@@ -14,9 +14,9 @@
         "lint:fix": "eslint . --ext ts,tsx,js,jsx --fix",
         "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\" \"server/**/*.{js,json}\"",
         "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\" \"server/**/*.{js,json}\"",
-        "migrate": "node-pg-migrate up",
-        "migrate:down": "node-pg-migrate down",
-        "migrate:create": "node-pg-migrate create"
+        "migrate": "node scripts/node-pg-migrate.cjs up",
+        "migrate:down": "node scripts/node-pg-migrate.cjs down",
+        "migrate:create": "node scripts/node-pg-migrate.cjs create"
     },
     "type": "module",
     "dependencies": {
