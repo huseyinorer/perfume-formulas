@@ -25,6 +25,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 10000;
 
+// Render terminates TLS and forwards requests through its proxy.
+// Trust the nearest proxy so rate limiting can use the client IP correctly.
+app.set('trust proxy', 1);
+
 // Database connection pool
 const pool = new Pool({
   user: process.env.DB_USER,
