@@ -804,6 +804,7 @@ router.post('/:id/shopier-product', authenticateToken, requireAdmin, async (req,
 router.put('/:id/shopier-product/sync', authenticateToken, requireAdmin, async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { title, price, stockQuantity } = req.body || {};
     const pool = req.app.get('pool');
     const stockRecord = await getStockRecordForShopier(pool, id);
 
@@ -816,17 +817,48 @@ router.put('/:id/shopier-product/sync', authenticateToken, requireAdmin, async (
     }
 
     const updates = {
-      price: formatShopierPrice(stockRecord.shopier_price),
-      stockQuantity: Number(stockRecord.stock_quantity),
+      title: title !== undefined ? String(title).trim() : undefined,
+      price: price !== undefined ? formatShopierPrice(price) : formatShopierPrice(stockRecord.shopier_price),
+      stockQuantity:
+        stockQuantity !== undefined ? Number(stockQuantity) : Number(stockRecord.stock_quantity),
     };
+
+    if (updates.title !== undefined && !updates.title) {
+      return res.status(400).json({ error: 'Shopier urun adi bos olamaz' });
+    }
+
+    if (price !== undefined && !String(price).trim()) {
+      return res.status(400).json({ error: 'Shopier fiyati bos olamaz' });
+    }
+
+    if (stockQuantity !== undefined && !String(stockQuantity).trim()) {
+      return res.status(400).json({ error: 'Shopier stok adedi bos olamaz' });
+    }
+
+    if (Number.isNaN(Number(updates.price)) || Number(updates.price) < 0) {
+      return res.status(400).json({ error: 'Shopier fiyati pozitif bir sayi olmali' });
+    }
+
+    if (!Number.isInteger(updates.stockQuantity) || updates.stockQuantity < 0) {
+      return res.status(400).json({ error: 'Shopier stok adedi pozitif bir tam sayi olmali' });
+    }
+
     const product = await updateShopierProduct(stockRecord.shopier_product_id, updates);
+    const productName = product?.name || updates.title || stockRecord.shopier_product_name;
+
+    if (productName !== stockRecord.shopier_product_name) {
+      await pool.query('UPDATE "PerfumeStock" SET shopier_product_name = $1 WHERE id = $2', [
+        productName,
+        id,
+      ]);
+    }
 
     res.json({
       message: 'Shopier urunu guncellendi',
       updates,
       current: {
         product_id: stockRecord.shopier_product_id,
-        product_name: stockRecord.shopier_product_name,
+        product_name: productName,
       },
       product,
     });

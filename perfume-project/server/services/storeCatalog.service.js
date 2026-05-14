@@ -107,7 +107,7 @@ export async function getShopierProduct(productId) {
   return normalizeShopierProduct(data);
 }
 
-export async function updateShopierProduct(productId, { price, stockQuantity }) {
+export async function updateShopierProduct(productId, { title, price, stockQuantity }) {
   const sdk = getShopierSdk();
 
   if (!sdk) {
@@ -115,6 +115,10 @@ export async function updateShopierProduct(productId, { price, stockQuantity }) 
   }
 
   const body = {};
+
+  if (title !== undefined && title !== null) {
+    body.title = String(title).trim();
+  }
 
   if (price !== undefined && price !== null) {
     body.priceData = { price: String(price) };

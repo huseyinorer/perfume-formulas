@@ -8,7 +8,8 @@ const Pagination = ({
   onPageChange, 
   pageSize, 
   onPageSizeChange, 
-  totalItems 
+  totalItems,
+  pageSizeOptions = [10, 50, 100],
 }) => {
   return (
     <div className="flex items-center justify-between px-2 py-4">
@@ -22,9 +23,11 @@ const Pagination = ({
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
         >
-          <option value={10}>10</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
+          {pageSizeOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
       </div>
       

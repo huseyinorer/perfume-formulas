@@ -49,19 +49,55 @@ const emptyShopierProductForm = {
   categoryId: '',
   mediaUrl: '',
 };
+const emptyShopierUpdateForm = {
+  title: '',
+  price: '',
+  stockQuantity: '',
+};
 
 const formatCurrency = (value) => `₺${value ?? 0}`;
 
+const calculateShopierPrice = (cost) => {
+  const numericCost = Number(cost) || 0;
+  return Math.floor(((numericCost + Math.max(numericCost * 0.6, 100) + 100) / 0.94 / 10)) * 10;
+};
+
+const getShopierStatusDisplay = (status) => {
+  if (status === 'inStock') {
+    return {
+      label: 'Stokta',
+      className:
+        'border-green-200 bg-green-100 text-green-700 dark:border-green-800 dark:bg-green-950/60 dark:text-green-300',
+    };
+  }
+
+  if (status === 'outOfStock') {
+    return {
+      label: 'Stok Dışı',
+      className:
+        'border-red-200 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300',
+    };
+  }
+
+  return {
+    label: '-',
+    className:
+      'border-slate-200 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  };
+};
+
 const getTodayInputDate = () => new Date().toISOString().split('T')[0];
 
-const StockManagementDialog = ({ open, onOpenChange }) => {
+const StockManagementDialog = ({ open = false, onOpenChange, variant = 'dialog' }) => {
   const API_URL = import.meta.env.VITE_API_URL;
+  const isPage = variant === 'page';
+  const isActive = isPage || open;
 
   const [isAddStockDialogOpen, setIsAddStockDialogOpen] = useState(false);
   const [stockList, setStockList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -79,6 +115,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   const [loadingShopierDetail, setLoadingShopierDetail] = useState(false);
   const [updatingShopierProduct, setUpdatingShopierProduct] = useState(false);
   const [shopierDetailError, setShopierDetailError] = useState(null);
+  const [shopierUpdateForm, setShopierUpdateForm] = useState(emptyShopierUpdateForm);
 
   const [isMaturationModalOpen, setIsMaturationModalOpen] = useState(false);
   const [selectedMaturationPerfume, setSelectedMaturationPerfume] = useState(null);
@@ -108,11 +145,11 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!isActive) return;
     const abortController = new AbortController();
     fetchStockList(abortController.signal);
     return () => abortController.abort();
-  }, [open, debouncedSearchTerm, currentPage, pageSize]);
+  }, [isActive, debouncedSearchTerm, currentPage, pageSize]);
 
   useEffect(() => {
     if (!isStoreModalOpen || !selectedStorePerfume) return;
@@ -188,6 +225,7 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
     setLoadingShopierDetail(true);
     setShopierDetailError(null);
     setShopierDetail(null);
+    setShopierUpdateForm(emptyShopierUpdateForm);
 
     try {
       const response = await fetch(`${API_URL}/perfume-stock/${stockId}/store-details`, {
@@ -195,7 +233,23 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         signal,
       });
       if (!response.ok) throw new Error('Shopier detaylari alinamadi');
-      setShopierDetail(await response.json());
+      const data = await response.json();
+      setShopierDetail(data);
+      setShopierUpdateForm({
+        title: data.product?.name || data.current?.product_name || '',
+        price:
+          data.product?.price !== undefined && data.product?.price !== null
+            ? String(data.product.price)
+            : selectedDetailPerfume?.shopier_price !== undefined
+              ? String(selectedDetailPerfume.shopier_price)
+              : '',
+        stockQuantity:
+          data.product?.stock !== undefined && data.product?.stock !== null
+            ? String(data.product.stock)
+            : selectedDetailPerfume?.stock_quantity !== undefined
+              ? String(selectedDetailPerfume.stock_quantity)
+              : '',
+      });
     } catch (err) {
       if (err.name !== 'AbortError') {
         setShopierDetailError(err.message);
@@ -208,6 +262,29 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
   const handleUpdateShopierProduct = async () => {
     if (!selectedDetailPerfume?.shopier_product_id) return;
 
+    const title = shopierUpdateForm.title.trim();
+    const rawPrice = String(shopierUpdateForm.price).trim();
+    const rawStockQuantity = String(shopierUpdateForm.stockQuantity).trim();
+    const formPrice = Number(shopierUpdateForm.price);
+    const stockQuantity = Number(shopierUpdateForm.stockQuantity);
+    const expectedShopierPrice = calculateShopierPrice(selectedDetailPerfume.price);
+    const shopierPrice = Number(shopierDetail?.product?.price);
+    const hasShopierPriceMismatch =
+      Number.isFinite(shopierPrice) &&
+      Number.isFinite(expectedShopierPrice) &&
+      Math.abs(shopierPrice - expectedShopierPrice) >= 0.01;
+    const price = hasShopierPriceMismatch ? expectedShopierPrice : formPrice;
+
+    if (!title) return setShopierDetailError('Shopier urun adi bos olamaz');
+    if (!rawPrice) return setShopierDetailError('Shopier fiyati bos olamaz');
+    if (!rawStockQuantity) return setShopierDetailError('Shopier stok adedi bos olamaz');
+    if (Number.isNaN(formPrice) || formPrice < 0) {
+      return setShopierDetailError('Shopier fiyati pozitif bir sayi olmali');
+    }
+    if (!Number.isInteger(stockQuantity) || stockQuantity < 0) {
+      return setShopierDetailError('Shopier stok adedi pozitif bir tam sayi olmali');
+    }
+
     setUpdatingShopierProduct(true);
     setShopierDetailError(null);
 
@@ -216,7 +293,15 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         `${API_URL}/perfume-stock/${selectedDetailPerfume.id}/shopier-product/sync`,
         {
           method: 'PUT',
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({
+            title,
+            price,
+            stockQuantity,
+          }),
         }
       );
       const data = await response.json();
@@ -226,6 +311,17 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         provider: 'shopier',
         current: data.current,
         product: data.product,
+      });
+      setShopierUpdateForm({
+        title: data.product?.name || data.current?.product_name || title,
+        price:
+          data.product?.price !== undefined && data.product?.price !== null
+            ? String(data.product.price)
+            : String(price),
+        stockQuantity:
+          data.product?.stock !== undefined && data.product?.stock !== null
+            ? String(data.product.stock)
+            : String(stockQuantity),
       });
     } catch (err) {
       setShopierDetailError(err.message);
@@ -258,6 +354,28 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         body: JSON.stringify(updates),
       });
       if (!response.ok) throw new Error('Stok güncellenemedi');
+      setStockList((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                ...updates,
+                shopier_price:
+                  updates.price !== undefined ? calculateShopierPrice(updates.price) : item.shopier_price,
+              }
+            : item
+        )
+      );
+      setSelectedDetailPerfume((prev) =>
+        prev?.id === id
+          ? {
+              ...prev,
+              ...updates,
+              shopier_price:
+                updates.price !== undefined ? calculateShopierPrice(updates.price) : prev.shopier_price,
+            }
+          : prev
+      );
       setEditingStock(null);
       setNewStockQuantity('');
       setNewPrice('');
@@ -519,15 +637,20 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
         { label: 'Alt Notalar', value: selectedDetailPerfume.base_notes },
       ]
     : [];
+  const shopierStatusDisplay = getShopierStatusDisplay(shopierDetail?.product?.status);
+  const expectedShopierPrice = selectedDetailPerfume
+    ? calculateShopierPrice(selectedDetailPerfume.price)
+    : null;
+  const actualShopierPrice = Number(shopierDetail?.product?.price);
+  const hasShopierPriceMismatch =
+    selectedDetailPerfume?.shopier_product_id &&
+    shopierDetail?.product &&
+    Number.isFinite(actualShopierPrice) &&
+    Number.isFinite(expectedShopierPrice) &&
+    Math.abs(actualShopierPrice - expectedShopierPrice) >= 0.01;
 
-  return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Stok Yönetimi</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
+  const stockContent = (
+    <div className="space-y-4">
             <div className="relative max-w-sm">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
               <Input
@@ -807,15 +930,40 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
                     pageSize={pageSize}
-                    onPageSizeChange={setPageSize}
+                    onPageSizeChange={(value) => {
+                      setPageSize(value);
+                      setCurrentPage(1);
+                    }}
                     totalItems={totalItems}
+                    pageSizeOptions={[25, 50, 100]}
                   />
                 </div>
               </>
             )}
+    </div>
+  );
+
+  return (
+    <>
+      {isPage ? (
+        <div className="space-y-6 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+              Stok Yönetimi
+            </h1>
           </div>
-        </DialogContent>
-      </Dialog>
+          {stockContent}
+        </div>
+      ) : (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Stok Yönetimi</DialogTitle>
+            </DialogHeader>
+            {stockContent}
+          </DialogContent>
+        </Dialog>
+      )}
 
       <Dialog open={isDetailModalOpen} onOpenChange={() => setIsDetailModalOpen(false)}>
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
@@ -963,7 +1111,9 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                         !selectedDetailPerfume.shopier_product_id
                       }
                       onClick={handleUpdateShopierProduct}
-                      className="bg-slate-900 text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 dark:disabled:bg-slate-700 dark:disabled:text-slate-300"
+                      className={`bg-slate-900 text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 dark:disabled:bg-slate-700 dark:disabled:text-slate-300 ${
+                        hasShopierPriceMismatch ? 'animate-pulse ring-2 ring-amber-400 ring-offset-2 dark:ring-offset-slate-900' : ''
+                      }`}
                     >
                       <RefreshCcw className="mr-2 h-4 w-4" />
                       {updatingShopierProduct ? 'Guncelleniyor...' : "Shopier'i Guncelle"}
@@ -976,44 +1126,99 @@ const StockManagementDialog = ({ open, onOpenChange }) => {
                     </div>
                   )}
 
-                  <div className="grid gap-4 px-6 py-6 md:grid-cols-2">
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 shadow-inner shadow-slate-100/60 dark:border-slate-700 dark:bg-slate-800/70 dark:shadow-none">
-                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Shopier Ürün Adı
-                      </p>
-                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
-                        {loadingShopierDetail
-                          ? 'Yukleniyor...'
-                          : shopierDetail?.product?.name ||
-                            shopierDetail?.current?.product_name ||
-                            'Henuz eslestirilmedi'}
-                      </p>
-                      {shopierDetail?.current?.product_id && (
-                        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                          ID: {shopierDetail.current.product_id}
-                        </p>
-                      )}
+                  {hasShopierPriceMismatch && (
+                    <div className="mx-6 mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+                      Maliyet fiyatınızla Shopier fiyatı uyuşmamaktadır. Güncellemek için
+                      Shopier'i Güncelle'ye tıklayın. Beklenen Shopier fiyatı:{' '}
+                      {formatCurrency(expectedShopierPrice)}.
                     </div>
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 shadow-inner shadow-slate-100/60 dark:border-slate-700 dark:bg-slate-800/70 dark:shadow-none">
-                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Shopier Fiyat / Stok
-                      </p>
-                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
-                        {loadingShopierDetail
-                          ? 'Yukleniyor...'
-                          : shopierDetail?.product
-                            ? `${formatCurrency(shopierDetail.product.price)} / ${
-                                shopierDetail.product.stock ?? '-'
-                              } adet`
-                            : selectedDetailPerfume.shopier_product_id
-                              ? 'Shopier urun detayi bulunamadi'
-                              : 'Eslestirme yok'}
-                      </p>
-                      {shopierDetail?.product?.status && (
-                        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                          Durum: {shopierDetail.product.status}
+                  )}
+
+                  <div className="space-y-5 px-6 py-6">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                          Shopier ID
                         </p>
-                      )}
+                        <p className="mt-2 text-sm font-medium text-slate-800 dark:text-slate-100">
+                          {loadingShopierDetail
+                            ? 'Yukleniyor...'
+                            : shopierDetail?.current?.product_id || 'Eslestirme yok'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                          Durum
+                        </p>
+                        {loadingShopierDetail ? (
+                          <p className="mt-2 text-sm font-medium text-slate-800 dark:text-slate-100">
+                            Yukleniyor...
+                          </p>
+                        ) : (
+                          <span
+                            className={`mt-2 inline-flex rounded-full border px-3 py-1 text-sm font-semibold ${shopierStatusDisplay.className}`}
+                          >
+                            {shopierStatusDisplay.label}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <div className="space-y-2 md:col-span-3">
+                        <Label htmlFor="shopier-update-title">Ürün Adı</Label>
+                        <Input
+                          id="shopier-update-title"
+                          value={shopierUpdateForm.title}
+                          disabled={
+                            loadingShopierDetail ||
+                            updatingShopierProduct ||
+                            !selectedDetailPerfume.shopier_product_id
+                          }
+                          onChange={(e) =>
+                            setShopierUpdateForm((prev) => ({ ...prev, title: e.target.value }))
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shopier-update-price">Fiyat</Label>
+                        <Input
+                          id="shopier-update-price"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={shopierUpdateForm.price}
+                          disabled={
+                            loadingShopierDetail ||
+                            updatingShopierProduct ||
+                            !selectedDetailPerfume.shopier_product_id
+                          }
+                          onChange={(e) =>
+                            setShopierUpdateForm((prev) => ({ ...prev, price: e.target.value }))
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shopier-update-stock">Adet</Label>
+                        <Input
+                          id="shopier-update-stock"
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={shopierUpdateForm.stockQuantity}
+                          disabled={
+                            loadingShopierDetail ||
+                            updatingShopierProduct ||
+                            !selectedDetailPerfume.shopier_product_id
+                          }
+                          onChange={(e) =>
+                            setShopierUpdateForm((prev) => ({
+                              ...prev,
+                              stockQuantity: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 </CardContent>

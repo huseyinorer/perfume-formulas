@@ -5,12 +5,14 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     setUser(null);
     setIsLoggedIn(false);
     setIsAdmin(false);
+    setAuthChecked(true);
   }, []);
 
   const loadUserFromToken = useCallback(() => {
@@ -18,6 +20,7 @@ export const useAuth = () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
+        setAuthChecked(true);
         return;
       }
 
@@ -26,6 +29,7 @@ export const useAuth = () => {
       if (!base64Url) {
         console.error("Invalid token format");
         handleLogout();
+        setAuthChecked(true);
         return;
       }
 
@@ -48,6 +52,7 @@ export const useAuth = () => {
       if (Date.now() >= expirationTime) {
         console.log("Token expired, logging out");
         handleLogout();
+        setAuthChecked(true);
         return;
       }
 
@@ -55,6 +60,7 @@ export const useAuth = () => {
       setUser(payload);
       setIsLoggedIn(true);
       setIsAdmin(!!payload.isAdmin);
+      setAuthChecked(true);
 
       // Token süresi dolmadan önce otomatik logout için timer
       const timeUntilExpiry = expirationTime - Date.now();
@@ -68,6 +74,7 @@ export const useAuth = () => {
     } catch (error) {
       console.error("Error parsing token:", error);
       handleLogout();
+      setAuthChecked(true);
     }
   }, [handleLogout]);
 
@@ -81,12 +88,14 @@ export const useAuth = () => {
     setUser(user);
     setIsLoggedIn(true);
     setIsAdmin(!!user.isAdmin);
+    setAuthChecked(true);
   };
 
   return {
     user,
     isLoggedIn,
     isAdmin,
+    authChecked,
     handleLogin,
     handleLogout,
     loadUserFromToken

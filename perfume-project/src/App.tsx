@@ -33,7 +33,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   // Hooks
-  const { user, isLoggedIn, isAdmin, handleLogin, handleLogout } = useAuth();
+  const { user, isLoggedIn, isAdmin, authChecked, handleLogin, handleLogout } = useAuth();
   const {
     perfumes,
     currentPage,
@@ -69,11 +69,13 @@ function App() {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPerfumeManagementOpen, setIsPerfumeManagementOpen] = useState(false);
-  const [isStockManagementOpen, setIsStockManagementOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [selectedFormulaId, setSelectedFormulaId] = useState<number | null>(null);
   const [showComments, setShowComments] = useState(false);
+  const isStockManagementPage = window.location.pathname.replace(/\/$/, '').endsWith('/stock-management');
+  const homeUrl = import.meta.env.BASE_URL;
+  const stockManagementUrl = `${import.meta.env.BASE_URL}stock-management`;
 
   // Handlers
   const handleRowClick = async (perfume: Perfume) => {
@@ -153,7 +155,13 @@ function App() {
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-gray-900 to-gray-700 p-3 rounded-lg">
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = homeUrl;
+              }}
+              className="bg-gradient-to-r from-gray-900 to-gray-700 p-3 rounded-lg text-left transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            >
               <h1 className="text font-bold text-white">
                 Parfüm Formülleri
                 {isAdmin && (
@@ -162,7 +170,7 @@ function App() {
                   </span>
                 )}
               </h1>
-            </div>
+            </button>
           </div>
 
           <div className="flex flex-wrap justify-center md:justify-end items-center gap-3">
@@ -214,7 +222,9 @@ function App() {
                   pendingRequestsCount={pendingRequests.length}
                   onPendingRequestsClick={() => setIsPendingDialogOpen(true)}
                   onAddPerfumeClick={() => setIsPerfumeManagementOpen(true)}
-                  onStockManagementClick={() => setIsStockManagementOpen(true)}
+                  onStockManagementClick={() => {
+                    window.location.href = stockManagementUrl;
+                  }}
                   onChangePasswordClick={() => setIsChangePasswordOpen(true)}
                   onLogout={handleLogout}
                   username={user?.username || ''}
@@ -252,6 +262,25 @@ function App() {
         </div>
       </div>
 
+      {isStockManagementPage ? (
+        !authChecked ? (
+          <div className="rounded-lg bg-white p-6 text-center shadow dark:bg-gray-800 dark:text-gray-100">
+            Yükleniyor...
+          </div>
+        ) : !isAdmin ? (
+          <div className="rounded-lg bg-white p-6 text-center shadow dark:bg-gray-800">
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              Yetkisiz erişim
+            </h1>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Stok yönetimi sayfasını yalnızca admin kullanıcılar görüntüleyebilir.
+            </p>
+          </div>
+        ) : (
+          <StockManagementDialog variant="page" />
+        )
+      ) : (
+        <>
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
           {/* Ikas Store Banner - 6 grid */}
@@ -437,6 +466,8 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
+        </>
+      )}
 
       {/* Other Dialogs */}
       <AddFormulaDialog
@@ -468,8 +499,6 @@ function App() {
         onOpenChange={setIsPerfumeManagementOpen}
         onUpdate={fetchPerfumes}
       />
-
-      <StockManagementDialog open={isStockManagementOpen} onOpenChange={setIsStockManagementOpen} />
 
       <FavoritesDialog
         open={isFavoritesOpen}
