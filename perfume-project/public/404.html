@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parfum Formulleri</title>
+    <script>
+      (function () {
+        var basePath = '/perfume-formulas/';
+        var targetPath = window.location.pathname + window.location.search + window.location.hash;
+
+        window.location.replace(
+          basePath + '?redirect=' + encodeURIComponent(targetPath)
+        );
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

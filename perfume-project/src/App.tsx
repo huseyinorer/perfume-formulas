@@ -31,7 +31,20 @@ import { Perfume, FormulaRequest } from './types/api.types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const restoreGithubPagesPath = () => {
+  const params = new URLSearchParams(window.location.search);
+  const redirectPath = params.get('redirect');
+
+  if (!redirectPath) {
+    return;
+  }
+
+  window.history.replaceState(null, '', redirectPath);
+};
+
 function App() {
+  restoreGithubPagesPath();
+
   // Hooks
   const { user, isLoggedIn, isAdmin, authChecked, handleLogin, handleLogout } = useAuth();
   const {
