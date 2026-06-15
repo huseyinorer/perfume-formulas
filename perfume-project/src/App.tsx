@@ -299,7 +299,7 @@ function App() {
           {/* Ikas Store Banner - 6 grid */}
           <div className="md:col-span-6">
             <a
-              href="https://soultraceperfumes.ikas.shop/"
+              href="https://www.shopier.com/soultrace"
               target="_blank"
               rel="noopener noreferrer"
               className="block h-full"
