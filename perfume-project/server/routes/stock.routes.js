@@ -116,6 +116,11 @@ function formatShopierPrice(value) {
   return Number(value || 0).toFixed(2);
 }
 
+function calculateShopierPrice(cost) {
+  const numericCost = Number(cost) || 0;
+  return Math.floor(((numericCost + Math.max(numericCost * 0.6, 100) + 100) / 0.94 / 10)) * 10;
+}
+
 function buildShopierDescription(stockRecord) {
   return [
     stockRecord.top_notes ? `Üst Notalar: ${stockRecord.top_notes}` : null,
@@ -295,6 +300,55 @@ async function updateStockRecord(pool, id, { stock_quantity, price }) {
   return pool.query(query, values);
 }
 
+async function syncShopierForStockUpdate(stockRecord, { stock_quantity, price }) {
+  if (!stockRecord.shopier_product_id) {
+    return {
+      status: 'skipped',
+      reason: 'not_linked',
+    };
+  }
+
+  const nextStockQuantity =
+    stock_quantity !== undefined && stock_quantity !== null
+      ? Number(stock_quantity)
+      : Number(stockRecord.stock_quantity);
+  const nextShopierPrice = calculateShopierPrice(
+    price !== undefined && price !== null ? price : stockRecord.price
+  );
+
+  const product = await updateShopierProduct(stockRecord.shopier_product_id, {
+    price: formatShopierPrice(nextShopierPrice),
+    stockQuantity: nextStockQuantity,
+  });
+
+  return {
+    status: 'synced',
+    product_id: stockRecord.shopier_product_id,
+    price: formatShopierPrice(nextShopierPrice),
+    stockQuantity: nextStockQuantity,
+    product,
+  };
+}
+
+async function updateStockRecordWithShopierSync(pool, id, updates) {
+  const stockRecord = await getStockRecordForShopier(pool, id);
+
+  if (!stockRecord) {
+    return {
+      result: { rowCount: 0, rows: [] },
+      shopierSync: null,
+    };
+  }
+
+  const shopierSync = await syncShopierForStockUpdate(stockRecord, updates);
+  const result = await updateStockRecord(pool, id, updates);
+
+  return {
+    result,
+    shopierSync,
+  };
+}
+
 async function getStockRecordForShopier(pool, id) {
   const result = await pool.query(
     `
@@ -413,15 +467,22 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res, next) => {
 
   try {
     const pool = req.app.get('pool');
-    const result = await updateStockRecord(pool, id, { stock_quantity, price });
+    const { result, shopierSync } = await updateStockRecordWithShopierSync(pool, id, {
+      stock_quantity,
+      price,
+    });
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Kayıt bulunamadı' });
     }
 
     res.json({
-      message: 'Güncelleme başarılı',
+      message:
+        shopierSync?.status === 'synced'
+          ? 'Güncelleme başarılı, Shopier senkronize edildi'
+          : 'Güncelleme başarılı',
       data: result.rows[0],
+      shopier_sync: shopierSync,
     });
   } catch (error) {
     next(error);
@@ -601,15 +662,22 @@ router.put('/automation/:id', async (req, res, next) => {
 
   try {
     const pool = req.app.get('pool');
-    const result = await updateStockRecord(pool, id, { stock_quantity, price });
+    const { result, shopierSync } = await updateStockRecordWithShopierSync(pool, id, {
+      stock_quantity,
+      price,
+    });
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Kayıt bulunamadı' });
     }
 
     res.json({
-      message: 'Güncelleme başarılı',
+      message:
+        shopierSync?.status === 'synced'
+          ? 'Güncelleme başarılı, Shopier senkronize edildi'
+          : 'Güncelleme başarılı',
       data: result.rows[0],
+      shopier_sync: shopierSync,
     });
   } catch (error) {
     next(error);

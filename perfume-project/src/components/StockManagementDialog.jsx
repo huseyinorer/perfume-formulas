@@ -353,7 +353,8 @@ const StockManagementDialog = ({ open = false, onOpenChange, variant = 'dialog' 
         },
         body: JSON.stringify(updates),
       });
-      if (!response.ok) throw new Error('Stok güncellenemedi');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Stok güncellenemedi');
       setStockList((prev) =>
         prev.map((item) =>
           item.id === id
