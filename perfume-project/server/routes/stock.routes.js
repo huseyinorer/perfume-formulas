@@ -206,8 +206,8 @@ function buildStockBaseQuery({ includeMaturingInfo = false } = {}) {
         s.ikas_product_name,
         FLOOR((((s.price + GREATEST(s.price * 0.50, 100) + 60) / 0.85) / 10)) * 10 AS dolap_price,
         CASE
-          WHEN FLOOR((s.price + GREATEST(s.price * 0.80, 100)) / 10) * 10 < 300
-            THEN 300
+          WHEN FLOOR((s.price + GREATEST(s.price * 0.80, 100)) / 10) * 10 < 400
+            THEN 400
           ELSE FLOOR((s.price + GREATEST(s.price * 0.80, 100)) / 10) * 10
         END AS cash_price,
         FLOOR((((s.price + GREATEST(s.price * 0.60, 100) + 100) / 0.94) / 10)) * 10 AS shopier_price,

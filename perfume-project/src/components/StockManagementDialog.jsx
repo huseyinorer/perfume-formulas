@@ -754,6 +754,7 @@ const StockManagementDialog = ({ open = false, onOpenChange, variant = 'dialog' 
                           )}
                         </span>
                       </TableHead>
+                      <TableHead className="dark:text-gray-300">Fiyat</TableHead>
                       <TableHead className="dark:text-gray-300">Kategori</TableHead>
                       <TableHead className="dark:text-gray-300">Demlenme Bilgisi</TableHead>
                       <TableHead className="dark:text-gray-300 text-center">Shopier</TableHead>
@@ -792,6 +793,13 @@ const StockManagementDialog = ({ open = false, onOpenChange, variant = 'dialog' 
                           ) : (
                             formatCurrency(item.price)
                           )}
+                        </TableCell>
+                        <TableCell className="dark:text-gray-300">
+                          <div className="flex flex-col gap-0.5 text-xs leading-tight">
+                            <span><span className="font-medium text-emerald-600 dark:text-emerald-400">Elden:</span> {formatCurrency(item.cash_price)}</span>
+                            <span><span className="font-medium text-blue-600 dark:text-blue-400">Shopier:</span> {formatCurrency(item.shopier_price)}</span>
+                            <span><span className="font-medium text-orange-600 dark:text-orange-400">Dolap:</span> {formatCurrency(item.dolap_price)}</span>
+                          </div>
                         </TableCell>
                         <TableCell className="dark:text-gray-300">{item.category || '-'}</TableCell>
                         <TableCell className="max-w-xs">
