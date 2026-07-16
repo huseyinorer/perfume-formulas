@@ -59,7 +59,9 @@ const formatCurrency = (value) => `₺${value ?? 0}`;
 
 const calculateShopierPrice = (cost) => {
   const numericCost = Number(cost) || 0;
-  return Math.floor(((numericCost + Math.max(numericCost * 0.6, 100) + 100) / 0.94 / 10)) * 10;
+  const basePrice = Math.floor(((numericCost + Math.max(numericCost * 0.75, 100) + 100) / 0.94 / 10)) * 10;
+  if (numericCost >= 140 && basePrice < 450) return 450;
+  return basePrice;
 };
 
 const getShopierStatusDisplay = (status) => {
